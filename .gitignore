@@ -13,3 +13,10 @@ webserv
 vgcore.*
 .DS_Store
 out
+
+# studies
+showip
+server
+client
+poll
+pollserver
