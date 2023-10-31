@@ -1,7 +1,7 @@
 ### O que é CGI?
 CGI significa Common Gateway Interface. É um padrão para executar programas em um servidor web. O servidor web pode ser configurado para executar um programa quando um recurso específico for solicitado. O programa pode ser escrito em qualquer linguagem de programação. O programa é executado e a saída é enviada de volta ao cliente. O programa pode ser usado para gerar uma página da web dinamicamente.
 
-###Uma analogia
+### Uma analogia
 Imagine que você esteja num restaurante. O menu (website) oferece várias opções de pratos (informações). Mas, em vez de escolher algo que já está pronto, você deseja algo personalizado, algo que ainda não foi preparado.
 
 #### Aqui entra o CGI:
