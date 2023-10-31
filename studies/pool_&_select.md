@@ -1,3 +1,8 @@
+# Loop principal do programa
+
+Essas duas funções podem ser utilizadas para ler os fds e as informações necessárias para que o projeto funcione.
+Todas as funções que são referentes à esta funcionalidade: ```select, poll, epoll (epoll_create, epoll_ctl, epoll_wait), kqueue (kqueue, kevent)```
+
 ## Pool
 
 Headers necessários para usar no C/C++:
