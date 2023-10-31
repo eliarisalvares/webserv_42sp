@@ -1,10 +1,10 @@
-O que é CGI?
+### O que é CGI?
 CGI significa Common Gateway Interface. É um padrão para executar programas em um servidor web. O servidor web pode ser configurado para executar um programa quando um recurso específico for solicitado. O programa pode ser escrito em qualquer linguagem de programação. O programa é executado e a saída é enviada de volta ao cliente. O programa pode ser usado para gerar uma página da web dinamicamente.
 
-Uma analogia
+### Uma analogia
 Imagine que você esteja num restaurante. O menu (website) oferece várias opções de pratos (informações). Mas, em vez de escolher algo que já está pronto, você deseja algo personalizado, algo que ainda não foi preparado.
 
-Aqui entra o CGI:
+#### Aqui entra o CGI:
 
 O Garçom (Web Browser): Você diz ao garçom o que deseja.
 A Cozinha (Servidor Web): O garçom leva seu pedido à cozinha. A cozinha representa o servidor web.
@@ -42,7 +42,7 @@ Uso: Embora o CGI ainda possa ser usado em alguns contextos, muitos desenvolvedo
 
 Em resumo, enquanto o CGI é uma técnica específica para permitir a comunicação entre um servidor web e programas externos, o backend é um termo mais amplo que abrange toda a infraestrutura e lógica de servidor de um sistema ou aplicativo web.
 
-Arquivo de configuração e CGI:
+### Arquivo de configuração e CGI:
 O arquivo deve conter a extensão para execução de CGI, que pode ser implementado usando Python ou Perl ou PHP ou qualquer outra linguagem de script. Por exemplo, se a url for /index.php, o servidor deve executar o arquivo index.php no diretório raiz do servidor.
 O CGI não deve ser chamado diretamente, mas seu path deve ser configurado no arquivo de configuração como PATH_INFO.
 Para requisições chunked, o servidor deve ser capaz de receber e enviar dados em chunks. O CGI vai esperar que EOF seja o fim do corpo da mensagem.
