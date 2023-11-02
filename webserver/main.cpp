@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 15:30:55 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/02 16:05:21 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <vector>
 
 // vamos usar para cada server do arquivo de config
 int	get_server_socket()
@@ -69,43 +70,32 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 // Add a new file descriptor to the set
-void add_to_pfds(struct pollfd *pfds[], int newfd, int *fd_count, int *fd_size)
+void add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 {
-	// If we don't have room, add more space in the pfds array
-	if (*fd_count == *fd_size) {
-		*fd_size *= 2; // Double it
+	struct pollfd a;
 
-		*pfds = (pollfd *)realloc(*pfds, sizeof(**pfds) * (*fd_size));
-	}
-
-	(*pfds)[*fd_count].fd = newfd;
-	(*pfds)[*fd_count].events = POLLIN | POLLOUT; // Check ready-to-read + write
-
-	(*fd_count)++;
+	a.fd = newfd;
+	a.events = POLLIN | POLLOUT; // Check ready-to-read + write
+	
+	pfds->push_back(a);
 }
 
 // Remove an index from the set
-void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
+void del_from_pfds(std::vector<struct pollfd> *pfds, int i)
 {
-	// Copy the one from the end over this one
-	pfds[i] = pfds[*fd_count-1];
-
-	(*fd_count)--;
+	pfds->erase(pfds->begin() + i);
 }
 
 int main() {
 	int server_fd = get_server_socket();  // file descriptor para o socket do servidor
 
-	// Start off with room for 5 connections
-	// (We'll realloc as necessary)
-	int fd_count = 0;
-	int fd_size = 5;
-	struct pollfd *pfds = (pollfd *)malloc(sizeof *pfds * fd_size);
+	std::vector<struct pollfd> pfds(0);
+	struct pollfd init;
 	
 	// Add the server socket ("listener")
-	pfds[0].fd = server_fd;
-	pfds[0].events = POLLIN; // Report ready to read on incoming connection
-	fd_count = 1; // For the listener
+	init.fd = server_fd;
+	init.events = POLLIN; // Report ready to read on incoming connection
+	pfds.push_back(init);
 
 	int newfd;        // newly accept()ed socket descriptor
 	struct sockaddr_storage remoteaddr; // client address
@@ -116,7 +106,7 @@ int main() {
 
 	// main loop
 	while(true) {
-		int poll_count = poll(pfds, fd_count, -1);
+		int poll_count = poll(pfds.data(), pfds.size(), -1);
 
 		if (poll_count == -1) {
 			perror("poll");
@@ -124,7 +114,8 @@ int main() {
 		}
 
 		// Run through the existing connections looking for data to read
-		for(int i = 0; i < fd_count; i++) {
+		int fd_size = pfds.size();
+		for(int i = 0; i < fd_size; i++) {
 
 			// Check if someone's ready to read
 			if (pfds[i].revents & POLLIN) { // We got one!!
@@ -141,7 +132,7 @@ int main() {
 					if (newfd == -1) {
 						perror("accept");
 					} else {
-						add_to_pfds(&pfds, newfd, &fd_count, &fd_size);
+						add_to_pfds(&pfds, newfd);
 
 						printf("pollserver: new connection from %s on "
 							"socket %d\n",
@@ -167,12 +158,11 @@ int main() {
 
 						close(pfds[i].fd); // Bye!
 
-						del_from_pfds(pfds, i, &fd_count);
-
+						del_from_pfds(&pfds, i);
 					} else {
 						// We got some good data from a client
 
-						for(int j = 0; j < fd_count; j++) {
+						for(int j = 0; j < fd_size; j++) {
 							// Send to everyone!
 							int dest_fd = pfds[j].fd;
 
