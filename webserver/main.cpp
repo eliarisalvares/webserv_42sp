@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 13:03:36 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/02 13:16:26 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int main() {
 		}
 		// run through the existing connections looking for data to read
 		for(int i = 0; i <= fdmax; i++) {
-			if (FD_ISSET(i, &read_fds)) { // we got one!!
+			if (FD_ISSET(i, &read_fds)) { // we got one!
 				if (i == server_fd) {
 					// handle new connections
 					new_addrlen = sizeof remoteaddr;
@@ -114,6 +114,7 @@ int main() {
 					}
 				} else {
 					// handle data from a client
+					// parse da request
 					if ((nbytes = recv(i, buf, sizeof buf, 0)) <= 0) {
 						// got error or connection closed by client
 						if (nbytes == 0) {
@@ -128,20 +129,20 @@ int main() {
 						// we got some data from a client
 						for(int j = server_fd; j <= fdmax; j++) {
 							// send to everyone!
-							if (FD_ISSET(j, &master)) {
-								// except the server_fd and ourselves
-								if (j != server_fd && j != i) {
-									if (send(j, buf, nbytes, 0) == -1) {
-										printf("server_fd = %d\n", server_fd);
-										printf("i = %d\n", i);
-										printf("j = %d\n", j);
-										printf("fdmax = %d\n", fdmax);
-										printf("nbytes = %d\n", nbytes);
-										printf("buf = %s\n", buf);
-										perror("send");
-									}
-								}
-							}
+							// if (FD_ISSET(j, &master)) {
+							// 	// except the server_fd and ourselves
+							// 	if (j != server_fd && j != i) {
+							// 		if (send(j, buf, nbytes, 0) == -1) {
+							// 			perror("send");
+							// 		}
+							// 	}
+							// }
+							//função para lidar com o buf
+							if (j == server_fd)
+								printf("from (%d), %s\n", i, buf);
+							char response[] = "HTTP/1.1 200 OK\nContent-Length: 12\n\n42\n>";
+							if (j == i)
+								send(j, response, sizeof(response), 0);
 						}
 					}
 				} // END handle data from client
