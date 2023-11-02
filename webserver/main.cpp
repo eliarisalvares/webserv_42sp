@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 13:16:26 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/02 15:30:55 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,10 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
+// vamos usar para cada server do arquivo de config
+int	get_server_socket()
 {
-	if (sa->sa_family == AF_INET) {
-		return &(((struct sockaddr_in*)sa)->sin_addr);
-	}
-
-	return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-int main() {
-	int server_fd;  // , client_fd; Um file descriptor para o socket do servidor e um para o socket do cliente
+	int server_fd;
 	struct sockaddr_in address;  // Struct para o endereço do servidor
 	// int addrlen = sizeof(address);  // Tamanho do endereço do servidor
 
@@ -64,90 +55,146 @@ int main() {
 	// Coloca o socket do servidor em modo de escuta, com um limite de 500 conexões pendentes (isso temos que ver, esse número os meninos usaram no projeto deles,
 	// mas não sei se é o ideal, acho que a gente tem que ver isso, meu sistema mostra 4096)
 	listen(server_fd, 500);
+	return (server_fd);
+}
 
-	struct sockaddr_storage remoteaddr; // client address
+// get sockaddr, IPv4 or IPv6:
+void *get_in_addr(struct sockaddr *sa)
+{
+	if (sa->sa_family == AF_INET) {
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	}
+
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+// Add a new file descriptor to the set
+void add_to_pfds(struct pollfd *pfds[], int newfd, int *fd_count, int *fd_size)
+{
+	// If we don't have room, add more space in the pfds array
+	if (*fd_count == *fd_size) {
+		*fd_size *= 2; // Double it
+
+		*pfds = (pollfd *)realloc(*pfds, sizeof(**pfds) * (*fd_size));
+	}
+
+	(*pfds)[*fd_count].fd = newfd;
+	(*pfds)[*fd_count].events = POLLIN | POLLOUT; // Check ready-to-read + write
+
+	(*fd_count)++;
+}
+
+// Remove an index from the set
+void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
+{
+	// Copy the one from the end over this one
+	pfds[i] = pfds[*fd_count-1];
+
+	(*fd_count)--;
+}
+
+int main() {
+	int server_fd = get_server_socket();  // file descriptor para o socket do servidor
+
+	// Start off with room for 5 connections
+	// (We'll realloc as necessary)
+	int fd_count = 0;
+	int fd_size = 5;
+	struct pollfd *pfds = (pollfd *)malloc(sizeof *pfds * fd_size);
+	
+	// Add the server socket ("listener")
+	pfds[0].fd = server_fd;
+	pfds[0].events = POLLIN; // Report ready to read on incoming connection
+	fd_count = 1; // For the listener
+
 	int newfd;        // newly accept()ed socket descriptor
-	fd_set master;    // master file descriptor list
-	fd_set read_fds;  // temp file descriptor list for select()
-	int fdmax;        // maximum file descriptor number
-	socklen_t new_addrlen;
-	char remoteIP[INET6_ADDRSTRLEN];
-	int nbytes;
+	struct sockaddr_storage remoteaddr; // client address
+	socklen_t addrlen;
+
 	char buf[256];    // buffer for client data
-
-	// add the listener->server_fd to the master set
-	FD_SET(server_fd, &master);
-
-	// keep track of the biggest file descriptor
-	fdmax = server_fd;
+	char remoteIP[INET6_ADDRSTRLEN];
 
 	// main loop
 	while(true) {
-		read_fds = master; // copy it
-		if (select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1) {
-			perror("select");
-			exit(4);
+		int poll_count = poll(pfds, fd_count, -1);
+
+		if (poll_count == -1) {
+			perror("poll");
+			exit(1);
 		}
-		// run through the existing connections looking for data to read
-		for(int i = 0; i <= fdmax; i++) {
-			if (FD_ISSET(i, &read_fds)) { // we got one!
-				if (i == server_fd) {
-					// handle new connections
-					new_addrlen = sizeof remoteaddr;
+
+		// Run through the existing connections looking for data to read
+		for(int i = 0; i < fd_count; i++) {
+
+			// Check if someone's ready to read
+			if (pfds[i].revents & POLLIN) { // We got one!!
+
+				// if server
+				if (pfds[i].fd == server_fd) {
+					// If server_fd is ready to read, handle new connection
+
+					addrlen = sizeof remoteaddr;
 					newfd = accept(server_fd,
 						(struct sockaddr *)&remoteaddr,
-						&new_addrlen);
+						&addrlen);
 
 					if (newfd == -1) {
 						perror("accept");
 					} else {
-						FD_SET(newfd, &master); // add to master set
-						if (newfd > fdmax) {    // keep track of the max
-							fdmax = newfd;
-						}
-						printf("selectserver: new connection from %s on "
+						add_to_pfds(&pfds, newfd, &fd_count, &fd_size);
+
+						printf("pollserver: new connection from %s on "
 							"socket %d\n",
 							inet_ntop(remoteaddr.ss_family,
 								get_in_addr((struct sockaddr*)&remoteaddr),
 								remoteIP, INET6_ADDRSTRLEN),
-						   newfd);
+							newfd);
 					}
 				} else {
-					// handle data from a client
-					// parse da request
-					if ((nbytes = recv(i, buf, sizeof buf, 0)) <= 0) {
-						// got error or connection closed by client
+					// If not the server_fd, we're just a regular client
+					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+
+					int sender_fd = pfds[i].fd;
+
+					if (nbytes <= 0) {
+						// Got error or connection closed by client
 						if (nbytes == 0) {
-							// connection closed
-							printf("selectserver: socket %d hung up\n", i);
+							// Connection closed
+							printf("pollserver: socket %d hung up\n", sender_fd);
 						} else {
 							perror("recv");
 						}
-						close(i); // bye!
-						FD_CLR(i, &master); // remove from master set
+
+						close(pfds[i].fd); // Bye!
+
+						del_from_pfds(pfds, i, &fd_count);
+
 					} else {
-						// we got some data from a client
-						for(int j = server_fd; j <= fdmax; j++) {
-							// send to everyone!
-							// if (FD_ISSET(j, &master)) {
-							// 	// except the server_fd and ourselves
-							// 	if (j != server_fd && j != i) {
-							// 		if (send(j, buf, nbytes, 0) == -1) {
-							// 			perror("send");
-							// 		}
-							// 	}
+						// We got some good data from a client
+
+						for(int j = 0; j < fd_count; j++) {
+							// Send to everyone!
+							int dest_fd = pfds[j].fd;
+
+							// Except the listener and ourselves
+							if (j == i){
+								if (pfds[i].revents & POLLOUT)
+								{
+									char response[] = "HTTP/1.1 200 OK\nContent-Length: 2\n\n42\n>";
+									send(dest_fd, response, sizeof(response), 0);
+								}
+								printf("from (%d): %s", i, buf);}
+							// if (dest_fd != listener && dest_fd != sender_fd) {
+							//     if (send(dest_fd, buf, nbytes, 0) == -1) {
+							//         perror("send");
+							//     }
 							// }
-							//função para lidar com o buf
-							if (j == server_fd)
-								printf("from (%d), %s\n", i, buf);
-							char response[] = "HTTP/1.1 200 OK\nContent-Length: 12\n\n42\n>";
-							if (j == i)
-								send(j, response, sizeof(response), 0);
 						}
 					}
+					memset(&buf, 0, sizeof(buf));
 				} // END handle data from client
-			} // END got new incoming connection
-		} // END looping through file descriptors
+			} // END got ready-to-read from poll()
+		}
 	}
 
 	// Close the server socket (though we won't actually get here in the current design)
@@ -155,57 +202,3 @@ int main() {
 
 	return 0;
 }
-
-	// epoll
-	// // Cria uma instância de epoll para monitorar eventos (aqui pode ser poll, epoll ou select, temos que ver qual é o melhor,
-	// // mas acho que o epoll é o mais eficiente, mas não sei se é o mais fácil de usar, 1024 é o ulimit -n do meu sistema, mas também seria
-	// // interessante ver se é o ideal)
-	// int epoll_fd = epoll_create(1024); 
-	// struct epoll_event event; // Struct do evento que será monitorado
-	// struct epoll_event events[10];  // Struct para armazenar os eventos que estão prontos
-
-	// // Configura o evento para monitorar o socket do servidor para eventos de leitura
-	// event.data.fd = server_fd;  // Associa o socket do servidor ao evento
-	// event.events = EPOLLIN;  // EPOLLIN é macro para eventos de leitura
-
-	// // a função epoll_ctl adiciona o socket do servidor ao epoll_fd para monitorar eventos
-	// epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event);
-
-	// // Loop para manter o servidor rodando indefinidamente
-	// while (1) {
-	// 	// Espera por eventos, -1 para esperar indefinidamente
-	// 	int num_fds = epoll_wait(epoll_fd, events, 10, -1);
-
-	// 	// Loop para lidar com todos os eventos que estão prontos
-	// 	for (int i = 0; i < num_fds; i++) {
-	// 		// Checa se o evento é do socket do servidor 
-	// 		if (events[i].data.fd == server_fd) {
-	// 			// Aceita a conexão do cliente
-	// 			client_fd = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
-
-	// 			// Adiciona o socket do cliente ao epoll_fd
-	// 			event.data.fd = client_fd;
-	// 			event.events = EPOLLIN;
-	// 			epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event);
-	// 		} else {
-	// 			// Lê os dados do cliente e armazena em um buffer de 30000 bytes, também temos
-	// 			// que ver se esse tamanho é o ideal
-	// 			char buffer[30000] = {0};
-	// 			int bytes_read = read(events[i].data.fd, buffer, 30000);
-
-	// 			// Se bytes_read for 0, significa que o cliente fechou a conexão
-	// 			if (bytes_read == 0) {
-	// 				// Fecha o socket do cliente e remove do epoll_fd
-	// 				close(events[i].data.fd);
-	// 				epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, &event);
-	// 			} else {
-	// 				// Printa o que foi recebido do cliente como requisição
-	// 				std::cout << buffer << std::endl;
-
-	// 				// Mandar uma resposta para o cliente
-	// 				char response[] = "HTTP/1.1 200 OK\nContent-Length: 12\n\n42\n>";
-	// 				send(events[i].data.fd, response, sizeof(response), 0);
-	// 			}
-	// 		}
-	// 	}
-	// }
