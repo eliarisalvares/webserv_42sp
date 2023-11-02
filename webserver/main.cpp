@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 16:05:21 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/02 16:17:01 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ int	get_server_socket()
 {
 	int server_fd;
 	struct sockaddr_in address;  // Struct para o endereço do servidor
-	// int addrlen = sizeof(address);  // Tamanho do endereço do servidor
 
 	// Cria o socket do servidor, AF_INET para IPv4, SOCK_STREAM para TCP, 0 para o protocolo
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -38,10 +37,8 @@ int	get_server_socket()
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
 
-	// - error on rerunning a server: "Address already in use" - 
-	// significa que um socket que estava conectado ainda está segurando a porta no 
-	// kernel e, portando, monopolizando-a. Para poder reutilizar a porta, podemos usar `setsockopt()`:
-	int yes=1;
+	int yes = 1;
+
 	// lose the pesky "Address already in use" error message
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
 		perror("setsockopt");
@@ -60,7 +57,7 @@ int	get_server_socket()
 }
 
 // get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
+void	*get_in_addr(struct sockaddr *sa)
 {
 	if (sa->sa_family == AF_INET) {
 		return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -70,7 +67,7 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 // Add a new file descriptor to the set
-void add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
+void	add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 {
 	struct pollfd a;
 
@@ -80,17 +77,14 @@ void add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 	pfds->push_back(a);
 }
 
-// Remove an index from the set
-void del_from_pfds(std::vector<struct pollfd> *pfds, int i)
-{
-	pfds->erase(pfds->begin() + i);
-}
-
-int main() {
+int	main() {
 	int server_fd = get_server_socket();  // file descriptor para o socket do servidor
 
 	std::vector<struct pollfd> pfds(0);
 	struct pollfd init;
+
+	char buf[256];    // buffer for client data
+	char remoteIP[INET6_ADDRSTRLEN];
 	
 	// Add the server socket ("listener")
 	init.fd = server_fd;
@@ -100,9 +94,6 @@ int main() {
 	int newfd;        // newly accept()ed socket descriptor
 	struct sockaddr_storage remoteaddr; // client address
 	socklen_t addrlen;
-
-	char buf[256];    // buffer for client data
-	char remoteIP[INET6_ADDRSTRLEN];
 
 	// main loop
 	while(true) {
@@ -157,8 +148,7 @@ int main() {
 						}
 
 						close(pfds[i].fd); // Bye!
-
-						del_from_pfds(&pfds, i);
+						pfds.erase(pfds.begin() + i); // Remove an index from the set
 					} else {
 						// We got some good data from a client
 
@@ -174,11 +164,6 @@ int main() {
 									send(dest_fd, response, sizeof(response), 0);
 								}
 								printf("from (%d): %s", i, buf);}
-							// if (dest_fd != listener && dest_fd != sender_fd) {
-							//     if (send(dest_fd, buf, nbytes, 0) == -1) {
-							//         perror("send");
-							//     }
-							// }
 						}
 					}
 					memset(&buf, 0, sizeof(buf));
