@@ -1,3 +1,6 @@
+################################################################################
+##                                 COMPILATION                                ##
+################################################################################
 # Variables
 NAME = webserv
 CXX = c++
@@ -10,16 +13,15 @@ REQUEST =		Request.cpp
 RESPONSE =		Response.cpp
 SERVER =		Server.cpp
 
-
-
-
 OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
 
 OBJPATH =		temp
 VPATH =			src src/Logger src/Request src/Response src/Server
 
-# RULES ----------------------
+################################################################################
+##                                    RULES                                   ##
+################################################################################
 
 # Default target
 all: $(NAME)
