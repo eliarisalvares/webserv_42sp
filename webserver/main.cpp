@@ -6,55 +6,13 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 16:17:01 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/03 13:43:15 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <vector>
 
-// vamos usar para cada server do arquivo de config
-int	get_server_socket()
-{
-	int server_fd;
-	struct sockaddr_in address;  // Struct para o endereço do servidor
-
-	// Cria o socket do servidor, AF_INET para IPv4, SOCK_STREAM para TCP, 0 para o protocolo
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-	// Configura o endereço do servidor e a porta, AF_INET para IPv4, INADDR_ANY para o endereço do host, htons para a porta
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(PORT);
-
-	int yes = 1;
-
-	// lose the pesky "Address already in use" error message
-	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
-		perror("setsockopt");
-		exit(1);
-	}
-	
-	// Associa o socket do servidor ao endereço e à porta especificados
-	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) == -1) {
-		perror("bind");
-	}
-
-	// Coloca o socket do servidor em modo de escuta, com um limite de 500 conexões pendentes (isso temos que ver, esse número os meninos usaram no projeto deles,
-	// mas não sei se é o ideal, acho que a gente tem que ver isso, meu sistema mostra 4096)
-	listen(server_fd, 500);
-	return (server_fd);
-}
 
 // get sockaddr, IPv4 or IPv6:
 void	*get_in_addr(struct sockaddr *sa)
@@ -78,7 +36,8 @@ void	add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 }
 
 int	main() {
-	int server_fd = get_server_socket();  // file descriptor para o socket do servidor
+	int port = PORT;
+	Server oneServer(port);  // file descriptor para o socket do servidor
 
 	std::vector<struct pollfd> pfds(0);
 	struct pollfd init;
@@ -87,7 +46,7 @@ int	main() {
 	char remoteIP[INET6_ADDRSTRLEN];
 	
 	// Add the server socket ("listener")
-	init.fd = server_fd;
+	init.fd = oneServer.getSocket();
 	init.events = POLLIN; // Report ready to read on incoming connection
 	pfds.push_back(init);
 
@@ -112,11 +71,11 @@ int	main() {
 			if (pfds[i].revents & POLLIN) { // We got one!!
 
 				// if server
-				if (pfds[i].fd == server_fd) {
+				if (pfds[i].fd == oneServer.getSocket()) {
 					// If server_fd is ready to read, handle new connection
 
 					addrlen = sizeof remoteaddr;
-					newfd = accept(server_fd,
+					newfd = accept(oneServer.getSocket(),
 						(struct sockaddr *)&remoteaddr,
 						&addrlen);
 
@@ -173,7 +132,7 @@ int	main() {
 	}
 
 	// Close the server socket (though we won't actually get here in the current design)
-	close(server_fd);
+	close(oneServer.getSocket());
 
 	return 0;
 }

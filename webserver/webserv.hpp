@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/02 12:56:01 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/03 13:43:38 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,26 @@
 # define WEBSERV_HPP
 
 # include <iostream> // std::cout
-# include <sys/socket.h> // socket(), bind(), listen(), accept()
-# include <netinet/in.h> // struct sockaddr_in
+# include <vector> // for the container with all conections
 # include <unistd.h> // read(), close()
 # include <sys/epoll.h> // epoll_create(), epoll_ctl(), epoll_wait()
 # include <poll.h> // poll
 
+// ver o que é necessário aqui
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+
+# include "src/Server/Server.hpp"
+
 
 # define PORT 8080
+
+class	Server;
 
 #endif
