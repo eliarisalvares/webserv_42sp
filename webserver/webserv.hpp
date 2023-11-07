@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:02:12 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:03:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,11 @@
 # include "Server.hpp"
 # include "Request.hpp"
 # include "RequestBuilder.hpp"
-
+# include "ParserConfig.hpp"
 
 # define PORT 8080
 
 class	Server;
-
-//functions
-
-int	getPort(char *file);
+class	ParserConfig;
 
 #endif

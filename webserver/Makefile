@@ -12,6 +12,7 @@ LOGGER =		Logger.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp
 RESPONSE =		Response.cpp
 SERVER =		Server.cpp
+PARSER =		ParserConfig.cpp openFile.cpp
 
 INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response -I src/Server
 
@@ -19,7 +20,7 @@ OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
 
 OBJPATH =		temp
-VPATH =			src src/Logger src/Request src/Response src/Server
+VPATH =			src src/Logger src/Request src/Response src/Server src/Parser
 
 ################################################################################
 ##                                    RULES                                   ##
