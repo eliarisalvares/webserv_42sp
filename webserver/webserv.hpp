@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/03 13:43:38 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/06 22:42:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@
 # include <arpa/inet.h>
 # include <netdb.h>
 
-# include "src/Server/Server.hpp"
+# include "Server.hpp"
+# include "Request.hpp"
+# include "RequestBuilder.hpp"
 
 
 # define PORT 8080

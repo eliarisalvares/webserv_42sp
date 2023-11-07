@@ -17,7 +17,7 @@ Class to log error, warning or debug messages
 # define RESET	"\033[0m"
 
 # ifndef DEBUG
-    #define DEBUG false
+    #define DEBUG true
 # endif
 
 class Logger {
@@ -29,7 +29,6 @@ public:
 	static void warning(std::string const msg);
 	static void info(std::string const msg);
 	static void debug(std::string const msg);
-	static void success(std::string const msg);
 	static void success(std::string const msg);
 	static void title(std::string const msg);
 

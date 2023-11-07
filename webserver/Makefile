@@ -7,11 +7,13 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP
 CXXDEBUG = -D DEBUG=true
 
-SRCS =			main.cpp $(SERVER)
+SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER)
 LOGGER =		Logger.cpp
-REQUEST =		Request.cpp
+REQUEST =		Request.cpp RequestBuilder.cpp
 RESPONSE =		Response.cpp
 SERVER =		Server.cpp
+
+INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response -I src/Server
 
 OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
@@ -28,7 +30,7 @@ all: $(NAME)
 
 # Folder for temporary objects
 $(OBJPATH)/%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE)
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
 
 # Folder for temporary objects
 $(OBJPATH):

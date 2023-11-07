@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/03 13:43:15 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/06 23:38:44 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,12 @@ void	add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 
 	a.fd = newfd;
 	a.events = POLLIN | POLLOUT; // Check ready-to-read + write
-	
+
 	pfds->push_back(a);
 }
 
 int	main() {
+	Logger log;
 	int port = PORT;
 	Server oneServer(port);  // file descriptor para o socket do servidor
 
@@ -44,7 +45,7 @@ int	main() {
 
 	char buf[256];    // buffer for client data
 	char remoteIP[INET6_ADDRSTRLEN];
-	
+
 	// Add the server socket ("listener")
 	init.fd = oneServer.getSocket();
 	init.events = POLLIN; // Report ready to read on incoming connection
@@ -55,6 +56,9 @@ int	main() {
 	socklen_t addrlen;
 
 	// main loop
+	std::vector<Request*> requests(0);
+	// std::vector<RequestBuilder> requestBuilders(0);
+	Request* request;
 	while(true) {
 		int poll_count = poll(pfds.data(), pfds.size(), -1);
 
@@ -111,6 +115,12 @@ int	main() {
 					} else {
 						// We got some good data from a client
 
+						// considering that we read only one time, create Request
+						request = RequestBuilder().build();
+						log.debug("Request pointer:");
+						std::cout << request << std::endl;
+						requests.push_back(request);
+
 						for(int j = 0; j < fd_size; j++) {
 							// Send to everyone!
 							int dest_fd = pfds[j].fd;
@@ -119,10 +129,19 @@ int	main() {
 							if (j == i){
 								if (pfds[i].revents & POLLOUT)
 								{
+									// get response from request here
+									// response = ResponseBuilder(request).build() ...
 									char response[] = "HTTP/1.1 200 OK\nContent-Length: 2\n\n42\n>";
 									send(dest_fd, response, sizeof(response), 0);
 								}
 								printf("from (%d): %s", i, buf);}
+
+								// delete request after sending response - problem here
+								// request = requests[i - 1]; // i - 1 because server doesn't is a request
+								// log.debug("Request pointer:");
+								// std::cout << request << std::endl;
+								// requests.erase(requests.begin() + i - 1); // Remove request
+								// delete request;
 						}
 					}
 					memset(&buf, 0, sizeof(buf));

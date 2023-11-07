@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/03 13:44:07 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/06 20:40:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@ Server::~Server(void) { }
 Server::Server(Server const& copy) { (void)copy; }
 
 Server const& Server::operator=(Server const & copy) {
-	if (this != &copy)
+	if (this != &copy) {
 		;// do stuff
+	}
 	return *this;
 }
 
@@ -47,7 +48,7 @@ void	Server::setSocket(int port) {
 		perror("setsockopt");
 		exit(1);
 	}
-	
+
 	// Associa o socket do servidor ao endereço e à porta especificados
 	if (bind(this->_socket, (struct sockaddr*)&address, sizeof(address)) == -1) {
 		perror("bind");
