@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:01:02 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:02:03 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,8 @@ int	main(int argc, char *argv[]) {
 		return 1;
 	}
 	int	port = getPort(argv[1]);
+	if (port == false)
+		return 1;
 	run(port);
 	return 0;
 }

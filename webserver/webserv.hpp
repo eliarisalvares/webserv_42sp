@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:01:52 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:02:12 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <unistd.h> // read(), close()
 # include <sys/epoll.h> // epoll_create(), epoll_ctl(), epoll_wait()
 # include <poll.h> // poll
+# include <fstream> // using files
 
 // ver o que é necessário aqui
 # include <stdio.h>
