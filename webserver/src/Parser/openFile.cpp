@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 16:26:41 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 16:56:36 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,11 @@ bool	checkFile(const std::string& fileName)
 	return (true);
 }
 
-int	getPort(char *fileName) {
-	// std::ifstream	inFile;
+ParserConfig	getConf(std::string fileName) {
+	ParserConfig	init();
 	
 	if (!checkFile(fileName))
 		return (false);
+	init.readFile(fileName);
 	return (PORT);
 }
