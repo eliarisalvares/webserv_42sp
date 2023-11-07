@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:03:44 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:04:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@
 class	Server;
 class	ParserConfig;
 
-ParserConfig	getConf(std::string fileName);
+
+bool	checkFile(const std::string& fileName);
 
 #endif

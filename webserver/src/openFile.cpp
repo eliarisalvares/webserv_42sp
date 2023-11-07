@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 17:54:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 18:28:27 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,3 @@ bool	checkFile(const std::string& fileName)
 	return (true);
 }
 
-ParserConfig	getConf(std::string fileName) {
-	
-	if (!checkFile(fileName))
-		return (false); //throw exception
-	ParserConfig	init();
-	init.keepFile(fileName);
-	return (init);
-}

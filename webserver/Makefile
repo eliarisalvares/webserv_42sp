@@ -7,14 +7,14 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP
 CXXDEBUG = -D DEBUG=true
 
-SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) openFile.cpp
+SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) $(PARSER) openFile.cpp
 LOGGER =		Logger.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp
 RESPONSE =		Response.cpp
 SERVER =		Server.cpp
-PARSER =		ParserConfig.cpp openFile.cpp
+PARSER =		ParserConfig.cpp
 
-INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response -I src/Server
+INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response -I src/Server -I src/Parser
 
 OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
