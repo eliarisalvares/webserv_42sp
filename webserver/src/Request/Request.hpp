@@ -7,8 +7,6 @@ Request Class
 
 # include <iostream>
 
-# include "Server.hpp"
-
 class Request {
 public:
 	Request(Server const& server); // provavelmente recebe outros dados: socket, conteúdo

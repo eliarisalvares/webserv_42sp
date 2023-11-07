@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "./src/Response/Response.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,6 +76,17 @@ void	add_to_pfds(std::vector<struct pollfd> *pfds, int newfd)
 	a.events = POLLIN | POLLOUT; // Check ready-to-read + write
 	
 	pfds->push_back(a);
+}
+
+std::string get_response() {
+	Response response;
+	response.setStatusCode(200);
+	response.setMessage("OK");
+	response.setBody("Hello World!");
+	response.addHeader("Content-Type", "text/plain");
+	response.addHeader("Content-Length", "12");
+	std::string response_string = response.toString();
+	return response_string;
 }
 
 int	main() {
@@ -150,18 +162,19 @@ int	main() {
 						close(pfds[i].fd); // Bye!
 						pfds.erase(pfds.begin() + i); // Remove an index from the set
 					} else {
+						Response response;
 						// We got some good data from a client
 
 						for(int j = 0; j < fd_size; j++) {
 							// Send to everyone!
-							int dest_fd = pfds[j].fd;
+							int dest_fd = pfds[j].fd; // não estamos usando isso, é igual ao pfds[i].fd no caso do j == i
 
 							// Except the listener and ourselves
 							if (j == i){
 								if (pfds[i].revents & POLLOUT)
 								{
-									char response[] = "HTTP/1.1 200 OK\nContent-Length: 2\n\n42\n>";
-									send(dest_fd, response, sizeof(response), 0);
+									std::string response_string = get_response();
+									send(dest_fd, response_string.c_str(), response_string.length(), 0);
 								}
 								printf("from (%d): %s", i, buf);}
 						}
