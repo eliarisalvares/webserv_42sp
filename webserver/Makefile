@@ -7,7 +7,7 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP
 CXXDEBUG = -D DEBUG=true
 
-SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE)
+SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) openFile.cpp
 LOGGER =		Logger.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp
 RESPONSE =		Response.cpp
