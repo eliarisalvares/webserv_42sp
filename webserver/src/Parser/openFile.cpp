@@ -6,12 +6,11 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 16:56:36 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 17:54:45 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
-#include <iomanip>
+#include "ParserConfig.hpp"
 
 int	checkFileName(std::string fileName) {
 	if (fileName.substr(fileName.find_last_of(".") + 1) == "conf")
@@ -43,10 +42,10 @@ bool	checkFile(const std::string& fileName)
 }
 
 ParserConfig	getConf(std::string fileName) {
-	ParserConfig	init();
 	
 	if (!checkFile(fileName))
-		return (false);
-	init.readFile(fileName);
-	return (PORT);
+		return (false); //throw exception
+	ParserConfig	init();
+	init.keepFile(fileName);
+	return (init);
 }
