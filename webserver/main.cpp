@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:59:55 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:01:02 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,9 @@ std::string get_response() {
 	return response_string;
 }
 
-int	main() {
+void	run() {
 	Logger log;
-	int port = PORT;
-	Server oneServer(port);  // file descriptor para o socket do servidor
+	Server oneServer(PORT);  // file descriptor para o socket do servidor
 
 	std::vector<struct pollfd> pfds(0);
 	struct pollfd init;
@@ -163,6 +162,17 @@ int	main() {
 
 	// Close the server socket (though we won't actually get here in the current design)
 	close(oneServer.getSocket());
+}
 
+int	main(int argc, char *argv[]) {
+	if (argc != 2) {
+		if (argc < 2)
+			std::cout << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
+		else if (argc > 2)
+			std::cout << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
+		return 1;
+	}
+	int	port = getPort(argv[1]);
+	run(port);
 	return 0;
 }
