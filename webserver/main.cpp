@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:02:03 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:02:26 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,9 +167,9 @@ void	run() {
 int	main(int argc, char *argv[]) {
 	if (argc != 2) {
 		if (argc < 2)
-			std::cout << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
+			std::cerr << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
 		else if (argc > 2)
-			std::cout << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
+			std::cerr << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
 		return 1;
 	}
 	int	port = getPort(argv[1]);
