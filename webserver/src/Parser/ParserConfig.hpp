@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:13:15 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 18:44:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,17 @@
 # include <fstream> // using files
 # include <iomanip> //function to check name
 # include <vector>
+# include <sstream>
 
 class ParserConfig {
 	public:
 		ParserConfig(void);
-		ParserConfig(int port);
 		~ParserConfig(void);
 		ParserConfig(ParserConfig const& copy);
 		ParserConfig const& operator=(ParserConfig const& copy);
 
-		void	keepFile(std::string fileName);
+		void	getConf(std::string fileName);
+
 		class SyntaxErrorException : public std::exception {
 			virtual const char* what(void) const throw();
 		};

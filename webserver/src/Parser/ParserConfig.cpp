@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:16:09 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 18:32:05 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ ParserConfig::~ParserConfig(void) { }
 ParserConfig::ParserConfig(ParserConfig const& copy) { (void)copy; }
 
 ParserConfig const& ParserConfig::operator=(ParserConfig const & copy) {
-	(void)copy;
+	if (this != &copy)
+		return copy;
 	return *this;
 }
 
@@ -39,7 +40,7 @@ static std::string trim(const std::string& line)
 	return trimmed;
 }
 
-void	ParserConfig::keepFile(std::string fileName) {
+void	ParserConfig::getConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::stringstream	inFile;
 	std::string			line;
@@ -48,9 +49,9 @@ void	ParserConfig::keepFile(std::string fileName) {
 	this->_fileContent = inFile.str();
 
 	if (!_beginingOfFile())
-		throw ;//error of not server in the begining
+		throw SyntaxErrorException();//error of not server in the begining
 	if (!_bracketsClosed())
-		throw ;//error of syntax
+		throw ServerErrorException();//error of syntax
 
 	while (std::getline(inputFile, line)) {
 		line = trim(line);
@@ -80,9 +81,9 @@ bool	ParserConfig::_bracketsClosed() {
 }
 
 const char* ParserConfig::SyntaxErrorException::what() const throw() {
-	return ("Error: Curly brackets not closed.");
+	return ("Curly brackets not closed.");
 }
 
 const char* ParserConfig::ServerErrorException::what() const throw() {
-	return ("Error: Server not at begining of file.");
+	return ("Server not at begining of file.");
 }

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:03:32 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:03:57 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,14 +172,18 @@ int	main(int argc, char *argv[]) {
 			std::cerr << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
 		return 1;
 	}
+	if (!checkFile(argv[1]))
+		return (false);
+
+	ParserConfig	port;
 	try {
-		ParserConfig	port = getConf(argv[1]);
-		
+		port.getConf(argv[1]);
 	}
-	catch {
-		std::cerr << e.what() << std::endl;
+	catch (std::exception & e) {
+		std::cerr << "Error: " << e.what() << std::endl;
 		return 1;
 	}
+	(void)port;
 	run();
 	return 0;
 }
