@@ -6,26 +6,46 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 14:41:09 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 16:26:41 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include <iomanip>
 
-int	openInFile(char *fileName, std::ifstream &input)
+int	checkFileName(std::string fileName) {
+	if (fileName.substr(fileName.find_last_of(".") + 1) == "conf")
+		return (true);
+	return (false);
+}
+
+bool	checkFile(const std::string& fileName)
 {
-	input.open(fileName);
-	if (!input.is_open())
-	{
-		std::cout << "Can't open file" << std::endl;
+	std::ifstream file;
+
+	if (!checkFileName(fileName)){
+		std::cerr << "Error: wrong file extension." << std::endl;
 		return (false);
 	}
+	file.open(fileName.c_str());
+	if (file.fail()){
+		std::cerr << "Error: could not open file." << std::endl;
+		file.close();
+		return (false);
+	}
+	if (file.peek() == EOF){
+		std::cerr << "Error: empty file." << std::endl;
+		file.close();
+		return (false);
+	}
+	file.close();
 	return (true);
 }
 
 int	getPort(char *fileName) {
-	std::ifstream	inFile;
-	if (!openInFile(fileName, inFile))
+	// std::ifstream	inFile;
+	
+	if (!checkFile(fileName))
 		return (false);
 	return (PORT);
 }
