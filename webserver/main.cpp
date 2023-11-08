@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/08 17:32:50 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,15 +165,8 @@ void	run() {
 }
 
 int	main(int argc, char *argv[]) {
-	if (argc != 2) {
-		if (argc < 2)
-			std::cerr << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
-		else if (argc > 2)
-			std::cerr << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
+	if (!checkArgs(argc, argv))
 		return 1;
-	}
-	if (!checkFile(argv[1]))
-		return (false);
 
 	ParserServer	port;
 	try {

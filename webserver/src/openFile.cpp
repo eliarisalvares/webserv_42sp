@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/08 17:32:53 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,18 @@ bool	checkFile(const std::string& fileName)
 	}
 	file.close();
 	return (true);
+}
+
+bool	checkArgs(int argc, char *argv[]) {
+	if (argc != 2) {
+		if (argc < 2)
+			std::cerr << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
+		else if (argc > 2)
+			std::cerr << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
+		return false;
+	}
+	if (!checkFile(argv[1]))
+		return false;
+	return true;
 }
 
