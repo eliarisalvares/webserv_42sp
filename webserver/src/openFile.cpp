@@ -6,11 +6,11 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:28:27 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParserConfig.hpp"
+#include "ParserServer.hpp"
 
 int	checkFileName(std::string fileName) {
 	if (fileName.substr(fileName.find_last_of(".") + 1) == "conf")

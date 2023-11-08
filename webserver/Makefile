@@ -11,7 +11,7 @@ SRCS =			main.cpp $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) openFile.cpp
 LOGGER =		Logger.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp
 RESPONSE =		Response.cpp
-SERVER =		Server.cpp ParserConfig.cpp
+SERVER =		Server.cpp ParserServer.cpp
 
 INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response -I src/Server -I src/Parser
 

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:03:57 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ int	main(int argc, char *argv[]) {
 	if (!checkFile(argv[1]))
 		return (false);
 
-	ParserConfig	port;
+	ParserServer	port;
 	try {
 		port.getConf(argv[1]);
 	}
