@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:04:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@
 # include "Server.hpp"
 # include "Request.hpp"
 # include "RequestBuilder.hpp"
-# include "ParserConfig.hpp"
+# include "ParserServer.hpp"
 
 # define PORT 8080
 
 class	Server;
-class	ParserConfig;
+class	ParserServer;
 
 
 bool	checkFile(const std::string& fileName);

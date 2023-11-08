@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:44:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@
 # include <vector>
 # include <sstream>
 
-class ParserConfig {
+class ParserServer {
 	public:
-		ParserConfig(void);
-		~ParserConfig(void);
-		ParserConfig(ParserConfig const& copy);
-		ParserConfig const& operator=(ParserConfig const& copy);
+		ParserServer(void);
+		~ParserServer(void);
+		ParserServer(ParserServer const& copy);
+		ParserServer const& operator=(ParserServer const& copy);
 
 		void	getConf(std::string fileName);
 

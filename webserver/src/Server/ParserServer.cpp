@@ -6,19 +6,19 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 18:32:05 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParserConfig.hpp"
+#include "ParserServer.hpp"
 
-ParserConfig::ParserConfig(void) { }
+ParserServer::ParserServer(void) { }
 
-ParserConfig::~ParserConfig(void) { }
+ParserServer::~ParserServer(void) { }
 
-ParserConfig::ParserConfig(ParserConfig const& copy) { (void)copy; }
+ParserServer::ParserServer(ParserServer const& copy) { (void)copy; }
 
-ParserConfig const& ParserConfig::operator=(ParserConfig const & copy) {
+ParserServer const& ParserServer::operator=(ParserServer const & copy) {
 	if (this != &copy)
 		return copy;
 	return *this;
@@ -40,7 +40,7 @@ static std::string trim(const std::string& line)
 	return trimmed;
 }
 
-void	ParserConfig::getConf(std::string fileName) {
+void	ParserServer::getConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::stringstream	inFile;
 	std::string			line;
@@ -60,12 +60,12 @@ void	ParserConfig::getConf(std::string fileName) {
 	inputFile.close();
 }
 
-bool	ParserConfig::_beginingOfFile() {
+bool	ParserServer::_beginingOfFile() {
 	//check if server block is at begining
 	return (true);
 }
 
-bool	ParserConfig::_bracketsClosed() {
+bool	ParserServer::_bracketsClosed() {
 	int	openBrackets = 0;
 	int	closeBrackets = 0;
 	
@@ -80,10 +80,10 @@ bool	ParserConfig::_bracketsClosed() {
 	return (false);
 }
 
-const char* ParserConfig::SyntaxErrorException::what() const throw() {
+const char* ParserServer::SyntaxErrorException::what() const throw() {
 	return ("Curly brackets not closed.");
 }
 
-const char* ParserConfig::ServerErrorException::what() const throw() {
+const char* ParserServer::ServerErrorException::what() const throw() {
 	return ("Server not at begining of file.");
 }
