@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserConfig.cpp                                   :+:      :+:    :+:   */
+/*   ParserServer.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/08 17:33:58 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,9 @@ void	ParserServer::getConf(std::string fileName) {
 	this->_fileContent = inFile.str();
 
 	if (!_beginingOfFile())
-		throw SyntaxErrorException();//error of not server in the begining
+		throw ServerErrorException();//error of not server in the begining
 	if (!_bracketsClosed())
-		throw ServerErrorException();//error of syntax
+		throw SyntaxErrorException();//error of syntax
 
 	while (std::getline(inputFile, line)) {
 		line = trim(line);

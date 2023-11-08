@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/08 17:33:02 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,6 @@ class	Server;
 class	ParserServer;
 
 
-bool	checkFile(const std::string& fileName);
+bool	checkArgs(int argc, char *argv[]);
 
 #endif
