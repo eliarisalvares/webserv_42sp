@@ -4,7 +4,7 @@
 # Variables
 NAME = webserv
 CXX = c++
-CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP
+CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP -g3
 CXXDEBUG = -D DEBUG=true
 
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
