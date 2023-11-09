@@ -36,7 +36,7 @@ private:
 	void parse(void);
 	// Server			getServer(void) const;
 
-	// Server const& _server;
+	// Server*						_server;
 	int							_fd;
 	std::vector<std::string>	_requestData;
 };

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/06 23:25:41 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/07 20:52:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ RequestBuilder const& RequestBuilder::operator=(RequestBuilder const& copy) {
 
 void RequestBuilder::addRequestData(std::string const newData) {
 	_requestData.push_back(newData);
+	// quebrar em char
+	// análise parcial - status - error, response
 }
 
 Request* RequestBuilder::build() {
