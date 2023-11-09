@@ -10,6 +10,7 @@ Response Class
 # include <map> /* map */
 # include <string> /* string */
 # include <sstream> /* stringstream */
+#include <fstream> /* ifstream */
 
 class Response {
 
@@ -40,5 +41,10 @@ private:
 	std::map<std::string, std::string> headers;
 
 };
+
+std::string responseBuilder(int statusCode, const std::string& message, const std::string& body, const std::string& contentType);
+std::string getHtmlContent(const std::string& filePath);
+std::string getContentType(const std::string& filePath);
+std::string getStatusMessage(int statusCode);
 
 #endif
