@@ -61,28 +61,6 @@ void	WebServ::init(void) {
 	}
 }
 
-// get sockaddr, IPv4 or IPv6:
-void	*get_in_addr(struct sockaddr *sa)
-{
-	if (sa->sa_family == AF_INET) {
-		return &(((struct sockaddr_in*)sa)->sin_addr);
-	}
-
-	return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-
-std::string get_response() {
-	Response response;
-	response.setStatusCode(200);
-	response.setMessage("OK");
-	response.setBody("Hello World!");
-	response.addHeader("Content-Type", "text/plain");
-	response.addHeader("Content-Length", "12");
-	std::string response_string = response.toString();
-	return response_string;
-}
-
 void	WebServ::run(void) {
 	int poll_count, fd;
 
@@ -165,6 +143,17 @@ bool	WebServ::_is_server_socket(int fd) {
 	return false;
 }
 
+// provavelmente vai ser uma função auxiliar para podermos colocar infos de log
+// get sockaddr, IPv4 or IPv6:
+void	*get_in_addr(struct sockaddr *sa)
+{
+	if (sa->sa_family == AF_INET) {
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	}
+
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
 void	WebServ::_create_connection(int server_fd) {
 	struct sockaddr_storage remoteaddr; // client address
 	char remoteIP[INET6_ADDRSTRLEN];
@@ -210,6 +199,17 @@ bool WebServ::_request_builder_exists(int fd) {
 	if (builderFound == this->_requestBuilderMap.end())
 		return false;
 	return true;
+}
+
+std::string get_response() {
+	Response response;
+	response.setStatusCode(200);
+	response.setMessage("OK");
+	response.setBody("Hello World!");
+	response.addHeader("Content-Type", "text/plain");
+	response.addHeader("Content-Length", "12");
+	std::string response_string = response.toString();
+	return response_string;
 }
 
 void WebServ::_respond(Request* request) {
