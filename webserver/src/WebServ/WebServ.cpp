@@ -61,6 +61,8 @@ void	WebServ::init(void) {
 	}
 }
 
+std::string get_response();
+
 void	WebServ::run(void) {
 	int poll_count, fd;
 
