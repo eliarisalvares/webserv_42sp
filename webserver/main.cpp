@@ -6,13 +6,15 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/08 21:50:56 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 09:58:41 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
 int	main(int argc, char *argv[]) {
+	Logger log;
+
 	if (!checkArgs(argc, argv))
 		return 1;
 
@@ -21,19 +23,32 @@ int	main(int argc, char *argv[]) {
 		port.getConf(argv[1]);
 	}
 	catch (std::exception & e) {
-		std::cerr << "Error: " << e.what() << std::endl;
+		log.error(e.what());
 		return 1;
 	}
 	(void)port;
 
 	WebServ	webserv;
+	bool	first_init = true;
 
-	// create servers and sockets for each server
-	webserv.createServers();
-	webserv.init();
+	// o servidor deve sempre restartar em caso de algum erro na execução
+	while (true) {
+		try {
+			// create servers and sockets for each server
+			if (first_init)
+				webserv.create_servers();
+			else
+				webserv.restart_socket_servers(); // criar os sockets novamente
+			webserv.init();
 
-	// main loop
-	webserv.run();
+			// main loop
+			webserv.run();
+
+		} catch (std::exception & e) {
+			log.error(e.what());
+			webserv.clean(); // para limparmos tudo que precisará ser limpo
+		}
+	}
 
 	return 0;
 }

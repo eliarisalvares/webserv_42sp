@@ -39,9 +39,11 @@ public:
 	WebServ(void);
 	~WebServ(void);
 
-	void	createServers(void);
+	void	create_servers(void);
 	void	init(void);
 	void	run(void);
+	void	clean(void);
+	void	restart_socket_servers(void);
 
 private:
 	// we want only one instance of WebServ, without copy
