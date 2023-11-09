@@ -20,7 +20,6 @@
 # include "RequestBuilder.hpp"
 
 # define PORT 8080
-# define BUFFSIZE 256
 
 // server types
 typedef std::map<int, Server*> t_server_map;
