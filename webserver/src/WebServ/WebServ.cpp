@@ -38,7 +38,7 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 	return *this;
 }
 
-void	WebServ::createServers(void) {
+void	WebServ::create_servers(void) {
 	// for now working with one server only
 	Server* oneServer = new Server(PORT);
 
@@ -71,7 +71,7 @@ void	WebServ::run(void) {
 
 		if (poll_count == -1) {
 			perror("poll");
-			exit(1);  // verificar se esse é o comportamento esperado, ou se rodamos novamente
+			exit(1);  // precisamos dar um raise aqui talvez
 		}
 
 		// Run through the existing connections looking for data to read
@@ -225,3 +225,31 @@ void WebServ::_respond(Request* request) {
 	std::string response_string = get_response();
 	send(response_fd, response_string.c_str(), response_string.length(), 0);
 }
+
+void WebServ::clean(void) {
+	t_pollfd_vector::iterator it, end = this->_pfds.end();
+
+	// close all connections, including server ports?
+	// não sei se pode fechar tudo, incluindo as portas dos servidores...
+	for (it = this->_pfds.begin(); it != end; ++it)
+		close((*it).fd);
+
+	// precisa verificar se isso gera leak
+	this->_servers.clear();
+	this->_pfds.clear();
+	this->_fds_map.clear();
+	this->_serverSockets.clear();
+	this->_requests.clear();
+	this->_responses.clear();
+	this->_requestBuilderMap.clear();
+
+	this->_total_fds = 0;
+}
+
+void WebServ::restart_socket_servers(void) {
+	t_server_iterator it, end = this->_servers.end();
+
+	for (it = this->_servers.begin(); it != end; ++it)
+		it->second->setSocket(it->second->getPort());
+}
+
