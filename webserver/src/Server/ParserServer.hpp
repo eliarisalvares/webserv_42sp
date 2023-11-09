@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserConfig.hpp                                   :+:      :+:    :+:   */
+/*   ParserServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:13:17 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/09 18:38:25 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 
 # include <iostream>
 # include <fstream> // using files
-# include <iomanip> //function to check name
 # include <vector>
-# include <sstream>
 
 class ParserServer {
 	public:

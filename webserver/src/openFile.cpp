@@ -6,11 +6,12 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/08 17:32:53 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/09 18:38:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParserServer.hpp"
+#include "WebServ.hpp"
+#include <iomanip> //function to check name
 
 int	checkFileName(std::string fileName) {
 	if (fileName.substr(fileName.find_last_of(".") + 1) == "conf")
@@ -20,20 +21,21 @@ int	checkFileName(std::string fileName) {
 
 bool	checkFile(const std::string& fileName)
 {
+	Logger	log;
 	std::ifstream file;
 
 	if (!checkFileName(fileName)){
-		std::cerr << "Error: wrong file extension." << std::endl;
+		log.error("Wrong file extension.");
 		return (false);
 	}
 	file.open(fileName.c_str());
 	if (file.fail()){
-		std::cerr << "Error: could not open file." << std::endl;
+		log.error("Could not open file.");
 		file.close();
 		return (false);
 	}
 	if (file.peek() == EOF){
-		std::cerr << "Error: empty file." << std::endl;
+		log.error("Empty file.");
 		file.close();
 		return (false);
 	}
@@ -42,11 +44,13 @@ bool	checkFile(const std::string& fileName)
 }
 
 bool	checkArgs(int argc, char *argv[]) {
+	Logger	log;
+
 	if (argc != 2) {
 		if (argc < 2)
-			std::cerr << "No configuration file\nUsage: ./webserv <name>.conf" << std::endl;
+			log.error("No configuration file\nUsage: ./webserv <name>.conf");
 		else if (argc > 2)
-			std::cerr << "Too many arguments\nUsage: ./webserv <name>.conf" << std::endl;
+			log.error("Too many arguments\nUsage: ./webserv <name>.conf");
 		return false;
 	}
 	if (!checkFile(argv[1]))

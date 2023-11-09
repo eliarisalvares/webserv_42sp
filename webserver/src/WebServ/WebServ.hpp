@@ -5,6 +5,7 @@
 # include <exception>
 # include <map>
 # include <vector>
+# include <fstream> // using files
 
 // for server logic
 # include <poll.h>
