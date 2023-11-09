@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/06 22:26:50 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 03:13:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef enum requestMethod {
 class Request {
 public:
 	// Request(Server const& server); // provavelmente recebe outros dados: socket, conteúdo
+	Request(int fd);
 	Request(void);
 	~Request(void);
 	Request(Request const& copy);
@@ -38,6 +39,7 @@ public:
 
 	// Server			getServer(void) const;
 	requestMethod	getMethod(void) const;
+	int				fd(void) const;
 
 private:
 

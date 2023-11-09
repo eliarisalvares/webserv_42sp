@@ -15,6 +15,8 @@
 
 # include <string>
 # include <vector>
+# include <cstring> // memset
+# include <unistd.h>
 
 # include "Logger.hpp"
 # include "Server.hpp"
@@ -22,22 +24,26 @@
 
 class RequestBuilder {
 public:
-	// Request(Server const& server); // provavelmente recebe outros dados: socket, conteúdo
-	RequestBuilder(void);
-	~RequestBuilder(void);
+	RequestBuilder(Server& server, int connection);
+	RequestBuilder(int connection);
 	RequestBuilder(RequestBuilder const& copy);
-	RequestBuilder const& operator=(RequestBuilder const& copy);
+	RequestBuilder& operator=(RequestBuilder const& copy);
+	~RequestBuilder(void);
 
-	void addRequestData(std::string const newData);
+	bool addRequestData(void);
 	Request* build(void);  // params: Server, fd da conexão
 
+	Server			getServer(void) const;
+	bool			is_ready(void) const;
+
 private:
+	RequestBuilder(void);
 
 	void parse(void);
-	// Server			getServer(void) const;
 
-	// Server*						_server;
+	Server*						_server; // RequestBuilder shouldn't edit Server
 	int							_fd;
+	bool						_ready;
 	std::vector<std::string>	_requestData;
 };
 
