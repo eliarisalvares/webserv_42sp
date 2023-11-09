@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/09 01:33:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 10:03:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,13 @@
 
 Server::Server(void) { }
 
-Server::Server(int port) {
+Server::Server(int port): _port(port) {
 	this->setSocket(port);
 	this->setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 }
 
 Server::~Server(void) {
+	this->_port = 8080;
 	this->setSocket(8080);
 	this->setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
  }
@@ -73,4 +74,8 @@ int	Server::getBufferSize(void) const {
 
 void	Server::setBufferSize(int size) {
 	this->_bufferSize = size;
+}
+
+int	Server::getPort(void) const {
+	return this->_port;
 }
