@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/08 17:33:58 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/09 18:40:30 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,27 +42,29 @@ static std::string trim(const std::string& line)
 
 void	ParserServer::getConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
-	std::stringstream	inFile;
 	std::string			line;
 
-	inFile << inputFile.rdbuf();
-	this->_fileContent = inFile.str();
-
-	if (!_beginingOfFile())
-		throw ServerErrorException();//error of not server in the begining
-	if (!_bracketsClosed())
-		throw SyntaxErrorException();//error of syntax
-
 	while (std::getline(inputFile, line)) {
-		line = trim(line);
-		_lines.push_back(line);
+		line = trim(line); //clear spaces and tabs -> do we need to keep the tabs to check for the spacing?
+		if (line.size() > 0)
+			_lines.push_back(line);
 	}
 	inputFile.close();
+	if (!_beginingOfFile())
+		throw ServerErrorException(); //error of not server in the begining
+	if (!_bracketsClosed())
+		throw SyntaxErrorException(); //error of syntax
+	std::cout << _lines.size() << std::endl;
+	for (size_t i = 0; i < _lines.size(); i++)
+	{
+		std::cout << _lines[i] << std::endl;
+	}
 }
 
 bool	ParserServer::_beginingOfFile() {
-	//check if server block is at begining
-	return (true);
+	if (_lines[0].substr() != "server {")
+		return false;
+	return true;
 }
 
 bool	ParserServer::_bracketsClosed() {
