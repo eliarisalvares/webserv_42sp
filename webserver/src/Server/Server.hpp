@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/09 10:02:04 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 13:26:53 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server Class
 # include <cstdlib> // exit
 # include <sys/socket.h> // socket(), bind(), listen(), accept()
 # include <netinet/in.h> // struct sockaddr_in
-#include <stdio.h> // errors
+# include <stdio.h> // errors
 
 # define BUFFSIZE 256
 
