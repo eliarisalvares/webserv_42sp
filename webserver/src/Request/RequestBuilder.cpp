@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/09 03:14:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 11:09:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,13 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 
 
 bool RequestBuilder::addRequestData(void) {
+	Logger log;
 	char buf[(this->_server)->getBufferSize()];
 
+	log.debug("reading data and saving it...");
 	int nbytes = recv(this->_fd, buf, sizeof buf, 0);
+	buf[nbytes] = '\0'; // tirar isso por causa de binário!!
+	printf("received: %s\n", buf);
 	if (nbytes <= 0) {
 		// Got error or connection closed by client
 		if (nbytes == 0) {
@@ -55,13 +59,14 @@ bool RequestBuilder::addRequestData(void) {
 		// raise error to close and remove RequestBuilder etc
 		// this->_pfds.erase(this->_pfds.begin() + i); // Remove an index from the set
 	}
-	return true;
 
 	// add request data in RequestBuilder
 	// quebrar em char
 	// análise parcial - status - error, response
 	_requestData.push_back(buf);
 	memset(&buf, 0, sizeof(buf)); // isso faz limpar o que foi salvo??
+
+	return true;
 }
 
 Request* RequestBuilder::build() {
