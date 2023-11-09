@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 16:50:49 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/09 01:30:04 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,24 @@ Server Class
 # include <netinet/in.h> // struct sockaddr_in
 #include <stdio.h> // errors
 
+# define BUFFSIZE 256
+
 class Server {
 	public:
 		Server(void);
 		Server(int port);
 		~Server(void);
 		Server(Server const& copy);
-		Server const& operator=(Server const& copy);
+		Server& operator=(Server const& copy);
 
-		int		getSocket(void);
+		int		getSocket(void) const;
 		void	setSocket(int port);
+		int		getBufferSize(void) const;
+		void	setBufferSize(int size);
 
 	private:
 		int	_socket;
+		int _bufferSize;
 };
 
 #endif

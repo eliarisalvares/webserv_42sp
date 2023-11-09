@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/07 19:00:13 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/09 01:33:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,20 @@ Server::Server(void) { }
 
 Server::Server(int port) {
 	this->setSocket(port);
+	this->setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 }
 
-Server::~Server(void) { }
+Server::~Server(void) {
+	this->setSocket(8080);
+	this->setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
+ }
 
 Server::Server(Server const& copy) { (void)copy; }
 
-Server const& Server::operator=(Server const & copy) {
+Server& Server::operator=(Server const & copy) {
 	if (this != &copy) {
-		;// do stuff
+		setSocket(copy.getSocket());
+		setBufferSize(copy.getBufferSize());
 	}
 	return *this;
 }
@@ -58,6 +63,14 @@ void	Server::setSocket(int port) {
 	listen(this->_socket, 500);
 }
 
-int	Server::getSocket() {
+int	Server::getSocket(void) const {
 	return (this->_socket);
+}
+
+int	Server::getBufferSize(void) const {
+	return this->_bufferSize;
+}
+
+void	Server::setBufferSize(int size) {
+	this->_bufferSize = size;
 }
