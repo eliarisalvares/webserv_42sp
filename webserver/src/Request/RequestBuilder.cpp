@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/09 11:09:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/09 12:06:16 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ bool RequestBuilder::addRequestData(void) {
 	// análise parcial - status - error, response
 	_requestData.push_back(buf);
 	memset(&buf, 0, sizeof(buf)); // isso faz limpar o que foi salvo??
-
+	this->_ready = true;
 	return true;
 }
 
@@ -73,8 +73,7 @@ Request* RequestBuilder::build() {
 	Logger log;
 	this->parse();
 	Request *req = new Request(this->_fd);
-	log.debug("Request pointer:");
-	std::cout << req << std::endl;
+	this->_ready = false;
 	return req;
 }
   // params: Server, fd da conexão

@@ -84,7 +84,7 @@ void	WebServ::run(void) {
 			if (this->_pfds[i].revents & POLLIN) {
 				log.debug("POLLIN event");
 				if (_is_server_socket(fd)) {
-					log.debug("create connection..");
+					log.debug("creating connection...");
 					_create_connection(fd);
 				} else {
 					// If not the server_fd, we're just a regular client
@@ -94,22 +94,7 @@ void	WebServ::run(void) {
 						_create_request_builder(fd);
 					}
 					// addRequestData() lê e vai indicar se a request é válida estruturalmente
-					// this->_requestBuilderMap[fd]->addRequestData(); // o if abaixo vai virar essa linha
-
-					if (this->_requestBuilderMap[fd]->addRequestData()) { // will read and group data
-						// mantive essa parte só pra mostrar que funciona como antes
-						// o for vai sair daqui e a resposta acontecerá
-						// no if abaixo do POLLOUT
-						log.debug("sending response...");
-						for(int j = 0; j < this->_total_fds; j++) {
-							// Send response
-							int dest_fd = this->_pfds[j].fd;
-							if (j == i) {
-								std::string response_string = get_response();
-								send(dest_fd, response_string.c_str(), response_string.length(), 0);
-							}
-						}
-					}
+					this->_requestBuilderMap[fd]->addRequestData();
 
 				} // END got ready-to-read from poll()
 			}
@@ -118,7 +103,7 @@ void	WebServ::run(void) {
 					_request_builder_exists(fd)
 					&& this->_requestBuilderMap[fd]->is_ready()  // when request parsing ends*
 				) {
-					log.debug("POLLOUT event and request parsing ended, ready to create Request object");
+					log.debug("POLLOUT event and request parsing ended");
 					// *pode ser que o parsing da request pegue um erro sem ter recebido
 					// todos os dados; pra ser mais eficaz e seguro a gente já
 					// vai retornar uma resposta com o erro adequado
@@ -126,9 +111,9 @@ void	WebServ::run(void) {
 
 					// create Request object
 					request = this->_requestBuilderMap[fd]->build();
-					log.debug("Request pointer:");
-					std::cout << request << std::endl;
-					log.debug("creating response...");
+					log.debug("creating request...");
+					// std::cout << request << std::endl;
+
 					_respond(request);
 
 					// delete request after sending response - problem here
@@ -225,13 +210,16 @@ std::string get_response() {
 
 void WebServ::_respond(Request* request) {
 	Response response;
+	Logger log;
 	int response_fd = request->fd();
 
 	// Lili:
 	// create Response object using Request object
 	// parse response
 	// send response
+	log.debug("creating response...");
 	std::string response_string = get_response();
+	log.debug("sending response...");
 	send(response_fd, response_string.c_str(), response_string.length(), 0);
 }
 
