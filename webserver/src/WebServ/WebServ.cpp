@@ -173,6 +173,7 @@ void	WebServ::_create_connection(int server_fd) {
 		this->_pfds.push_back(a);
 		// ensures we keep the relation between the connection and it's server
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
+		this->_total_fds++;
 
 		// >>>>>>>>>>>>>>>>>>>>>>> remove this
 		printf("pollserver: new connection from %s on socket %d\n",
