@@ -2,6 +2,7 @@
 # define WEB_SERV_HPP
 
 # include <iostream>
+# include <exception>
 # include <map>
 # include <vector>
 
@@ -66,5 +67,7 @@ private:
 	bool	_is_server_socket(int fd);
 	void	_create_connection(int newfd);
 };
+
+std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds);
 
 #endif

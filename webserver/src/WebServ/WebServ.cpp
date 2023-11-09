@@ -65,7 +65,9 @@ std::string get_response();
 
 void	WebServ::run(void) {
 	int poll_count, fd;
+	Logger log;
 
+	log.debug("run");
 	while(true) {
 		poll_count = poll(this->_pfds.data(), this->_pfds.size(), -1);
 
@@ -80,11 +82,14 @@ void	WebServ::run(void) {
 
 			// Check if someone's ready to read
 			if (this->_pfds[i].revents & POLLIN) {
+				log.debug("POLLIN event");
 				if (_is_server_socket(fd)) {
+					log.debug("create connection..");
 					_create_connection(fd);
 				} else {
 					// If not the server_fd, we're just a regular client
 					if (!_request_builder_exists(fd)) {
+						log.debug("creating RequestBuilder...");
 						// create RequestBuilder which will handle request parsing and creation
 						_create_request_builder(fd);
 					}
@@ -95,6 +100,7 @@ void	WebServ::run(void) {
 						// mantive essa parte só pra mostrar que funciona como antes
 						// o for vai sair daqui e a resposta acontecerá
 						// no if abaixo do POLLOUT
+						log.debug("sending response...");
 						for(int j = 0; j < this->_total_fds; j++) {
 							// Send response
 							int dest_fd = this->_pfds[j].fd;
@@ -112,16 +118,17 @@ void	WebServ::run(void) {
 					_request_builder_exists(fd)
 					&& this->_requestBuilderMap[fd]->is_ready()  // when request parsing ends*
 				) {
+					log.debug("POLLOUT event and request parsing ended, ready to create Request object");
 					// *pode ser que o parsing da request pegue um erro sem ter recebido
 					// todos os dados; pra ser mais eficaz e seguro a gente já
 					// vai retornar uma resposta com o erro adequado
-					Logger log;
 					Request* request;
 
 					// create Request object
 					request = this->_requestBuilderMap[fd]->build();
 					log.debug("Request pointer:");
 					std::cout << request << std::endl;
+					log.debug("creating response...");
 					_respond(request);
 
 					// delete request after sending response - problem here
@@ -183,6 +190,7 @@ void	WebServ::_create_connection(int server_fd) {
 				remoteIP, INET6_ADDRSTRLEN
 			),
 			newfd);
+		std::cout << this->_pfds << std::endl;
 	}
 }
 
@@ -254,3 +262,12 @@ void WebServ::restart_socket_servers(void) {
 		it->second->setSocket(it->second->getPort());
 }
 
+std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {
+	t_pollfd_vector::const_iterator it, end = _pfds.end();
+
+	o << GREY << "fds: ";
+	for (it = _pfds.begin(); it != end; ++it)
+		o << (*it).fd << " | ";
+	o << RESET;
+	return o;
+}
