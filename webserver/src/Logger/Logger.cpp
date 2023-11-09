@@ -12,20 +12,20 @@ Logger const& Logger::operator=(Logger const & copy) {
 }
 
 void Logger::error(std::string const msg) {
-	std::cout << ORANGE << msg << RESET;
+	std::cerr << ORANGE << "[ ERROR ] " << msg << RESET;
 }
 
 void Logger::warning(std::string const msg) {
-	std::cout << YELLOW << msg << RESET;
+	std::cout << YELLOW << "[ WARNING ] " << msg << RESET;
 }
 
 void Logger::info(std::string const msg) {
-	std::cout << BLUE << msg << RESET;
+	std::cout << BLUE << "[ INFO ] " << msg << RESET;
 }
 
 void Logger::debug(std::string const msg) {
 	if (DEBUG)
-		std::cout << GREY << msg << RESET;
+		std::cout << GREY << "[ DEBUG ] " << msg << RESET;
 }
 
 void Logger::success(std::string const msg) {
