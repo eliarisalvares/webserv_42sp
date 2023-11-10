@@ -1,24 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserServer.cpp                                   :+:      :+:    :+:   */
+/*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/09 18:40:30 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/10 17:01:34 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParserServer.hpp"
+#include "ServerParser.hpp"
 
-ParserServer::ParserServer(void) { }
+ServerParser::ServerParser(void) { }
 
-ParserServer::~ParserServer(void) { }
+ServerParser::~ServerParser(void) { }
 
-ParserServer::ParserServer(ParserServer const& copy) { (void)copy; }
+ServerParser::ServerParser(ServerParser const& copy) { (void)copy; }
 
-ParserServer const& ParserServer::operator=(ParserServer const & copy) {
+ServerParser const& ServerParser::operator=(ServerParser const & copy) {
 	if (this != &copy)
 		return copy;
 	return *this;
@@ -40,7 +40,39 @@ static std::string trim(const std::string& line)
 	return trimmed;
 }
 
-void	ParserServer::getConf(std::string fileName) {
+bool	ServerParser::_beginingOfFile() {
+	if (_lines[0].substr() != "server {")
+		return false;
+	return true;
+}
+
+bool	ServerParser::_bracketsClosed() {
+	int	openBrackets = 0;
+	int	closeBrackets = 0;
+	
+	for (size_t i = 0; i < this->_fileContent.size(); i++) {
+		if (this->_fileContent[i] == '{')
+			openBrackets++;
+		else if (this->_fileContent[i] == '}')
+			closeBrackets++;
+	}
+	if (openBrackets == closeBrackets)
+		return true;
+	return false;
+}
+
+bool	ServerParser::_minimalRequirements(int index) {
+	bool	check = false;
+
+	while (_lines[index].substr() != "}") {
+		if (_lines[index].substr(0, 6) == "listen")
+			check = true;
+		index++;
+	}
+	return check;
+}
+
+void	ServerParser::getConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::string			line;
 
@@ -54,38 +86,32 @@ void	ParserServer::getConf(std::string fileName) {
 		throw ServerErrorException(); //error of not server in the begining
 	if (!_bracketsClosed())
 		throw SyntaxErrorException(); //error of syntax
-	std::cout << _lines.size() << std::endl;
 	for (size_t i = 0; i < _lines.size(); i++)
 	{
-		std::cout << _lines[i] << std::endl;
+		while (_lines[i].substr() != "server {") {
+			if (_lines[i].substr() == "}" && _lines[i - 1].substr() == "server {")
+				throw ListenNotFoundErrorExeption();
+			else if ( _lines[i].substr() == "}") 
+				break ;
+			else if (!_minimalRequirements(i))
+				throw ListenNotFoundErrorExeption();
+			i++;
+		}
 	}
 }
 
-bool	ParserServer::_beginingOfFile() {
-	if (_lines[0].substr() != "server {")
-		return false;
-	return true;
+void	ServerParser::servers(void) {
+	;
 }
 
-bool	ParserServer::_bracketsClosed() {
-	int	openBrackets = 0;
-	int	closeBrackets = 0;
-	
-	for (size_t i = 0; i < this->_fileContent.size(); i++) {
-		if (this->_fileContent[i] == '{')
-			openBrackets++;
-		else if (this->_fileContent[i] == '}')
-			closeBrackets++;
-	}
-	if (openBrackets == closeBrackets)
-		return (true);
-	return (false);
+const char* ServerParser::ListenNotFoundErrorExeption::what() const throw() {
+	return ("Port to listen not found.");
 }
 
-const char* ParserServer::SyntaxErrorException::what() const throw() {
+const char* ServerParser::SyntaxErrorException::what() const throw() {
 	return ("Curly brackets not closed.");
 }
 
-const char* ParserServer::ServerErrorException::what() const throw() {
+const char* ServerParser::ServerErrorException::what() const throw() {
 	return ("Server not at begining of file.");
 }

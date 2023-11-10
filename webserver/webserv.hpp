@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/09 18:38:50 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/10 15:57:06 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@
 # include <exception>
 
 # include "WebServ.hpp"
-# include "ParserServer.hpp"
+# include "ServerParser.hpp"
 
 class	Server;
-class	ParserServer;
+class	ServerParser;
 
 bool	checkArgs(int argc, char *argv[]);
 
