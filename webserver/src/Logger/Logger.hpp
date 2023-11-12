@@ -26,6 +26,7 @@ public:
 	~Logger(void);
 
 	static void error(std::string const msg);
+	static void perror(std::string const msg);
 	static void warning(std::string const msg);
 	static void info(std::string const msg);
 	static void debug(std::string const msg);

@@ -15,6 +15,12 @@ void Logger::error(std::string const msg) {
 	std::cerr << ORANGE << "[ ERROR ] " << msg << RESET << std::endl;
 }
 
+void Logger::perror(std::string const msg) {
+	std::cerr << ORANGE << "[ ERROR ] ";
+	perror(msg);
+	std::cerr << RESET;
+}
+
 void Logger::warning(std::string const msg) {
 	std::cout << YELLOW << "[ WARNING ] " << msg << RESET << std::endl;
 }
