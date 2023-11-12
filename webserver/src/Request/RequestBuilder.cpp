@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/09 12:06:16 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/12 13:31:13 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 // private constructor
 RequestBuilder::RequestBuilder(void) {}
 
-RequestBuilder::RequestBuilder(Server& server, int connection):
-	_server(&server), _fd(connection), _ready(false) {  // change _ready
+RequestBuilder::RequestBuilder(Server* server, int connection):
+	_fd(connection), _ready(false), _server(server){
+	_parser = RequestParser();
 	_requestData.clear();
 }
 
@@ -34,53 +35,52 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 	return *this;
 }
 
-
-bool RequestBuilder::addRequestData(void) {
+bool RequestBuilder::read(void) {
+	char buf[(this->_server)->getBufferSize()];  // isso pode ser despendioso?
 	Logger log;
-	char buf[(this->_server)->getBufferSize()];
+	int nbytes;
 
 	log.debug("reading data and saving it...");
-	int nbytes = recv(this->_fd, buf, sizeof buf, 0);
-	buf[nbytes] = '\0'; // tirar isso por causa de binário!!
-	printf("received: %s\n", buf);
+	nbytes = recv(this->_fd, buf, sizeof buf, 0);
+
 	if (nbytes <= 0) {
-		// Got error or connection closed by client
 		if (nbytes == 0) {
-			// Connection closed
-			printf("pollserver: socket %d hung up\n", this->_fd);
-		} else {
-			perror("recv");
-		}
+			log.warning("client connection closed:");
+			printf("GREY" "socket %d hung up\n" "RESET", this->_fd);
+		} else
+			log.perror("recv");
 
-		close(this->_fd); // Bye!
-
+		close(this->_fd);
 		return false;
-
-		// raise error to close and remove RequestBuilder etc
-		// this->_pfds.erase(this->_pfds.begin() + i); // Remove an index from the set
 	}
 
-	// add request data in RequestBuilder
-	// quebrar em char
-	// análise parcial - status - error, response
-	_requestData.push_back(buf);
-	memset(&buf, 0, sizeof(buf)); // isso faz limpar o que foi salvo??
-	this->_ready = true;
+	for (int i = 0; i < nbytes; ++i)
+		_requestData.push_back(buf[i]);
+
+	memset(&buf, 0, sizeof(buf));
 	return true;
 }
 
-Request* RequestBuilder::build() {
+void RequestBuilder::parse(void) {
+	std::vector<char>::iterator it, end = _requestData.end();
+	std::cout << GREY << "Received: ";
+	for(it = _requestData.begin(); it != end; ++it) {
+		std::cout << *it;
+		if (*it == CR)
+			std::cout << "\nCR here";
+		if (*it == LF)
+			std::cout << "LF here";
+	}
+	std::cout << RESET << std::endl;
+}
+
+Request* RequestBuilder::build(void) {
 	Logger log;
 	this->parse();
 	Request *req = new Request(this->_fd);
 	this->_ready = false;
 	return req;
 }
-  // params: Server, fd da conexão
-
-
-void RequestBuilder::parse() {}
-
 
 bool RequestBuilder::is_ready(void) const {
 	return this->_ready;

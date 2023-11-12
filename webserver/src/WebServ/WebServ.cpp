@@ -67,6 +67,7 @@ void	WebServ::run(void) {
 
 	log.debug("run");
 	while(true) {
+		// &(*this->_pfds.begin()
 		poll_count = poll(this->_pfds.data(), this->_pfds.size(), -1);
 
 		if (poll_count == -1) {
@@ -85,29 +86,18 @@ void	WebServ::run(void) {
 					log.debug("creating connection...");
 					_create_connection(fd);
 				} else {
-					// If not the server_fd, we're just a regular client
-					if (!_request_builder_exists(fd)) {
-						log.debug("creating RequestBuilder...");
-						// create RequestBuilder which will handle request parsing and creation
-						_create_request_builder(fd);
-					}
-					// addRequestData() lê e vai indicar se a request é válida estruturalmente
-					this->_requestBuilderMap[fd]->addRequestData();
-
-				} // END got ready-to-read from poll()
+					_receive(fd);
+				}
 			}
 			if (this->_pfds[i].revents & POLLOUT) {  // can send
-				if (
-					_request_builder_exists(fd)
-					&& this->_requestBuilderMap[fd]->is_ready()  // when request parsing ends*
-				) {
+				if (_is_ready_to_respond(fd)) {  // when request parsing ends*
 					log.debug("POLLOUT event and request parsing ended");
 					// *pode ser que o parsing da request pegue um erro sem ter recebido
 					// todos os dados; pra ser mais eficaz e seguro a gente já
 					// vai retornar uma resposta com o erro adequado
-					Request* request;
 
 					// create Request object
+					Request* request;
 					request = this->_requestBuilderMap[fd]->build();
 					log.debug("creating request...");
 					// std::cout << request << std::endl;
@@ -116,14 +106,13 @@ void	WebServ::run(void) {
 
 					// delete request after sending response - problem here
 					// requests.erase(requests.begin() + i - 1); // Remove request
-					// delete request;
+					delete request;
 					// clean requestBuilder or delete it?
 				}
 			}
 		}
 	}
 }
-
 
 bool	WebServ::_is_server_socket(int fd) {
 	std::vector<int>::iterator it, end = this->_serverSockets.end();
@@ -156,7 +145,7 @@ void	WebServ::_create_connection(int server_fd) {
 	addrlen = sizeof remoteaddr;
 	newfd = accept(server_fd, (struct sockaddr *)&remoteaddr, &addrlen);
 	if (newfd == -1) {
-		perror("accept");
+		log.perror("accept");
 	} else {
 		a.fd = newfd;
 		a.events = POLLIN | POLLOUT; // Check ready-to-read + write
@@ -177,22 +166,48 @@ void	WebServ::_create_connection(int server_fd) {
 	}
 }
 
-void WebServ::_create_request_builder(int fd) {
+void WebServ::_receive(int fd) {
+	RequestBuilder* request_builder;
+
+	request_builder = _get_request_builder(fd);
+	if (request_builder->read()) {
+		request_builder->parse();
+		// if (request_builder->is_ready())
+		// 	request_builder->build();
+	}
+	else
+		_end_connection(fd);
+}
+
+RequestBuilder* WebServ::_create_request_builder(int fd) {
 	int server_fd;
 	RequestBuilder *builder;
 
+	log.debug("creating RequestBuilder...");
 	server_fd = this->_fds_map[fd];
-	builder = new RequestBuilder(*(this->_servers[server_fd]), fd);
+	builder = new RequestBuilder(this->_servers[server_fd], fd);
 	this->_requestBuilderMap.insert(std::make_pair(fd, builder));
+	return builder;
 }
 
-bool WebServ::_request_builder_exists(int fd) {
+RequestBuilder* WebServ::_get_request_builder(int fd) {
+	t_req_builder_iterator builder;
+
+	builder = this->_requestBuilderMap.find(fd);
+	if (builder == this->_requestBuilderMap.end())
+		return _create_request_builder(fd);
+	return builder->second;
+}
+
+bool WebServ::_is_ready_to_respond(int fd) {
 	t_req_builder_iterator builderFound;
 
 	builderFound = this->_requestBuilderMap.find(fd);
-	if (builderFound == this->_requestBuilderMap.end())
-		return false;
-	return true;
+	if (builderFound != this->_requestBuilderMap.end()) {
+		if (builderFound->second->is_ready())
+			return true;
+	}
+	return false;
 }
 
 void WebServ::_respond(Request* request) {
@@ -235,6 +250,47 @@ void WebServ::clean(void) {
 	this->_requestBuilderMap.clear();
 
 	this->_total_fds = 0;
+}
+
+// for server we need to create other function
+void WebServ::_end_connection(int fd) {
+	t_pollfd_iterator it, end = this->_pfds.end();
+	t_request_iterator request;
+	t_response_iterator response;
+	t_req_builder_iterator builder;
+	std::map<int, int>::iterator fds_map;
+
+	// fazer um template pra esses deletes - std::map<int, T*>
+	// clean structures data
+	builder = this->_requestBuilderMap.find(fd);
+	if (builder != this->_requestBuilderMap.end()) {
+		delete builder->second;
+		this->_requestBuilderMap.erase(fd);
+	}
+	request = this->_requests.find(fd);
+	if (request != this->_requests.end()) {
+		delete request->second;
+		this->_requests.erase(fd);
+	}
+	response = this->_responses.find(fd);
+	if (response != this->_responses.end()) {
+		delete response->second;
+		this->_responses.erase(fd);
+	}
+
+	// clean fds structures
+	for (it = this->_pfds.begin(); it != end; ++it) {
+		if ((*it).fd == fd) {
+			this->_pfds.erase(it);
+			break;
+		}
+	}
+	fds_map = this->_fds_map.find(fd);
+	if (fds_map != this->_fds_map.end())
+		this->_fds_map.erase(fd);
+
+	--this->_total_fds;
+	close(fd);
 }
 
 void WebServ::restart_socket_servers(void) {
