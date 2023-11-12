@@ -26,14 +26,17 @@ typedef std::map<int, Server*>::iterator t_server_iterator;
 
 // request types
 typedef std::map<int, Request*> t_request_map;
+typedef std::map<int, Request*>::iterator t_request_iterator;
 typedef std::map<int, RequestBuilder*> t_req_builder_map;
 typedef std::map<int, RequestBuilder*>::iterator t_req_builder_iterator;
 
 // response types
 typedef std::map<int, Response*> t_response_map;
+typedef std::map<int, Response*>::iterator t_response_iterator;
 
 // other types
 typedef std::vector<struct pollfd> t_pollfd_vector;
+typedef std::vector<struct pollfd>::iterator t_pollfd_iterator;
 
 class WebServ {
 public:
@@ -46,6 +49,8 @@ public:
 	void	clean(void);
 	void	restart_socket_servers(void);
 
+	Logger	log;
+
 private:
 	// we want only one instance of WebServ, without copy
 	WebServ(WebServ const& copy);
@@ -54,10 +59,14 @@ private:
 	t_server_map		_servers;
 	t_request_map		_requests;
 	t_response_map		_responses;
-	t_req_builder_map	_requestBuilderMap;
-	void				_create_request_builder(int fd);
-	bool				_request_builder_exists(int fd);
+	void				_receive(int fd);
 	void				_respond(Request* request);
+
+	// RequestBuilder
+	t_req_builder_map	_requestBuilderMap;
+	RequestBuilder*		_get_request_builder(int fd);
+	RequestBuilder*		_create_request_builder(int fd);
+	bool				_is_ready_to_respond(int fd);
 
 	// dealing with sockets fds
 	int					_total_fds;
@@ -66,6 +75,7 @@ private:
 	std::map<int, int>	_fds_map;  // connection between fds and server
 	bool	_is_server_socket(int fd);
 	void	_create_connection(int newfd);
+	void	_end_connection(int fd);
 };
 
 std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds);

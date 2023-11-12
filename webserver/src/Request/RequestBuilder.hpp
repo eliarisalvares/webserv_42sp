@@ -21,17 +21,18 @@
 # include "Logger.hpp"
 # include "Server.hpp"
 # include "Request.hpp"
+# include "RequestParser.hpp"
 
 class RequestBuilder {
 public:
-	RequestBuilder(Server& server, int connection);
-	RequestBuilder(int connection);
+	RequestBuilder(Server* server, int connection);
 	RequestBuilder(RequestBuilder const& copy);
 	RequestBuilder& operator=(RequestBuilder const& copy);
 	~RequestBuilder(void);
 
-	bool addRequestData(void);
-	Request* build(void);  // params: Server, fd da conexão
+	bool		read(void);
+	void		parse(void);
+	Request*	build(void);
 
 	Server			getServer(void) const;
 	bool			is_ready(void) const;
@@ -39,12 +40,11 @@ public:
 private:
 	RequestBuilder(void);
 
-	void parse(void);
-
-	Server*						_server; // RequestBuilder shouldn't edit Server
-	int							_fd;
-	bool						_ready;
-	std::vector<std::string>	_requestData;
+	int					_fd;
+	bool				_ready;
+	Server*				_server;
+	RequestParser		_parser;
+	std::vector<char>	_requestData;
 };
 
 #endif

@@ -4,14 +4,14 @@
 # Variables
 NAME = webserv
 CXX = c++
-CXXFLAGS = -Wall -Wextra -std=c++98 -MMD -MP -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -g3
 CXXDEBUG = -D DEBUG=true
 
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 				openFile.cpp
 WEBSERV =		WebServ.cpp
 SERVER =		Server.cpp ParserServer.cpp
-REQUEST =		Request.cpp RequestBuilder.cpp
+REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp
 LOGGER =		Logger.cpp
 
@@ -45,8 +45,8 @@ $(NAME): $(OBJPATH) $(OBJ)
 	$(CXX) $(OBJ) -o $(NAME)
 
 # Compiling the source files
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# %.o: %.cpp
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Removing all object files
 clean:
