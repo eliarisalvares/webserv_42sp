@@ -14,7 +14,6 @@
 # define BUILD_REQUEST_HPP
 
 # include <string>
-# include <vector>
 # include <cstring> // memset
 # include <unistd.h>
 
@@ -30,12 +29,18 @@ public:
 	RequestBuilder& operator=(RequestBuilder const& copy);
 	~RequestBuilder(void);
 
+	typedef enum e_builder_error {
+		NONE,
+		PARSE_ERROR,
+	}           t_builder_error;
+
 	bool		read(void);
 	void		parse(void);
 	Request*	build(void);
 
 	Server			getServer(void) const;
 	bool			is_ready(void) const;
+	e_builder_error error(void);
 
 private:
 	RequestBuilder(void);
@@ -43,8 +48,12 @@ private:
 	int					_fd;
 	bool				_ready;
 	Server*				_server;
+	e_builder_error		_error;
+	std::string			_error_str;
+
+	// parse data
+	char*				_buffer;
 	RequestParser		_parser;
-	std::vector<char>	_requestData;
 };
 
 #endif
