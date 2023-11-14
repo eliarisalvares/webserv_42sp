@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/14 12:09:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/14 12:19:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,25 +58,24 @@ bool RequestBuilder::read(void) {
 		close(this->_fd);
 		return false;
 	}
-	for (int i = 0; i < nbytes; ++i)
-		_requestData.push_back(buf[i]);
 
-	// _parser.break_data(_buffer, nbytes);
+	_parser.break_data(_buffer, nbytes);
 	memset(_buffer, 0, nbytes);
 	return true;
 }
 
 void RequestBuilder::parse(void) {
-	std::vector<char>::iterator it, end = _requestData.end();
-	std::cout << GREY << "Received: ";
-	for(it = _requestData.begin(); it != end; ++it) {
-		std::cout << *it;
-		if (*it == CR)
-			std::cout << "\nCR here";
-		if (*it == LF)
-			std::cout << "LF here";
+	if (_parser.step() == RequestParser::INIT) {
+		_parser.first_line();
+		if (_parser.error()) {
+			_ready = true;
+			_error = PARSE_ERROR; // pode ter outros
+			_error_str = "parser error"; // alterar isso aqui
+		}
+		if (_parser.step() == RequestParser::END)
+			_ready = true;
 	}
-	std::cout << RESET << std::endl;
+	_ready = true;  // this wiil change
 }
 
 Request* RequestBuilder::build(void) {
