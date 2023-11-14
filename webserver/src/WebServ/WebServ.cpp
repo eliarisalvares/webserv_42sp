@@ -103,10 +103,9 @@ void	WebServ::run(void) {
 					// std::cout << request << std::endl;
 
 					_respond(request);
-
-					// delete request after sending response - problem here
-					// requests.erase(requests.begin() + i - 1); // Remove request
 					delete request;
+					delete this->_requestBuilderMap[fd];  // ou dá um clean nele
+					this->_requestBuilderMap.erase(fd);
 					// clean requestBuilder or delete it?
 				}
 			}
@@ -145,7 +144,7 @@ void	WebServ::_create_connection(int server_fd) {
 	addrlen = sizeof remoteaddr;
 	newfd = accept(server_fd, (struct sockaddr *)&remoteaddr, &addrlen);
 	if (newfd == -1) {
-		log.perror("accept");
+		log.strerror("accept", errno);
 	} else {
 		a.fd = newfd;
 		a.events = POLLIN | POLLOUT; // Check ready-to-read + write

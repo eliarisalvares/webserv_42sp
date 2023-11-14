@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/12 13:31:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/14 12:09:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,15 @@
 RequestBuilder::RequestBuilder(void) {}
 
 RequestBuilder::RequestBuilder(Server* server, int connection):
-	_fd(connection), _ready(false), _server(server){
+	_fd(connection), _ready(false), _server(server) {
+	_buffer = new char[server->getBufferSize()];
+	memset(_buffer, 0, strlen(_buffer));
 	_parser = RequestParser();
-	_requestData.clear();
 }
 
-RequestBuilder::~RequestBuilder(void) {}
+RequestBuilder::~RequestBuilder(void) {
+	delete _buffer;
+}
 
 RequestBuilder::RequestBuilder(RequestBuilder const& copy) {
 	*this = copy;
@@ -36,28 +39,30 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 }
 
 bool RequestBuilder::read(void) {
-	char buf[(this->_server)->getBufferSize()];  // isso pode ser despendioso?
 	Logger log;
 	int nbytes;
+	int error;
 
 	log.debug("reading data and saving it...");
-	nbytes = recv(this->_fd, buf, sizeof buf, 0);
+	nbytes = recv(_fd, _buffer, _server->getBufferSize(), 0);
+	error = errno;
 
 	if (nbytes <= 0) {
+		std::cout << "error: " << errno << std::endl;
 		if (nbytes == 0) {
 			log.warning("client connection closed:");
 			printf("GREY" "socket %d hung up\n" "RESET", this->_fd);
 		} else
-			log.perror("recv");
+			log.strerror("recv", error);
 
 		close(this->_fd);
 		return false;
 	}
-
 	for (int i = 0; i < nbytes; ++i)
 		_requestData.push_back(buf[i]);
 
-	memset(&buf, 0, sizeof(buf));
+	// _parser.break_data(_buffer, nbytes);
+	memset(_buffer, 0, nbytes);
 	return true;
 }
 
