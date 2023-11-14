@@ -6,6 +6,8 @@ Class to log error, warning or debug messages
 # define LOGGER_HPP
 
 # include <iostream>
+# include <cerrno>
+# include <cstring>
 
 # define ORANGE	"\033[0;38;5;166m"
 # define BLUE	"\033[38;5;75m"
@@ -26,7 +28,7 @@ public:
 	~Logger(void);
 
 	static void error(std::string const msg);
-	static void perror(std::string const msg);
+	static void strerror(std::string const msg, int error);
 	static void warning(std::string const msg);
 	static void info(std::string const msg);
 	static void debug(std::string const msg);
