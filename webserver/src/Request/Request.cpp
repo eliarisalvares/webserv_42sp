@@ -6,14 +6,15 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/09 10:19:41 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/15 15:43:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
 Request::Request(void): _fd(0), _method(GET) { }
-Request::Request(int fd): _fd(fd), _method(GET) { }
+Request::Request(int fd, Server* server):
+	_server(server), _fd(fd), _method(GET) { }
 
 Request::~Request(void) { }
 

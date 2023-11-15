@@ -15,8 +15,6 @@ static const std::map<int, std::string> initializeMessageMap() {
     m.insert(std::make_pair(409, "Conflict"));
     m.insert(std::make_pair(413, "Payload Too Large"));
     m.insert(std::make_pair(414, "URI Too Long"));
-    m.insert(std::make_pair(415, "Unsupported Media Type"));
-    m.insert(std::make_pair(418, "I'm a teapot"));
     m.insert(std::make_pair(500, "Internal Server Error"));
 
     return m;

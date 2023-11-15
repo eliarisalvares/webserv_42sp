@@ -32,6 +32,7 @@ public:
 	typedef enum e_builder_error {
 		NONE,
 		PARSE_ERROR,
+		METHOD_NOT_ALLOWED,
 	}           t_builder_error;
 
 	bool		read(void);
