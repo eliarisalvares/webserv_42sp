@@ -46,5 +46,7 @@ std::string responseBuilder(int statusCode, const std::string& message, const st
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);
+std::string getCurrentDate(void);
+void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength);
 
 #endif
