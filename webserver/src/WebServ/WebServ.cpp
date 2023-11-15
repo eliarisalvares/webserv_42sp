@@ -213,20 +213,12 @@ void WebServ::_respond(Request* request) {
 	Response response;
 	Logger log;
 	int response_fd = request->fd();
-	int status_code = 200;
 
 	//std::string filePath = request->_requestData;
 	std::string filePath = "content/index.html";
-	std::string contentType = getContentType(filePath);
-	std::string body = getHtmlContent(filePath);
-	std::string message = getStatusMessage(status_code);
 
-	// Lili:
-	// create Response object using Request object
-	// parse response
-	// send response
 	log.debug("creating response...");
-	std::string response_string = responseBuilder(status_code, message, body, contentType);
+	std::string response_string = responseBuilder(filePath);
 	log.debug("sending response...");
 	send(response_fd, response_string.c_str(), response_string.length(), 0);
 }

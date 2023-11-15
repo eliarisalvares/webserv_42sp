@@ -35,14 +35,48 @@ std::string getHtmlContent(const std::string& filePath) {
     return buffer.str();
 }
 
-std::string responseBuilder(int statusCode, const std::string& message, const std::string& body, const std::string& contentType) {
+std::string getCurrentDate(void)
+{
+    time_t   now;
+    struct tm  ts;
+    char       buf[80];
+
+    time(&now);
+    ts = *localtime(&now);
+    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", &ts);
+    return buf;
+}
+
+void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength) {
+    response.addHeader("Content-Type", contentType);
+    response.addHeader("Content-Length", contentLength);
+    response.addHeader("Date", getCurrentDate());
+    response.addHeader("Server", "Webserv WebWizards");
+    response.addHeader("Access-Control-Allow-Origin", "*");
+    response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE");
+    response.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    response.addHeader("Access-Control-Allow-Credentials", "true");
+    response.addHeader("Cache-Control", "no-cache");
+}
+
+
+std::string responseBuilder(const std::string& filePath) {
     Response response;
+
+    std::string contentType = getContentType(filePath);
+    std::string body = getHtmlContent(filePath);
+    int statusCode = body.empty() ? 404 : 200;
+    std::string message = getStatusMessage(statusCode);
+
     response.setStatusCode(statusCode);
     response.setMessage(message);
     response.setBody(body);
+
     std::stringstream ss;
     ss << body.length();
-    response.addHeader("Content-Type", contentType);
-    response.addHeader("Content-Length", ss.str());
+
+    setResponseHeaders(response, contentType, ss.str());
+
     return response.toString();
 }
+
