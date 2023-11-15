@@ -42,7 +42,7 @@ private:
 
 };
 
-std::string responseBuilder(int statusCode, const std::string& message, const std::string& body, const std::string& contentType);
+std::string responseBuilder(const std::string& filePath);
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);

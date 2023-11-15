@@ -60,13 +60,18 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 }
 
 
-std::string responseBuilder(int statusCode, const std::string& message, const std::string& body, const std::string& contentType) {
+std::string responseBuilder(const std::string& filePath) {
     Response response;
+
+    std::string contentType = getContentType(filePath);
+    std::string body = getHtmlContent(filePath);
+    int statusCode = body.empty() ? 404 : 200;
+    std::string message = getStatusMessage(statusCode);
 
     response.setStatusCode(statusCode);
     response.setMessage(message);
     response.setBody(body);
-    
+
     std::stringstream ss;
     ss << body.length();
 
@@ -74,3 +79,4 @@ std::string responseBuilder(int statusCode, const std::string& message, const st
 
     return response.toString();
 }
+
