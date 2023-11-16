@@ -6,13 +6,15 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/10 17:01:34 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/16 15:25:26 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerParser.hpp"
 
-ServerParser::ServerParser(void) { }
+ServerParser::ServerParser(void) {
+	_nbrServers = 0;
+}
 
 ServerParser::~ServerParser(void) { }
 
@@ -75,6 +77,7 @@ bool	ServerParser::_minimalRequirements(int index) {
 void	ServerParser::getConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::string			line;
+	bool				check = false;
 
 	while (std::getline(inputFile, line)) {
 		line = trim(line); //clear spaces and tabs -> do we need to keep the tabs to check for the spacing?
@@ -89,19 +92,32 @@ void	ServerParser::getConf(std::string fileName) {
 	for (size_t i = 0; i < _lines.size(); i++)
 	{
 		while (_lines[i].substr() != "server {") {
+			if (check == false) {
+				check = _minimalRequirements(i);
+			}
 			if (_lines[i].substr() == "}" && _lines[i - 1].substr() == "server {")
 				throw ListenNotFoundErrorExeption();
 			else if ( _lines[i].substr() == "}") 
 				break ;
-			else if (!_minimalRequirements(i))
-				throw ListenNotFoundErrorExeption();
 			i++;
 		}
+		if (i && !check)
+			throw ListenNotFoundErrorExeption();
 	}
 }
 
 void	ServerParser::servers(void) {
-	;
+	for (size_t i = 0; i < _lines.size(); i++) {
+		// t_infoServer	newServer;
+
+		getServerInfo(_lines, i);
+		// newServer = getServerInfo(_lines, i);
+		if (_lines[i].substr() == "server {") {
+			while ( _lines[i].substr() != "}") 
+				i++;
+		}
+		// _servers.push_back(newServer);
+	}
 }
 
 const char* ServerParser::ListenNotFoundErrorExeption::what() const throw() {

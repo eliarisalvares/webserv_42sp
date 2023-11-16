@@ -1,24 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserServer.hpp                                   :+:      :+:    :+:   */
+/*   ServerParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/10 16:37:23 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/16 15:08:35 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSER_HPP
 # define PARSER_HPP
 
-# include <iostream>
-# include <fstream> // using files
-# include <vector>
-# include <map>
-
-typedef std::map<std::string, std::string>	t_infoServer;
+# include "ServerBuilder.hpp"
 
 class ServerParser {
 	public:
@@ -41,6 +36,7 @@ class ServerParser {
 		};
 	private:
 		std::string					_fileContent;
+		size_t						_nbrServers;
 		std::vector<std::string>	_lines;
 		std::vector<t_infoServer>	_servers;
 

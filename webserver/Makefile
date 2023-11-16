@@ -10,7 +10,7 @@ CXXDEBUG = -D DEBUG=true
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 				openFile.cpp
 WEBSERV =		WebServ.cpp
-SERVER =		Server.cpp ParserServer.cpp
+SERVER =		Server.cpp ServerParser.cpp ServerBuilder.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
@@ -62,5 +62,9 @@ re: fclean all
 
 # Checking headers for each file
 -include $(DEPS)
+
+#run the program with args
+run:
+	./$(NAME) testconfig.conf
 
 .PHONY: all clean fclean re
