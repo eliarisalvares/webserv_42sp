@@ -156,7 +156,7 @@ void	WebServ::_create_connection(int server_fd) {
 		this->_total_fds++;
 
 		// >>>>>>>>>>>>>>>>>>>>>>> remove this
-		printf("pollserver: new connection from %s on socket %d\n",
+		printf("poll server: new connection from %s on socket %d\n",
 			inet_ntop(
 				remoteaddr.ss_family,
 				get_in_addr((struct sockaddr*)&remoteaddr),
