@@ -100,4 +100,78 @@ struct sockaddr_storage {
 - you can see the address family in the `ss_family field`: check this to see if it’s AF_INET or AF_INET6 (for IPv4 or IPv6). Then you can cast it to the right struct if you wanna
 
 
-##
+## Http structure
+
+the format of an HTTP message is:
+
+```
+<initial line, different for request vs. response>
+Header1: value1 // zero or more header lines
+Header2: value2
+Header3: value3
+...
+
+<optional message body goes here, like file contents or query data;
+ it can be many lines long, or even binary data $&*%@!^$@>
+```
+
+- Each part of a HTTP request is separated by a new line. Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline.
+- A HTTP request is terminated by two newlines. Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
+
+### Initial Request Line
+A request line has three parts, separated by spaces: a method name, the local path of the requested resource, and the version of HTTP being used
+
+- Method names are always uppercase
+- The path is the part of the URL after the host name, also called the request URI
+- The HTTP version always takes the form "HTTP/x.x", uppercase
+- Parts of request line is separated by a space character. Technically there should be only one space though I've seen badly malformed requests that send multiple spaces. Browsers will never send more than one space
+
+### Initial Response Line (Status Line)
+
+It has three parts separated by spaces: the HTTP version, a response status code that gives the result of the request, and an English reasonphrase describing the status code.
+- The HTTP version is in the same format as in the request line, "HTTP/x.x".
+- The status code is meant to be computer-readable; the reason phrase is meant to be human-readable, and may vary
+- The status code is a three-digit integer, and the first digit identifies the general category of response:
+	- 1xx indicates an informational message only
+	- 2xx indicates success of some kind
+	- 3xx redirects the client to another URL
+	- 4xx indicates an error on the client's part
+	- 5xx indicates an error on the server's part
+
+### Header Lines
+Header lines provide information about the request or response, or about the object sent in the message body.
+- one line per header, of the form "Header-Name: value", ending with CRLF, but you should handle LF correctly
+- The header name is not case-sensitive (though the value may be). Header name can be either title-case or lowercase or mixed, all are valid
+- Any number of spaces or tabs may be between the ":" and the value
+- Header lines beginning with space or tab are actually part of the previous header line, folded into multiple lines for easy reading. The following two headers are equivalent:
+
+```
+Header1: some-long-value-1a, some-long-value-1b
+
+HEADER1:    some-long-value-1a,
+            some-long-value-1b
+```
+
+- HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
+
+
+### The Message Body
+An HTTP message may have a body of data sent after the header lines.
+- In a response, this is where the requested resource is returned to the client (the most common use of the message body), or perhaps explanatory text if there's an error.
+- In a request, this is where user-entered data or uploaded files are sent to the server.
+
+If an HTTP message includes a body, there are usually header lines in the message that describe the body:
+- Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
+- Content-Length: header gives the number of bytes in the body.
+
+<hr>
+"Be strict in what you send and tolerant in what you receive." Other clients and servers you interact with may have minor flaws in their messages, but you should try to work gracefully with them. In particular, the HTTP specification suggests the following:
+
+Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
+The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
+
+
+
+
+303 See Other (HTTP 1.1 only)
+The resource has moved to another URL (given by the Location: response header), and should be automatically retrieved by the client. This is often used by a CGI script to redirect the browser to an existing file.
