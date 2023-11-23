@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 16:37:04 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:19:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 
 RequestParser::RequestParser(void):
-	_idx(0), _step(INIT), _error(NONE) {
+	_idx(0), _step(METHOD), _error(NONE) {
 	_data.clear();
 	_result.clear();
 }
@@ -146,3 +146,113 @@ bool RequestParser::_found_EOL(void) {
 	return false;
 }
 
+// Field name:
+// The requested field name. It MUST conform to the field-name syntax defined
+// in Section 5.1, and it SHOULD be restricted to just letters, digits,
+// and hyphen ('-') characters, with the first character being a letter.
+void RequestParser::header(void) {
+	std::vector<char>::iterator it;
+	std::string header_name;
+	std::string header_value;
+
+	log.debug("parsing header");
+	while (_found_EOL()) {
+		log.debug("Found EOL");
+		for (it = _data.begin(); it != _data_it && *it != TP; ++it)
+			header_name.push_back(*it);
+		log.debug(header_name);
+		if (*it == TP)
+			++it;
+		while (*it == SP)
+			++it;
+		for (; it != _data_it; ++it)
+			header_value.push_back(*it);
+		log.debug(header_value);
+		_result.insert(t_result_pair(header_name, header_value));
+		it += 2;
+		_data.erase(_data.begin(), it);
+		header_name.clear();
+		header_value.clear();
+	}
+	if (*it == CR && *(it + 1) == LF) {
+		log.warning("end of headers");
+		_step = END;  ///////////////////////
+	}  // double CRFL
+}
+
+// general:
+// Each part of a HTTP request is separated by a new line
+// Note: Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline
+// Parts of request line is separated by a space character. Technically there should be only one space though I've seen badly malformed requests that send multiple spaces. Browsers will never send more than one space
+
+// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
+// The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
+
+// headers
+// one line per header, of the form "Header-Name: value", ending with CRLF
+// you should handle LF correctly
+// The header name is not case-sensitive (though the value may be) - Header
+// name can be either title-case or lowercase or mixed, all are valid
+// Any number of spaces or tabs may be between the ":" and the value
+// Header lines beginning with space or tab are actually part of the previous header line, folded into multiple lines for easy reading.
+// the following two headers are equivalent:
+
+// Header1: some-long-value-1a, some-long-value-1b
+// HEADER1:    some-long-value-1a,
+//             some-long-value-1b
+
+// HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
+
+// If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
+// Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
+// Content-Length: header gives the number of bytes in the body.
+
+// A HTTP request is terminated by two newlines
+// Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
+
+// The most common use of POST, by far, is to submit HTML form data to CGI scripts. In this case, the Content-Type: header is usually application/x-www-form-urlencoded, and the Content-Length: header gives the length of the URL-encoded form data
+// Ex:
+// POST /path/script.cgi HTTP/1.0
+// From: frog@jmarshall.com
+// User-Agent: HTTPTool/1.0
+// Content-Type: application/x-www-form-urlencoded
+// Content-Length: 32
+
+// home=Cosby&favorite+flavor=flies
+
+// You can use a POST request to send whatever data you want, not just form submissions. Just make sure the sender and the receiving program agree on the format.
+
+
+// URL encoding
+// HTML form data is usually URL-encoded to package it in a GET or POST submission. In a nutshell, here's how you URL-encode the name-value pairs of the form data:
+
+// Convert all "unsafe" characters in the names and values to "%xx", where "xx" is the ascii value of the character, in hex. "Unsafe" characters include =, &, %, +, non-printable characters, and any others you want to encode-- there's no danger in encoding too many characters. For simplicity, you might encode all non-alphanumeric characters.
+// Change all spaces to plusses.
+// String the names and values together with = and &, like
+// name1=value1&name2=value2&name3=value3
+// This string is your message body for POST submissions, or the query string for GET submissions.
+// For example, if a form has a field called "name" that's set to "Lucy", and a field called "neighbors" that's set to "Fred & Ethel", the URL-encoded form data would be
+// name=Lucy&neighbors=Fred+%26+Ethel
+// with a length of 34.
+
+// Using GET to Submit Query or Form Data
+// You can use GET to send small amounts of data to the server. The key is to understand just what the request URI is: It's not necessarily a file name, it's a string that identifies a data resource on the server. That may be a file name, but it may also be, for example, a specific query to a specific database. The result of that query may not live in a file, but it's a data resource all the same, identified by the search engine and the query data that together produce it.
+
+// So, to send data to a CGI script using a GET request, include that data after the question mark in the URL (read about URL syntax for more details). For example,
+
+// GET /path/script.cgi?field1=value1&field2=value2 HTTP/1.0
+
+
+// CGI response
+// Sending an Existing File Back as a Response
+// If your HTML response is always the same, or if you want to respond with one of several existing files, you may find the "Location:" response header useful. Use it to redirect the browser to another URL.
+
+// By way of example, if your CGI script prints the following line to STDOUT:
+
+// Location: response.html
+// followed by a blank line, then the remote browser will retrieve response.html and treat it as the response from your CGI script. You can redirect the browser to either a relative or absolute URL.
+// In this situation, do not print the "Content-type:" response header.
+
+
+// "Transfer-Encoding: chunked" header. All HTTP 1.1 clients must be able to receive chunked messages
+// Servers aren't required to generate chunked messages; they just have to be able to receive them.

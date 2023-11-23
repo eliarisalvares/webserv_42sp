@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/15 14:15:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/23 00:49:45 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,15 @@
 
 # include "Logger.hpp"
 
-// ABNF Rules
-
-// Special chars
+// Special chars - ABNF Rules
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
+
+// others
+# define TP ':'
+
+typedef std::pair<std::string, std::string> t_result_pair;
 
 class RequestParser {
 public:
@@ -36,9 +39,7 @@ public:
 
 	typedef enum e_steps {
 		ERROR,
-		INIT,
-		CRLF,
-		FIRST_LINE,  // CRLF?
+		FIRST_LINE,
 		METHOD,
 		URI,
 		PROTOCOL,
@@ -60,10 +61,28 @@ public:
 		INVALID_HTTP_VERSION,
 	}           t_parser_error;
 
+	typedef enum e_abnf_rules {
+		ALPHA, // (letters)
+		// CR, // (carriage return)
+		CRLF, // (CR LF)
+		CTL, // (controls)
+		DIGIT, // (decimal 0-9)
+		DQUOTE, // (double quote)
+		HEXDIG, // (hexadecimal 0-9/A-F/a-f)
+		HTAB, // (horizontal tab)
+		// LF, // (line feed)
+		OCTET, // (any 8-bit sequence of data)
+		// SP, // (space)
+		VCHAR, //(any visible US-ASCII character)
+	}           t_abnf_rules;
+
 	void			break_data(char* buffer, size_t bytes_read);
 	void			first_line(void);
+	void			header(void);
 	e_steps			step(void);
 	e_parser_error	error(void);
+
+	bool			first_line_not_parsed(void);
 
 private:
 	bool								_found_EOL(void);
