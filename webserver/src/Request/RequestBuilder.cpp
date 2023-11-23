@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 16:36:27 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:19:00 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ bool RequestBuilder::read(void) {
 		std::cout << "error: " << errno << std::endl;
 		if (nbytes == 0) {
 			log.warning("client connection closed:");
-			printf("GREY" "socket %d hung up\n" "RESET", this->_fd);
+			printf(GREY "socket %d hung up\n" "RESET", this->_fd);
 		} else
 			log.strerror("recv", error);
 
@@ -65,17 +65,19 @@ bool RequestBuilder::read(void) {
 }
 
 void RequestBuilder::parse(void) {
-	if (_parser.step() == RequestParser::INIT) {
+	if (_parser.step() == RequestParser::METHOD) {
 		_parser.first_line();
-		if (_parser.error()) {
-			_ready = true;
-			_error = PARSE_ERROR; // pode ter outros
-			_error_str = "parser error"; // alterar isso aqui
-		}
-		if (_parser.step() == RequestParser::END)
-			_ready = true;
 	}
-	_ready = true;  // this wiil change
+	if (_parser.step() == RequestParser::HEADER) {
+		_parser.header();
+	}
+	if (_parser.error()) {
+		_ready = true;
+		_error = PARSE_ERROR; // pode ter outros
+		_error_str = "parser error"; // alterar isso aqui
+	}
+	if (_parser.step() == RequestParser::END)
+		_ready = true;
 }
 
 Request* RequestBuilder::build(void) {
