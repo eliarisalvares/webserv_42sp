@@ -32,8 +32,11 @@ Server Class
 # define SERVER_NAME "Server WebWizards"
 # define CGI_EXECUTOR "python3"
 # define CGI_LOCATION "/cgi"
+# define SERVER_PORT "8080"
+# define METHODS "GET, POST, DELETE"
 
 class Server {
+	friend class Response;
 	public:
 		Server(void);
 		Server(int port);
@@ -46,6 +49,9 @@ class Server {
 		void	setSocket(int port);
 		int		getBufferSize(void) const;
 		void	setBufferSize(int size);
+		static std::string	getServerName(void);
+		static std::string getCurrentPort(void);
+		static std::string getAllowedMethods(void);
 
 	private:
 		int									_port;  // obrigatório

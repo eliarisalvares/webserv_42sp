@@ -10,7 +10,17 @@ Response Class
 # include <map> /* map */
 # include <string> /* string */
 # include <sstream> /* stringstream */
-#include <fstream> /* ifstream */
+# include <fstream> /* ifstream */
+# include <cstdio> /* perror */
+# include <unistd.h> /* close */
+# include <cstring> /* memset */
+# include <sys/time.h> /* gettimeofday */
+# include <iomanip> /* setfill, setw */
+# include <ctime> /* time_t, localtime, strftime */
+
+# include "Server.hpp"
+# include "Request.hpp"
+# include "Logger.hpp"
 
 class Response {
 
@@ -42,6 +52,7 @@ private:
 
 };
 
+std::string handleCGI(void);
 std::string responseBuilder(const std::string& filePath);
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
