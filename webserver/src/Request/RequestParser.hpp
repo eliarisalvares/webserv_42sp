@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/23 00:49:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/25 17:36:09 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # define SP ' '
 
 // others
-# define TP ':'
+# define COLON ':'
 
 typedef std::pair<std::string, std::string> t_result_pair;
 
@@ -85,8 +85,6 @@ public:
 	bool			first_line_not_parsed(void);
 
 private:
-	bool								_found_EOL(void);
-
 	Logger								log;
 	size_t								_idx;
 	t_steps								_step;
@@ -95,6 +93,10 @@ private:
 	std::vector<char>					_data;
 	std::vector<char>::iterator			_data_it;
 	std::map<std::string, std::string>	_result;
+
+	bool								_found_EOL(void);
+
+	void								_print_data(void);
 };
 
 #endif

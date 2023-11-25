@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/15 15:53:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/25 17:07:08 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ Server Class
 # include <stdio.h> // errors
 # include <map>
 
-# define BUFFSIZE 256
+# define BUFFSIZE 1024 // segfault com 20, 50
 # define CLIENT_MAX_BODY_SIZE 100
 # define TIMEOUT 5000
 # define LOCATION "/"
