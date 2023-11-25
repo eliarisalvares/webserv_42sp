@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:19:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:20:08 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,16 @@ void RequestParser::break_data(char* buffer, size_t bytes_read) {
 	for (size_t i = 0; i < bytes_read; ++i)
 		_data.push_back(buffer[i]);
 
-	std::vector<char>::iterator it, end = _data.end();
 	if (DEBUG) {
 		std::cout << GREY << "Received/remaining data:\n";
+		_print_data();
+	}
+}
+
+void RequestParser::_print_data(void) {
+	std::vector<char>::iterator it, end = _data.end();
+
+	if (DEBUG) {
 		for(it = _data.begin(); it != end; ++it) {
 			if (*it == CR)
 				std::cout << " CR";
@@ -158,10 +165,10 @@ void RequestParser::header(void) {
 	log.debug("parsing header");
 	while (_found_EOL()) {
 		log.debug("Found EOL");
-		for (it = _data.begin(); it != _data_it && *it != TP; ++it)
+		for (it = _data.begin(); it != _data_it && *it != COLON; ++it)
 			header_name.push_back(*it);
 		log.debug(header_name);
-		if (*it == TP)
+		if (*it == COLON)
 			++it;
 		while (*it == SP)
 			++it;
@@ -173,11 +180,12 @@ void RequestParser::header(void) {
 		_data.erase(_data.begin(), it);
 		header_name.clear();
 		header_value.clear();
+		if (*it == CR && *(it + 1) == LF) {
+			log.info("end of headers - remaining data:");
+			_print_data();
+			_step = END;  ///////////////////////
+		}  // double CRFL
 	}
-	if (*it == CR && *(it + 1) == LF) {
-		log.warning("end of headers");
-		_step = END;  ///////////////////////
-	}  // double CRFL
 }
 
 // general:
