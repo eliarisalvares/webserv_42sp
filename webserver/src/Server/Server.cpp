@@ -93,3 +93,15 @@ void	Server::setBufferSize(int size) {
 int	Server::getPort(void) const {
 	return this->_port;
 }
+
+std::string	Server::getServerName(void) {
+	return (SERVER_NAME);
+}
+
+std::string	Server::getCurrentPort(void) {
+	return (SERVER_PORT);
+}
+
+std::string	Server::getAllowedMethods(void) {
+	return (METHODS);
+}

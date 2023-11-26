@@ -215,7 +215,7 @@ void WebServ::_respond(Request* request) {
 	int response_fd = request->fd();
 
 	//std::string filePath = request->_requestData;
-	std::string filePath = "content/index.html";
+	std::string filePath = "content/cgi/current_time.py";
 
 	log.debug("creating response...");
 	std::string response_string = responseBuilder(filePath);

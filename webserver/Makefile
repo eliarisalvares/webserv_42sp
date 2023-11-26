@@ -12,7 +12,7 @@ SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 WEBSERV =		WebServ.cpp
 SERVER =		Server.cpp ParserServer.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
-RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp
+RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
 
 INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response \
