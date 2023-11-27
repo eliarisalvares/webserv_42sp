@@ -8,22 +8,23 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -g3
 CXXDEBUG = -D DEBUG=true
 
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
-				openFile.cpp
+				$(UTILS)
 WEBSERV =		WebServ.cpp
 SERVER =		Server.cpp ServerParser.cpp ServerBuilder.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
+UTILS =			openFile.cpp ftstring.cpp
 
 INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response \
-				-I src/Server -I src/Parser -I src/WebServ
+				-I src/Server -I src/Parser -I src/WebServ -I src/Utils
 
 OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
 
 OBJPATH =		temp
 VPATH =			src src/Logger src/Request src/Response src/Server src/Parser \
-				src/WebServ
+				src/WebServ src/Utils
 
 ################################################################################
 ##                                    RULES                                   ##
