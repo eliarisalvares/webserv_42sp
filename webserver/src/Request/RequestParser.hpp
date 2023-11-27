@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/25 17:36:09 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:49:45 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@
 // others
 # define COLON ':'
 
-typedef std::pair<std::string, std::string> t_result_pair;
+typedef std::map<std::string, std::string>	t_string_map;
+typedef std::pair<std::string, std::string>	t_string_pair;
 
 class RequestParser {
 public:
@@ -83,6 +84,7 @@ public:
 	e_parser_error	error(void);
 
 	bool			first_line_not_parsed(void);
+	t_string_map	get_result(void) const;
 
 private:
 	Logger								log;
@@ -92,7 +94,7 @@ private:
 	std::string							_error_str;
 	std::vector<char>					_data;
 	std::vector<char>::iterator			_data_it;
-	std::map<std::string, std::string>	_result;
+	t_string_map						_result;
 
 	bool								_found_EOL(void);
 
