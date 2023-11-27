@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/14 10:53:09 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 12:57:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ void RequestParser::first_line(void) {
 
 bool RequestParser::_found_EOL(void) {
 	std::vector<char>::iterator end = _data.end();
+	(void)_idx;
 
 	for(_data_it = _data.begin(); _data_it != end; ++_data_it) {
 		if (*_data_it == CR) {
