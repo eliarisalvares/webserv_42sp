@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/10 15:57:06 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/27 15:29:10 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ int	main(int argc, char *argv[]) {
 	// WebServ	webserv;
 	// bool	first_init = true;
 
-	// o servidor deve sempre restartar em caso de algum erro na execução
+	// // o servidor deve sempre restartar em caso de algum erro na execução
 	// while (true) {
 	// 	try {
 	// 		// create servers and sockets for each server
 	// 		if (first_init)
 	// 		{
-	// 			webserv.create_servers();
+	// 			webserv.create_servers(); //send port.servers
 	// 			first_init = false;
 	// 		}
 	// 		else

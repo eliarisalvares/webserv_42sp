@@ -65,6 +65,6 @@ re: fclean all
 
 #run the program with args
 run:
-	./$(NAME) testconfig.conf
+	./$(NAME) config/testconfig.conf
 
 .PHONY: all clean fclean re
