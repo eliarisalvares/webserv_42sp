@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/15 15:42:07 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 15:27:17 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,18 +26,7 @@ Server::Server(int port): _port(port) {
 	this->_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
-Server::~Server(void) {
-	this->_port = 8080;
-	this->setSocket(8080);
-	this->setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
-	this->_client_max_body_size = CLIENT_MAX_BODY_SIZE;
-	this->_server_name = SERVER_NAME;
-	this->_root = ROOT;
-	this->_cgi_location = CGI_LOCATION;
-	this->_location_root.clear();
-	this->_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
-	this->_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
- }
+Server::~Server(void) { }
 
 Server::Server(Server const& copy) { (void)copy; }
 

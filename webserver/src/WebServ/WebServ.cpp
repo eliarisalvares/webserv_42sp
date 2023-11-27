@@ -45,6 +45,7 @@ void	WebServ::create_servers(void) {
 	this->_servers.insert(
 		std::pair<int, Server*>(oneServer->getSocket(), oneServer)
 	);
+	//will get the socket for the server, initialize the server
 }
 
 void	WebServ::init(void) {

@@ -15,4 +15,8 @@ class PortNotFoundErrorExeption : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
+class PortNeedsSudoExeption : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
 #endif
