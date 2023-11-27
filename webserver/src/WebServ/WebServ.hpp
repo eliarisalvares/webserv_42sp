@@ -18,10 +18,12 @@
 # include "Request.hpp"
 # include "Response.hpp"
 # include "RequestBuilder.hpp"
+# include "ftstring.hpp"
 
 # define PORT 8080
 
 // server types
+typedef std::map<std::string, std::string>	t_infoServer;
 typedef std::map<int, Server*> t_server_map;
 typedef std::map<int, Server*>::iterator t_server_iterator;
 
@@ -44,7 +46,7 @@ public:
 	WebServ(void);
 	~WebServ(void);
 
-	void	create_servers(void);
+	void	create_servers(std::vector<t_infoServer> servers);
 	void	init(void);
 	void	run(void);
 	void	clean(void);

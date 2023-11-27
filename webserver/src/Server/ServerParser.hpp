@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/16 15:08:35 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/27 16:31:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PARSER_HPP
 
 # include "ServerBuilder.hpp"
+# include "ftstring.hpp"
 
 class ServerParser {
 	public:
@@ -22,8 +23,9 @@ class ServerParser {
 		ServerParser(ServerParser const& copy);
 		ServerParser const& operator=(ServerParser const& copy);
 
-		void	getConf(std::string fileName);
-		void	servers(void);
+		void						servers(void);
+		void						getConf(std::string fileName);
+		std::vector<t_infoServer>	getServers(void);
 
 		class SyntaxErrorException : public std::exception {
 			virtual const char* what(void) const throw();

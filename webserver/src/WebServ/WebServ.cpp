@@ -38,9 +38,10 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 	return *this;
 }
 
-void	WebServ::create_servers(void) {
+void	WebServ::create_servers(std::vector<t_infoServer> servers) {
 	// for now working with one server only
-	Server* oneServer = new Server(PORT);
+	int port = ftstring::strtoi(servers[0]["listen"]);
+	Server* oneServer = new Server(port);
 
 	this->_servers.insert(
 		std::pair<int, Server*>(oneServer->getSocket(), oneServer)
