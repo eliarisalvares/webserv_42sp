@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:20:08 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:51:56 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,10 +110,10 @@ void RequestParser::first_line(void) {
 		log.debug(version);
 		_step = HEADER;
 		_data.erase(_data.begin(), _data_it + 2);
-		_result.insert(t_result_pair("method", method));
-		_result.insert(t_result_pair("uri", uri));
-		_result.insert(t_result_pair("protocol", protocol));
-		_result.insert(t_result_pair("version", version));
+		_result.insert(t_string_pair("method", method));
+		_result.insert(t_string_pair("uri", uri));
+		_result.insert(t_string_pair("protocol", protocol));
+		_result.insert(t_string_pair("version", version));
 	}
 }
 
@@ -175,7 +175,7 @@ void RequestParser::header(void) {
 		for (; it != _data_it; ++it)
 			header_value.push_back(*it);
 		log.debug(header_value);
-		_result.insert(t_result_pair(header_name, header_value));
+		_result.insert(t_string_pair(header_name, header_value));
 		it += 2;
 		_data.erase(_data.begin(), it);
 		header_name.clear();
@@ -186,6 +186,10 @@ void RequestParser::header(void) {
 			_step = END;  ///////////////////////
 		}  // double CRFL
 	}
+}
+
+t_string_map	RequestParser::get_result(void) const {
+	return _result;  // tem problema? não vou alterar, só consultar...
 }
 
 // general:

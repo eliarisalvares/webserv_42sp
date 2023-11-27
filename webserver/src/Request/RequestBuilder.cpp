@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:19:00 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:55:42 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,9 @@ void RequestBuilder::parse(void) {
 }
 
 Request* RequestBuilder::build(void) {
+	t_string_map parse_result = _parser.get_result();
 	Logger log;
-	this->parse();
+
 	Request *req = new Request(this->_fd, this->_server);
 	this->_ready = false;
 	return req;
