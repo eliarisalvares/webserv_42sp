@@ -14,7 +14,7 @@ SERVER =		Server.cpp ServerParser.cpp ServerBuilder.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
-UTILS =			openFile.cpp ftstring.cpp
+UTILS =			openFile.cpp ftstring.cpp http.cpp
 
 INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response \
 				-I src/Server -I src/Parser -I src/WebServ -I src/Utils
