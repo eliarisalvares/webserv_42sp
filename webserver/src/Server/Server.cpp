@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 16:18:03 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 16:46:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,7 @@ Server::Server(int port): _port(port) {
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
-Server::~Server(void) { }
-
-Server::Server(Server const& copy) { (void)copy; }
-
-Server& Server::operator=(Server const & copy) {
-	if (this != &copy) {
-		setSocket(copy.getSocket());
-		setBufferSize(copy.getBufferSize());
-	}
-	return *this;
-}
-
-void	Server::setServer(std::vector<std::string> input, size_t index) {
+Server::Server(std::vector<std::string> input, size_t index) {
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -60,32 +48,16 @@ void	Server::setServer(std::vector<std::string> input, size_t index) {
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
-void	Server::setSocket() {
-	struct sockaddr_in address;  // Struct para o endereço do servidor
+Server::~Server(void) { }
 
-	// Cria o socket do servidor, AF_INET para IPv4, SOCK_STREAM para TCP, 0 para o protocolo
-	this->_socket = socket(AF_INET, SOCK_STREAM, 0);
+Server::Server(Server const& copy) { (void)copy; }
 
-	// Configura o endereço do servidor e a porta, AF_INET para IPv4, INADDR_ANY para o endereço do host, htons para a porta
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(_port);
-
-	int yes = 1;
-
-	// lose the pesky "Address already in use" error message
-	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
-		perror("setsockopt");
-		exit(1);
+Server& Server::operator=(Server const & copy) {
+	if (this != &copy) {
+		setSocket(copy.getSocket());
+		setBufferSize(copy.getBufferSize());
 	}
-	// Associa o socket do servidor ao endereço e à porta especificados
-	if (bind(this->_socket, (struct sockaddr*)&address, sizeof(address)) == -1) {
-		perror("bind");
-	}
-
-	// Coloca o socket do servidor em modo de escuta, com um limite de 500 conexões pendentes (isso temos que ver, esse número os meninos usaram no projeto deles,
-	// mas não sei se é o ideal, acho que a gente tem que ver isso, meu sistema mostra 4096)
-	listen(this->_socket, 500);
+	return *this;
 }
 
 // vamos usar para cada server do arquivo de config

@@ -10,6 +10,7 @@
 # include "Logger.hpp"
 
 typedef std::map<std::string, std::string>	t_infoServer;
+typedef std::vector<std::string>			t_vector;
 
 int	getPortConf(std::vector<std::string> input, int index);
 
