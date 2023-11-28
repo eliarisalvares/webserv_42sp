@@ -3,8 +3,8 @@
 # Configurações para o primeiro servidor
 server {
 	listen			8080				# Porta do servidor
-	server_names		localhost		# Nome do servidor (opcional)
-	error_page		404 404.html		# Página de erro personalizada (opcional)
+	server_name		localhost			# Nome do servidor (opcional)
+	error_pages		404 404.html		# Página de erro personalizada (opcional)
 
 	# Configurações para rotas
 	location / {
@@ -20,7 +20,7 @@ server {
 	# Configuração para rota que redireciona
 	location /redirect {
 		root				/var/www/html
-		redirect			/about		# Redireciona para a rota /about
+	t			/about		# Redireciona para a rota /about
 	}
 
 	# Configuração para rota que aceita uploads de arquivos
@@ -50,3 +50,4 @@ server {
 		autoindex		true			# habilita listagem de diretórios
 	}
 }```
+

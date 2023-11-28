@@ -7,6 +7,7 @@
 # include <vector>
 # include <map>
 # include "ftstring.hpp"
+# include "Logger.hpp"
 
 typedef std::map<std::string, std::string>	t_infoServer;
 

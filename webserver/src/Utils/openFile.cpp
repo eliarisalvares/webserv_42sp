@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/09 18:38:11 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:14:00 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ bool	checkArgs(int argc, char *argv[]) {
 	}
 	if (!checkFile(argv[1]))
 		return false;
+	log.info("File oppened successfully.");
 	return true;
 }
 

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/25 17:07:08 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:02:15 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Server Class
 # define CGI_LOCATION "/cgi"
 # define SERVER_PORT "8080"
 # define METHODS "GET, POST, DELETE"
+# define ERROR_PAGES "404 404.html"
 
 class Server {
 	friend class Response;

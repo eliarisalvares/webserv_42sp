@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/27 16:37:58 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 12:56:28 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	main(int argc, char *argv[]) {
 			// create servers and sockets for each server
 			if (first_init)
 			{
-				webserv.create_servers(port.getServers()); //send port.servers
+				webserv.create_servers(port.getServersConf()); //send port.servers
 				first_init = false;
 			}
 			else
