@@ -21,6 +21,7 @@ Response Class
 # include "Server.hpp"
 # include "Request.hpp"
 # include "Logger.hpp"
+# include "http.hpp"
 
 class Response {
 
