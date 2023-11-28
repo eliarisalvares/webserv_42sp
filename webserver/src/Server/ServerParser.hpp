@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 13:56:26 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:57:20 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ class ServerParser {
 			virtual const char* what(void) const throw();
 		};
 	private:
-		std::string					_fileContent;
 		std::vector<std::string>	_lines;
 
 		bool	_beginingOfFile();

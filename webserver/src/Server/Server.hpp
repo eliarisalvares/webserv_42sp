@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 14:03:38 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:04:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,15 @@ Server Class
 # include <netinet/in.h> // struct sockaddr_in
 # include <stdio.h> // errors
 # include <map>
+# include "ServerParser.hpp"
+# include "ServerBuilder.hpp"
 
 # define BUFFSIZE 256 //buffersize ?
 # define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size
 # define TIMEOUT 5000 // precisa colocar?
 # define LOCATION "/" // vai ser definida através de mts possibilidades (kill me pls)
 # define ROOT "content" //root
-# define SERVER_NAME "Server WebWizards" ///server_name
+# define SERVER_NAME "WebWizards" ///server_name
 # define CGI_EXECUTOR "python3" //cgi
 # define CGI_LOCATION "/cgi"
 # define SERVER_PORT "8080" //listen
@@ -45,9 +47,11 @@ class Server {
 		Server(Server const& copy);
 		Server& operator=(Server const& copy);
 
+		void	setServer(std::vector<std::string> input, size_t index);
 		int		getSocket(void) const;
-		int		getPort(void) const;
+		void	setSocket(void);
 		void	setSocket(int port);
+		int		getPort(void) const;
 		int		getBufferSize(void) const;
 		void	setBufferSize(int size);
 		static std::string	getServerName(void);
