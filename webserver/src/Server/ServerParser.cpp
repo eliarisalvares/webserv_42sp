@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/27 16:31:26 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:11:42 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,9 @@ void	ServerParser::getConf(std::string fileName) {
 void	ServerParser::servers(void) {
 	for (size_t i = 0; i < _lines.size(); i++) {
 		t_infoServer	newServer;
+		Logger	log;
 
-		// getServerInfo(_lines, i);
+		log.debug("Setting the server info from .conf file.");
 		newServer = getServerInfo(_lines, i);
 		if (_lines[i].substr() == "server {") {
 			while ( _lines[i].substr() != "}") 
@@ -104,18 +105,18 @@ void	ServerParser::servers(void) {
 	}
 }
 
-std::vector<t_infoServer>	ServerParser::getServers(void) {
+std::vector<t_infoServer>	ServerParser::getServersConf(void) {
 	return _servers;
 }
 
 const char* ServerParser::ListenNotFoundErrorExeption::what() const throw() {
-	return ("Port to listen not found.");
+	return ("Listen token to set port not found.");
 }
 
 const char* ServerParser::SyntaxErrorException::what() const throw() {
-	return ("Curly brackets not closed.");
+	return ("Close brackets \'}\' not closed.");
 }
 
 const char* ServerParser::ServerErrorException::what() const throw() {
-	return ("Server not at begining of file.");
+	return ("Unknown token, expect server.");
 }
