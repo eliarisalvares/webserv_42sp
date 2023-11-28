@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 19:51:12 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 20:39:47 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			_port = getPortConf(input, index);
 		if (input[i].substr(0, 12) == "server_name ")
 			_server_name = getNameConf(input, index);
+		if (input[i].substr(0, 21) == "client_max_body_size ")
+			_client_max_body_size = getBodySizeConf(input, index);
 	}
-	if (!_port)
-		std::cout << "FUCK YOU C++\n";
 	configSocket(_port);
 	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 	_location_root.clear();
