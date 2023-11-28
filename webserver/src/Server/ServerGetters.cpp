@@ -8,9 +8,6 @@ int	Server::getBufferSize(void) const {
 	return this->_bufferSize;
 }
 
-void	Server::setBufferSize(int size) {
-	this->_bufferSize = size;
-}
 
 int	Server::getPort(void) const {
 	return this->_port;
