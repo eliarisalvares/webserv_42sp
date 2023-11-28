@@ -304,7 +304,7 @@ void WebServ::restart_socket_servers(void) {
 	t_server_iterator it, end = this->_servers.end();
 
 	for (it = this->_servers.begin(); it != end; ++it)
-		it->second->setSocket(it->second->getPort());
+		it->second->configSocket(it->second->getPort());
 }
 
 std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {

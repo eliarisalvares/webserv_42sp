@@ -9,10 +9,8 @@
 # include "ftstring.hpp"
 # include "Logger.hpp"
 
-typedef std::map<std::string, std::string>	t_infoServer;
-typedef std::vector<std::string>			t_vector;
-
-int	getPortConf(std::vector<std::string> input, int index);
+int							getPortConf(std::vector<std::string> input, int index);
+std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
 
 class PortNotFoundErrorExeption : public std::exception {
 	virtual const char* what(void) const throw();

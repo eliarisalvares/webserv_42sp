@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 19:05:37 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 19:51:12 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Server::Server(void) { }
 
 Server::Server(int port): _port(port) {
-	setSocket(port);
+	configSocket(port);
 	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
 	_server_name.push_back(SERVER_NAME);
@@ -36,12 +36,12 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			i++ ;
 		if (input[i].substr(0, 7) == "listen ")
 			_port = getPortConf(input, index);
-		// if (input[i].substr(0, 12) == "server_name ")
-		// 	_server_name = getNameConf(input, index);
+		if (input[i].substr(0, 12) == "server_name ")
+			_server_name = getNameConf(input, index);
 	}
 	if (!_port)
 		std::cout << "FUCK YOU C++\n";
-	setSocket(_port);
+	configSocket(_port);
 	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 	_location_root.clear();
 	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
@@ -54,14 +54,14 @@ Server::Server(Server const& copy) { (void)copy; }
 
 Server& Server::operator=(Server const & copy) {
 	if (this != &copy) {
-		setSocket(copy.getSocket());
+		configSocket(copy.getSocket());
 		setBufferSize(copy.getBufferSize());
 	}
 	return *this;
 }
 
 // vamos usar para cada server do arquivo de config
-void	Server::setSocket(int port) {
+void	Server::configSocket(int port) {
 	struct sockaddr_in address;  // Struct para o endereço do servidor
 
 	// Cria o socket do servidor, AF_INET para IPv4, SOCK_STREAM para TCP, 0 para o protocolo
