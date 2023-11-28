@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:46:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 13:10:26 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:56:26 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@ class ServerParser {
 		ServerParser(ServerParser const& copy);
 		ServerParser const& operator=(ServerParser const& copy);
 
-		void						servers(void);
-		void						getConf(std::string fileName);
-		std::vector<t_infoServer>	getServersConf(void);
+		size_t	nbrServers;
+
+		void						setConf(std::string fileName);
+		std::vector<std::string>	getConf(void);
 
 		class SyntaxErrorException : public std::exception {
 			virtual const char* what(void) const throw();
@@ -37,11 +38,12 @@ class ServerParser {
 		class ListenNotFoundErrorExeption : public std::exception {
 			virtual const char* what(void) const throw();
 		};
+		class EmptyServerErrorExeption : public std::exception {
+			virtual const char* what(void) const throw();
+		};
 	private:
 		std::string					_fileContent;
-		size_t						_nbrServers;
 		std::vector<std::string>	_lines;
-		std::vector<t_infoServer>	_servers;
 
 		bool	_beginingOfFile();
 		bool	_bracketsClosed();
