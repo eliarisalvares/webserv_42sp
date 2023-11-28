@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 22:05:16 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/27 22:35:57 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,10 @@ namespace http {
 		INTERNAL_SERVER_ERROR = 500,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
 	}			t_status;
+
+	typedef enum e_content_type {
+
+	}			t_content_type;
 }
 
 #endif
