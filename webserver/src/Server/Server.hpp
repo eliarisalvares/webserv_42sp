@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 14:04:29 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:05:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,12 @@ class Server {
 	public:
 		Server(void);
 		Server(int port);
+		Server(std::vector<std::string> input, size_t index);
 		~Server(void);
 		Server(Server const& copy);
 		Server& operator=(Server const& copy);
 
-		void	setServer(std::vector<std::string> input, size_t index);
 		int		getSocket(void) const;
-		void	setSocket(void);
 		void	setSocket(int port);
 		int		getPort(void) const;
 		int		getBufferSize(void) const;
