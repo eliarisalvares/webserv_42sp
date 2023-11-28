@@ -1,15 +1,5 @@
 #include "ServerBuilder.hpp"
 
-int	functionLocationDeal(t_infoServer *server, std::vector<std::string> input, int index) {
-	//idk what to do yet
-	Logger	log;
-
-	log.debug("Dealing with location info.");
-	(void)server;
-	(void)input;
-	return index;
-}
-
 // t_infoServer	getServerInfo(std::vector<std::string> input, int index) {
 // 	t_infoServer	server;
 // 	Logger	log;
@@ -50,8 +40,8 @@ int	functionLocationDeal(t_infoServer *server, std::vector<std::string> input, i
 // }
 
 int	getPortConf(std::vector<std::string> input, int index) {
-	int	port;
-	int	extraBrackets = 0;
+	int		port;
+	int		extraBrackets = 0;
 	Logger	log;
 
 	for (size_t i = index; i < input.size(); i++) {
@@ -75,17 +65,19 @@ int	getPortConf(std::vector<std::string> input, int index) {
 	return (port);
 }
 
-std::string	getNameConf(std::vector<std::string> input, int index) {
-	std::string	name;
-	int	extraBrackets = 0;
-	Logger	log;
+std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) {
+	std::string					name;
+	std::vector<std::string>	serverName;
+	int							extraBrackets = 0;
+	Logger						log;
 
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
 		if (input[i].substr(0, 7) == "server_name ") {
-			//do stuff
 			name = input[i].substr(7);
+			serverName = ftstring::split(name, ' ');
+			log.debug("Server name successfully setted from .conf file.");
 		}
 		if (input[index].substr(0, 7) == "location ")
 			extraBrackets++;
@@ -94,7 +86,7 @@ std::string	getNameConf(std::vector<std::string> input, int index) {
 		if (input[index].substr() == "}" && !extraBrackets)
 			break ;
 	}
-	return (name);
+	return (serverName);
 }
 
 const char* PortNotFoundErrorExeption::what() const throw() {

@@ -35,4 +35,15 @@ std::string	itostr(int nbr) {
 	return i_as_string;
 }
 
+std::vector<std::string> split(std::string const &str, char delimiter)
+{
+	std::string					tmp;
+	std::stringstream			ss(str);
+	std::vector<std::string>	substrings;
+
+	while (std::getline(ss, tmp, delimiter))
+		substrings.push_back(tmp);
+	return (substrings);
+}
+
 } //end namespace

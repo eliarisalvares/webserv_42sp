@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 14:06:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 19:51:49 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,15 @@ class Server {
 		Server(Server const& copy);
 		Server& operator=(Server const& copy);
 
+		void	configSocket(int port);
+		void	setBufferSize(int size);
+
 		int		getSocket(void) const;
-		void	setSocket(int port);
 		int		getPort(void) const;
 		int		getBufferSize(void) const;
-		void	setBufferSize(int size);
 		static std::string	getServerName(void);
-		static std::string getCurrentPort(void);
-		static std::string getAllowedMethods(void);
+		static std::string	getCurrentPort(void);
+		static std::string	getAllowedMethods(void);
 
 	private:
 		int									_port;  // obrigatório
