@@ -46,7 +46,11 @@ t_infoServer	getServerInfo(std::vector<std::string> input, int index) {
 			server["client_max_body_size"] = input[i].substr(21);
 			log.debug("Client max body size setted.");
 		}
-		if (input[i].substr(0, 8) == "location")
+		if (input[i].substr(0, 8) == "location") {
+			functionLocationDeal(&server, input, i);
+			while (input[i].substr() != "}")
+				i++;
+		}
 			i += functionLocationDeal(&server, input, i);
 		if (input[i].substr() == "}")
 			break ;

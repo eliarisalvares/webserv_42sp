@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 14:02:15 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:03:38 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,17 @@ Server Class
 # include <stdio.h> // errors
 # include <map>
 
-# define BUFFSIZE 1024 // segfault com 20, 50
-# define CLIENT_MAX_BODY_SIZE 100
-# define TIMEOUT 5000
-# define LOCATION "/"
-# define ROOT "content"
-# define SERVER_NAME "Server WebWizards"
-# define CGI_EXECUTOR "python3"
+# define BUFFSIZE 256 //buffersize ?
+# define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size
+# define TIMEOUT 5000 // precisa colocar?
+# define LOCATION "/" // vai ser definida através de mts possibilidades (kill me pls)
+# define ROOT "content" //root
+# define SERVER_NAME "Server WebWizards" ///server_name
+# define CGI_EXECUTOR "python3" //cgi
 # define CGI_LOCATION "/cgi"
-# define SERVER_PORT "8080"
-# define METHODS "GET, POST, DELETE"
-# define ERROR_PAGES "404 404.html"
+# define SERVER_PORT "8080" //listen
+# define METHODS "GET, POST, DELETE" //allowed_methods
+# define ERROR_PAGES "404 404.html" //error_pages
 
 class Server {
 	friend class Response;

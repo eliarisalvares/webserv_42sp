@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 12:56:28 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:50:25 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ int	main(int argc, char *argv[]) {
 	if (!checkArgs(argc, argv))
 		return 1;
 
+	WebServ	webserv;
 	ServerParser	port;
 	try {
-		port.getConf(argv[1]);
-		port.servers();
+		port.setConf(argv[1]);
+		webserv.create_servers(port.getConf());
 	}
 	catch (std::exception & e) {
 		log.error(e.what());
@@ -29,7 +30,6 @@ int	main(int argc, char *argv[]) {
 	}
 	(void)port;
 
-	WebServ	webserv;
 	bool	first_init = true;
 
 	// o servidor deve sempre restartar em caso de algum erro na execução
@@ -38,7 +38,7 @@ int	main(int argc, char *argv[]) {
 			// create servers and sockets for each server
 			if (first_init)
 			{
-				webserv.create_servers(port.getServersConf()); //send port.servers
+				// webserv.create_servers(port.getServersConf()); //send port.servers
 				first_init = false;
 			}
 			else

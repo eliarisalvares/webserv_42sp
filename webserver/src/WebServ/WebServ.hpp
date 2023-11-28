@@ -46,7 +46,7 @@ public:
 	WebServ(void);
 	~WebServ(void);
 
-	void	create_servers(std::vector<t_infoServer> servers);
+	void	create_servers(std::vector<std::string> confFile);
 	void	init(void);
 	void	run(void);
 	void	clean(void);

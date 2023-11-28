@@ -6,14 +6,14 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 13:11:42 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:55:44 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerParser.hpp"
 
 ServerParser::ServerParser(void) {
-	_nbrServers = 0;
+	nbrServers = 0;
 }
 
 ServerParser::~ServerParser(void) { }
@@ -58,7 +58,7 @@ bool	ServerParser::_minimalRequirements(int index) {
 	return check;
 }
 
-void	ServerParser::getConf(std::string fileName) {
+void	ServerParser::setConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::string			line;
 	bool				check = false;
@@ -75,12 +75,14 @@ void	ServerParser::getConf(std::string fileName) {
 		throw SyntaxErrorException(); //error of syntax
 	for (size_t i = 0; i < _lines.size(); i++)
 	{
+		if (_lines[i].substr() == "server {")
+			nbrServers++;
 		while (_lines[i].substr() != "server {") {
 			if (check == false) {
 				check = _minimalRequirements(i);
 			}
 			if (_lines[i].substr() == "}" && _lines[i - 1].substr() == "server {")
-				throw ListenNotFoundErrorExeption();
+				throw EmptyServerErrorExeption();
 			else if ( _lines[i].substr() == "}") 
 				break ;
 			i++;
@@ -90,27 +92,16 @@ void	ServerParser::getConf(std::string fileName) {
 	}
 }
 
-void	ServerParser::servers(void) {
-	for (size_t i = 0; i < _lines.size(); i++) {
-		t_infoServer	newServer;
-		Logger	log;
-
-		log.debug("Setting the server info from .conf file.");
-		newServer = getServerInfo(_lines, i);
-		if (_lines[i].substr() == "server {") {
-			while ( _lines[i].substr() != "}") 
-				i++;
-		}
-		_servers.push_back(newServer);
-	}
-}
-
-std::vector<t_infoServer>	ServerParser::getServersConf(void) {
-	return _servers;
+std::vector<std::string>	ServerParser::getConf(void) {
+	return _lines;
 }
 
 const char* ServerParser::ListenNotFoundErrorExeption::what() const throw() {
 	return ("Listen token to set port not found.");
+}
+
+const char* ServerParser::EmptyServerErrorExeption::what() const throw() {
+	return ("Server with no content.");
 }
 
 const char* ServerParser::SyntaxErrorException::what() const throw() {
