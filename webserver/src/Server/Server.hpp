@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 14:05:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:06:27 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ class Server {
 		int									_socket;
 		int									_bufferSize;
 		int									_client_max_body_size;
-		std::string							_server_name;
 		std::string							_root;  // geral do server; cada location vai poder ter um root diferente
 		std::string							_cgi_location;
+		std::vector<std::string>			_server_name;
 		std::map<std::string, std::string>	_location_root;  // inclui o par pro cgi
 		std::map<int, std::string>			_error_pages;  // obrigatório
 		// o que sabemos que falta: autoindex, redirect

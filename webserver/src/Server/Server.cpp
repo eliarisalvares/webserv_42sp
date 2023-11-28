@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 16:46:11 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 19:05:37 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Server::Server(int port): _port(port) {
 	setSocket(port);
 	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
-	_server_name = SERVER_NAME;
+	_server_name.push_back(SERVER_NAME);
 	_root = ROOT;
 	_cgi_location = CGI_LOCATION;
 	_location_root.clear();
@@ -27,6 +27,10 @@ Server::Server(int port): _port(port) {
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
+	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
+	_server_name.push_back(SERVER_NAME);
+	_root = ROOT;
+	_cgi_location = CGI_LOCATION;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -39,10 +43,6 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		std::cout << "FUCK YOU C++\n";
 	setSocket(_port);
 	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
-	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
-	_server_name = SERVER_NAME;
-	_root = ROOT;
-	_cgi_location = CGI_LOCATION;
 	_location_root.clear();
 	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
@@ -89,30 +89,3 @@ void	Server::setSocket(int port) {
 	listen(this->_socket, 500);
 }
 
-int	Server::getSocket(void) const {
-	return (this->_socket);
-}
-
-int	Server::getBufferSize(void) const {
-	return this->_bufferSize;
-}
-
-void	Server::setBufferSize(int size) {
-	this->_bufferSize = size;
-}
-
-int	Server::getPort(void) const {
-	return this->_port;
-}
-
-std::string	Server::getServerName(void) {
-	return (SERVER_NAME);
-}
-
-std::string	Server::getCurrentPort(void) {
-	return (SERVER_PORT);
-}
-
-std::string	Server::getAllowedMethods(void) {
-	return (METHODS);
-}
