@@ -11,7 +11,7 @@
 
 typedef std::map<std::string, std::string>	t_infoServer;
 
-t_infoServer	getServerInfo(std::vector<std::string> input, int index);
+int	getPortConf(std::vector<std::string> input, int index);
 
 class PortNotFoundErrorExeption : public std::exception {
 	virtual const char* what(void) const throw();

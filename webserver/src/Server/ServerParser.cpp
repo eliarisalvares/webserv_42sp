@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 13:55:44 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/28 15:39:30 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,14 @@ bool	ServerParser::_beginingOfFile() {
 bool	ServerParser::_bracketsClosed() {
 	int	openBrackets = 0;
 	int	closeBrackets = 0;
-	
-	for (size_t i = 0; i < this->_fileContent.size(); i++) {
-		if (this->_fileContent[i] == '{')
-			openBrackets++;
-		else if (this->_fileContent[i] == '}')
-			closeBrackets++;
+
+	for (size_t i = 0; i < _lines.size(); i++) {
+		for (size_t j = 0; j < _lines[i].length(); j++) {
+			if (_lines[i][j] == '{')
+				openBrackets++;
+			else if (_lines[i][j] == '}')
+				closeBrackets++;
+		}
 	}
 	if (openBrackets == closeBrackets)
 		return true;
@@ -62,6 +64,7 @@ void	ServerParser::setConf(std::string fileName) {
 	std::ifstream		inputFile(fileName.c_str());
 	std::string			line;
 	bool				check = false;
+	int					extraBrackets = 0;
 
 	while (std::getline(inputFile, line)) {
 		line = ftstring::trimWhitespace(line);
@@ -81,9 +84,13 @@ void	ServerParser::setConf(std::string fileName) {
 			if (check == false) {
 				check = _minimalRequirements(i);
 			}
+			if (_lines[i].substr(0, 9) == "location ")
+				extraBrackets++;
 			if (_lines[i].substr() == "}" && _lines[i - 1].substr() == "server {")
 				throw EmptyServerErrorExeption();
-			else if ( _lines[i].substr() == "}") 
+			else if ( _lines[i].substr() == "}" && extraBrackets)
+				extraBrackets--;
+			else if ( _lines[i].substr() == "}" && !extraBrackets) 
 				break ;
 			i++;
 		}

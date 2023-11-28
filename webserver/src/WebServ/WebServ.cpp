@@ -38,14 +38,28 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 	return *this;
 }
 
-void	WebServ::create_servers(std::vector<std::string> confFile) {
+void	WebServ::create_servers(std::vector<std::string> input) {
 	// for now working with one server only
-	(void)confFile;
-	Server* oneServer = new Server(8080);
+	int	extraBrackets = 0;
 
-	this->_servers.insert(
-		std::pair<int, Server*>(oneServer->getSocket(), oneServer)
-	);
+	for (size_t index = 0; index < input.size(); index++) {
+		Server oneServer;
+
+		if (input[index] == input.back())
+			break ;
+		oneServer.setServer(input, index);
+		if (input[index].substr(0, 8) == "server {") {
+			while (input[index].substr() != "}" && extraBrackets == 0) {
+				if (input[index].substr(0, 9) == "location ")
+					extraBrackets++;
+				else if (input[index].substr() == "}")
+					extraBrackets--;
+				index++;
+			}
+		}
+		this->_servers.insert(std::pair<int, Server*>(oneServer.getSocket(), &oneServer));
+	}
+
 	//will get the socket for the server, initialize the server
 }
 
