@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 19:51:49 by feralves         ###   ########.fr       */
+/*   Updated: 2023/11/29 13:36:57 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ Server Class
 # include "ServerBuilder.hpp"
 
 # define BUFFSIZE 256 //buffersize ?
-# define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size
+# define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size -> in KILOBYTES?
 # define TIMEOUT 5000 // precisa colocar?
 # define LOCATION "/" // vai ser definida através de mts possibilidades (kill me pls)
 # define ROOT "content" //root
