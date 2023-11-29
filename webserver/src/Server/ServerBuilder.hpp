@@ -10,6 +10,8 @@
 # include "Logger.hpp"
 
 int							getPortConf(std::vector<std::string> input, int index);
+int							getBodySizeConf(std::vector<std::string> input, int index);
+std::string					getRootConf(std::vector<std::string> input, int index);
 std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
 
 class PortNotFoundErrorExeption : public std::exception {
