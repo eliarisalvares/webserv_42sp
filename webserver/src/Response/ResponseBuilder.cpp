@@ -54,9 +54,9 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
     response.addHeader("Content-Type", contentType);
     response.addHeader("Content-Length", contentLength);
     response.addHeader("Date", getCurrentDate());
-    response.addHeader("Server", Server::getServerName());
+    response.addHeader("Server", "localhost"); // TODO: get hostname from server
     response.addHeader("Access-Control-Allow-Origin", "*");
-    response.addHeader("Access-Control-Allow-Methods", Server::getAllowedMethods());
+    response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE"); // TODO: get allowed methods from server
     response.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     response.addHeader("Access-Control-Allow-Credentials", "true");
     response.addHeader("Cache-Control", "no-cache");
