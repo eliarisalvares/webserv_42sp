@@ -65,6 +65,8 @@ int	getPortConf(std::vector<std::string> input, int index) {
 	return (port);
 }
 
+// Sets the maximum body size for client requests.
+// Megabytes, M, and Kilobytes, K, are the accepted units.
 int	getBodySizeConf(std::vector<std::string> input, int index) {
 	int			bodySize;
 	std::string	bodySizeString;
@@ -76,7 +78,11 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 			i++ ;
 		if (input[i].substr(0, 21) == "client_max_body_size ") {
 			bodySizeString = input[i].substr(21);
-			//read size, get M to proper size, check if there's other possibilities
+			//read size, get M or K -> 1M is the limit
+			//check string for the letter -> give error if letter is different than M or K
+			//if bigger than 1M -> give error
+			// 1K is the minimal size
+			//range from 1K to 1000K -> pass this info ahead
 			bodySize = ftstring::itostr(bodySizeString);
 			log.debug("client_max_body_size successfully setted from .conf file.");
 		}
