@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 16:08:44 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 21:02:43 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
