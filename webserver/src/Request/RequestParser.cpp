@@ -105,9 +105,12 @@ void RequestParser::first_line(void) {
 			protocol.push_back(*it);
 		log.debug(protocol);
 		++it;
-		for (; it != _data_it; ++it)
-			version.push_back(*it);
-		log.debug(version);
+		if (it != _data_it && *it == '/') {
+			++it;
+			for (; it != _data_it; ++it)
+				version.push_back(*it);
+			log.debug(version);
+		}
 		_step = HEADER;
 		_data.erase(_data.begin(), _data_it + 2);
 		_result.insert(t_string_pair("method", method));

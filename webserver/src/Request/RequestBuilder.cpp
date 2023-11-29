@@ -18,12 +18,12 @@ RequestBuilder::RequestBuilder(void) {}
 RequestBuilder::RequestBuilder(Server* server, int connection):
 	_fd(connection), _ready(false), _server(server) {
 	_buffer = new char[server->getBufferSize()];
-	memset(_buffer, 0, strlen(_buffer));
+	memset(_buffer, 0, server->getBufferSize());
 	_parser = RequestParser();
 }
 
 RequestBuilder::~RequestBuilder(void) {
-	delete _buffer;
+	delete[] _buffer;
 }
 
 RequestBuilder::RequestBuilder(RequestBuilder const& copy) {

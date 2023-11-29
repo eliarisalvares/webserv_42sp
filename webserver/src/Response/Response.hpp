@@ -17,6 +17,9 @@ Response Class
 # include <sys/time.h> /* gettimeofday */
 # include <iomanip> /* setfill, setw */
 # include <ctime> /* time_t, localtime, strftime */
+# include <unistd.h> /* fork, execve, pipe, dup2, close */
+# include <sys/wait.h> /* waitpid */
+# include <errno.h> /* errno */
 
 # include "Server.hpp"
 # include "Request.hpp"
