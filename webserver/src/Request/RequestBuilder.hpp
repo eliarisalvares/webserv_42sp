@@ -39,7 +39,7 @@ public:
 	void		parse(void);
 	Request*	build(void);
 
-	Server			getServer(void) const;
+	Server*			getServer(void) const;
 	bool			is_ready(void) const;
 	e_builder_error error(void);
 
@@ -49,10 +49,12 @@ private:
 	int					_fd;
 	bool				_ready;
 	Server*				_server;
+	Request*			_request;
 	e_builder_error		_error;
 	std::string			_error_str;
 
 	// parse data
+	size_t				_bytes_readed;
 	char*				_buffer;
 	RequestParser		_parser;
 };

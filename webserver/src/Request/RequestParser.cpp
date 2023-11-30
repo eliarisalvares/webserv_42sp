@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:51:56 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/29 23:40:54 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,13 @@
 
 RequestParser::RequestParser(void):
 	_idx(0), _step(METHOD), _error(NONE) {
+	_request = new Request();
+	_data.clear();
+	_result.clear();
+}
+
+RequestParser::RequestParser(Request* request):
+	_idx(0), _step(METHOD), _error(NONE), _request(request) {
 	_data.clear();
 	_result.clear();
 }
@@ -204,6 +211,7 @@ t_string_map	RequestParser::get_result(void) const {
 // The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
 
 // headers
+// servers should treat headers as an unordered set
 // one line per header, of the form "Header-Name: value", ending with CRLF
 // you should handle LF correctly
 // The header name is not case-sensitive (though the value may be) - Header
@@ -271,3 +279,46 @@ t_string_map	RequestParser::get_result(void) const {
 
 // "Transfer-Encoding: chunked" header. All HTTP 1.1 clients must be able to receive chunked messages
 // Servers aren't required to generate chunked messages; they just have to be able to receive them.
+
+
+// GET não pode ter body -> retornar erro
+
+// POST ->
+
+// chunked:
+// Transfer-Encoding: chunked
+// Content-Length: 0 (se tiver, deve ser 0 para evitar ambiguidade)
+
+
+// 3. Chunk Format (RFC 7230, Section 4.1):
+// Format: Each chunk starts with the size of the chunk in hexadecimal followed
+// by a CRLF (carriage return and line feed) sequence, then the chunk data, and
+// another CRLF.
+// Example:
+// http
+// Copy code
+// POST /example HTTP/1.1
+// Host: example.com
+// Transfer-Encoding: chunked
+
+// 4
+// data
+// 5
+// chunk
+// 0
+// Explanation: In this example, two chunks of data are sent. The size of the
+// first chunk is 4, followed by the chunk data ("data"). The size of the second
+// chunk is 5, followed by the chunk data ("chunk"). A chunk with size 0
+// indicates the end of the message.
+// 4. Trailer Headers (Optional):
+// Header Format: Additional headers may be sent in trailers after the final
+// chunk. Trailers are optional and can include headers like Content-MD5 or others.
+
+
+// @app.route('/example', methods=['GET'])
+// def handle_request():
+//     user_input = request.headers.get('User-Input')
+
+//     # Validate and sanitize user input
+//     if '\r' in user_input or '\n' in user_input:
+//         return "Invalid input", 400

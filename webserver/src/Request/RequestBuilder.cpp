@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:55:42 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/29 23:41:13 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@
 RequestBuilder::RequestBuilder(void) {}
 
 RequestBuilder::RequestBuilder(Server* server, int connection):
-	_fd(connection), _ready(false), _server(server) {
+	_fd(connection), _ready(false), _server(server), _bytes_readed(0) {
+	_request = new Request(connection, server);  // deletar fora porque vamos devolver
 	_buffer = new char[server->getBufferSize()];
 	memset(_buffer, 0, server->getBufferSize());
-	_parser = RequestParser();
+	_parser = RequestParser(_request);
 }
 
 RequestBuilder::~RequestBuilder(void) {
@@ -84,9 +85,10 @@ Request* RequestBuilder::build(void) {
 	t_string_map parse_result = _parser.get_result();
 	Logger log;
 
-	Request *req = new Request(this->_fd, this->_server);
+	if (_parser.error())
+		_request->setError(true);
 	this->_ready = false;
-	return req;
+	return _request;
 }
 
 bool RequestBuilder::is_ready(void) const {

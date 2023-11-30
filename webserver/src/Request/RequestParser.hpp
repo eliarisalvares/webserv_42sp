@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:49:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/29 23:39:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include <iostream>
 
 # include "Logger.hpp"
+# include "http.hpp"
+# include "Request.hpp"
 
 // Special chars - ABNF Rules
 # define CR '\r'
@@ -34,6 +36,7 @@ typedef std::pair<std::string, std::string>	t_string_pair;
 class RequestParser {
 public:
 	RequestParser(void);
+	RequestParser(Request* request);
 	RequestParser(RequestParser const& copy);
 	RequestParser& operator=(RequestParser const& copy);
 	~RequestParser(void);
@@ -91,6 +94,7 @@ private:
 	size_t								_idx;
 	t_steps								_step;
 	t_parser_error						_error;
+	Request*							_request;
 	std::string							_error_str;
 	std::vector<char>					_data;
 	std::vector<char>::iterator			_data_it;
