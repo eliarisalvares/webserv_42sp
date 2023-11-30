@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 23:16:38 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:23:00 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int Request::fd(void) const {
 	return this->_fd;
 }
 
-http::e_status Request::status_code(void) const {
+http::HttpStatus Request::status_code(void) const {
 	return this->_status_code;
 }
 
@@ -79,7 +79,7 @@ bool Request::is_chuncked(void) const {
 	return this->_is_chuncked;
 }
 
-http::e_content_type Request::content_type(void) const {
+http::ContentType Request::content_type(void) const {
 	return this->_content_type;
 }
 
@@ -92,7 +92,7 @@ void Request::setMethod(requestMethod method) {
 	this->_method = method;
 }
 
-void Request::setStatusCode(http::e_status status) {
+void Request::setStatusCode(http::HttpStatus status) {
 	this->_status_code = status;
 }
 
@@ -108,7 +108,7 @@ void Request::setChuncked(bool is_chuncked) {
 	this->_is_chuncked = is_chuncked;
 }
 
-void Request::setContentType(http::e_content_type type) {
+void Request::setContentType(http::ContentType type) {
 	this->_content_type = type;
 }
 

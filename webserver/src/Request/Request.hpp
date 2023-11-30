@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 02:16:29 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:24:05 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,20 +43,20 @@ public:
 	Server*					server(void) const;
 	requestMethod			method(void) const;
 	int						fd(void) const;
-	http::e_status			status_code(void) const;
+	http::HttpStatus			status_code(void) const;
 	std::string				uri(void) const;
 	bool					has_error(void) const;
 	bool					is_chuncked(void) const;
-	http::e_content_type	content_type(void) const;
+	http::ContentType	content_type(void) const;
 	size_t					content_length(void) const;
 
 	// setters
 	void					setMethod(requestMethod method);
-	void					setStatusCode(http::e_status status);
+	void					setStatusCode(http::HttpStatus status);
 	void					setUri(std::string const uri);
 	void					setError(bool has_error);
 	void					setChuncked(bool is_chuncked);
-	void					setContentType(http::e_content_type type);
+	void					setContentType(http::ContentType type);
 	void					setContentLength(size_t length);
 
 private:
@@ -65,13 +65,13 @@ private:
 	int						_fd;
 	bool					_error;
 	requestMethod			_method;
-	http::e_status			_status_code;
+	http::HttpStatus		_status_code;
 	std::string				_uri;
 	bool					_is_chuncked;
 
 	// headers data
 	std::string				_host;
-	http::e_content_type	_content_type;
+	http::ContentType		_content_type;
 	size_t					_content_length;
 
 };

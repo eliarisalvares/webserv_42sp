@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/29 23:18:16 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:33:38 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <string>
 
 namespace http {
-	typedef enum e_status {
+	enum HttpStatus {
 		CONTINUE = 100,
 		OK = 200,
 		CREATED = 201,
@@ -39,11 +39,11 @@ namespace http {
 		// 422 Unprocessable Content - erro de código em python (cgi gera automático?)
 		INTERNAL_SERVER_ERROR = 500,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
-	}			t_status;
+	};
 
-	typedef enum e_content_type {
+	enum ContentType {
 
-	}			t_content_type;
+	};
 
 	// all methods in HTTP
 	std::set<std::string>				_fill_methods(void);
