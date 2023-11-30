@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/29 23:46:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:22:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,31 @@ std::set<std::string> _fill_headers(void) {
 	return headers;
 }
 
+}
+
+const char* http::InvalidErrorCode::what() const throw() {
+	return "InvalidRequest: invalid error status code";
+}
+
+http::InvalidRequest::InvalidRequest(http::HttpStatus error) {
+	if (error < http::BAD_REQUEST)
+		throw http::InvalidErrorCode();
+	_error = error;
+}
+
+const char* http::InvalidRequest::what() const throw() {
+	switch (_error) {
+    case http::BAD_REQUEST:
+      return "Bad request";
+    case http::METHOD_NOT_ALLOWED:
+      return "Method not allowed";
+    case http::LENGTH_REQUIRED:
+      return "Length required";
+    case http::URI_TOO_LONG:
+      return "Request URI too long";
+    case http::HTTP_VERSION_NOT_SUPPORTED:
+      return "HTTP version not supported";
+    default:
+      return "Unknown error";
+  }
 }

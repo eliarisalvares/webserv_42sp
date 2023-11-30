@@ -15,6 +15,7 @@
 
 # include <set>
 # include <string>
+# include <exception>
 
 namespace http {
 	enum HttpStatus {
@@ -52,7 +53,24 @@ namespace http {
 	// headers that needs a validation - não sei se isso vai ser útil
 	std::set<std::string>				_fill_headers(void);
 	static std::set<std::string> const	headers = http::_fill_headers();
+
+	class InvalidRequest;
+	class InvalidErrorCode;
 }
+
+	class http::InvalidRequest: public std::exception {
+		http::HttpStatus _error;
+
+		public:
+			InvalidRequest(http::HttpStatus error);
+			const char* what() const throw();
+			http::HttpStatus get_error_code(void) const;
+	};
+
+	class http::InvalidErrorCode: public std::exception {
+		public:
+			const char* what() const throw();
+	};
 
 #endif
 
