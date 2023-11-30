@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 10:49:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 11:18:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,8 @@ void RequestParser::method(char c) {
 		log.debug(_method);
 	}
 	else {
-		_step = ERROR;
-		_request->setMethod(INVALID_METHOD);  // precisa?
-		_request->setStatusCode(http::BAD_REQUEST);
-		_request->setError(true);
+		_step = ERROR; // acho que vai poder tirar isso
+		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 }
 
@@ -106,9 +104,8 @@ void RequestParser::uri(char c) {
 		_step = PROTOCOL;
 	}
 	else {
-		_step = ERROR;
-		_request->setStatusCode(http::BAD_REQUEST);
-		_request->setError(true);
+		_step = ERROR; // acho que vai poder tirar isso
+		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 }
 void RequestParser::protocol(char c) {
@@ -124,8 +121,8 @@ void RequestParser::protocol(char c) {
 		log.debug(_protocol);
 	} // checkar _protocol == "HTTP"
 	else {
-		_step = ERROR;
-		_request->setStatusCode(http::BAD_REQUEST);
+		_step = ERROR; // acho que vai poder tirar isso
+		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 }
 
@@ -140,9 +137,8 @@ void RequestParser::version(char c) {
 		log.debug(_version);
 	}
 	else {
-		_step = ERROR;
-		_request->setStatusCode(http::BAD_REQUEST);
-		_request->setError(true);
+		_step = ERROR; // acho que vai poder tirar isso
+		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 10:22:17 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 11:15:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,20 @@ http::InvalidRequest::InvalidRequest(http::HttpStatus error) {
 const char* http::InvalidRequest::what() const throw() {
 	switch (_error) {
     case http::BAD_REQUEST:
-      return "Bad request";
+      return "400 Bad request";
     case http::METHOD_NOT_ALLOWED:
-      return "Method not allowed";
+      return "405 Method not allowed";
     case http::LENGTH_REQUIRED:
-      return "Length required";
+      return "411 Length required";
     case http::URI_TOO_LONG:
-      return "Request URI too long";
+      return "414 Request URI too long";
     case http::HTTP_VERSION_NOT_SUPPORTED:
-      return "HTTP version not supported";
+      return "505 HTTP version not supported";
     default:
       return "Unknown error";
   }
+}
+
+http::HttpStatus http::InvalidRequest::get_error_code(void) const {
+	return _error;
 }

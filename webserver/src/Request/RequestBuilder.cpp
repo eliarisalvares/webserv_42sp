@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 10:23:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 11:11:59 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,38 +65,46 @@ bool RequestBuilder::read(void) {
 void RequestBuilder::parse(void) {
 	size_t i = 0;
 
-	while (i < _bytes_readed) {
-		switch (_parser.step())
-		{
-			case RequestParser::INIT:
-			case RequestParser::METHOD:
-				_parser.method(_buffer[i]);
-				break;
-			case RequestParser::URI:
-				_parser.uri(_buffer[i]);
-				break;
-			case RequestParser::PROTOCOL:
-				_parser.protocol(_buffer[i]);
-				break;
-			case RequestParser::VERSION:
-				_parser.version(_buffer[i]);
-				break;
-			case RequestParser::HEADER:
-				_parser.header();
-				break;
-			case RequestParser::BODY:
-			case RequestParser::END:
-				_ready = true;
-				break;
-			case RequestParser::ERROR:
-				_request->setError(true);
-				_ready = true;
-				break;
-			default:
-				break;
+	while (i < _bytes_readed && !_ready) {
+		try {
+			switch (_parser.step())
+			{
+				case RequestParser::INIT:
+				case RequestParser::METHOD:
+					_parser.method(_buffer[i]);
+					break;
+				case RequestParser::URI:
+					_parser.uri(_buffer[i]);
+					break;
+				case RequestParser::PROTOCOL:
+					_parser.protocol(_buffer[i]);
+					break;
+				case RequestParser::VERSION:
+					_parser.version(_buffer[i]);
+					break;
+				case RequestParser::HEADER:
+					_parser.header();
+					break;
+				case RequestParser::BODY:
+				case RequestParser::END:
+					_ready = true;
+					break;
+				case RequestParser::ERROR:
+					_request->setError(true);
+					_ready = true;
+					break;
+				default:
+					break;
+			}
+		} catch (http::InvalidRequest& e) {
+			log.warning(e.what());
+			_request->setError(true);
+			_request->setStatusCode(e.get_error_code());
+			_ready = true;
+		} catch (std::exception& e) {
+			log.error("error on request parsing: ");
+			log.error(e.what());
 		}
-		if (_ready)
-			break;
 		i++;
 	}
 	memset(_buffer, 0, _bytes_readed);

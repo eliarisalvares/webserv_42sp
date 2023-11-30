@@ -45,6 +45,7 @@ public:
 
 private:
 	RequestBuilder(void);
+	Logger				log;
 
 	int					_fd;
 	bool				_ready;
