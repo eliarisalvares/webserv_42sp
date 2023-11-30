@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 12:08:35 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 19:42:15 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ public:
 	}           t_abnf_rules;
 
 	void			break_data(char* buffer, size_t bytes_read);
-	void			first_line(void);
 	void			method(char c);
 	void			uri(char c);
 	void			protocol(char c);
@@ -95,21 +94,17 @@ public:
 	void			check_crlf(char c);
 	void			header(char c);
 	Steps			step(void);
-	// Error	error(void);
 
-	bool			first_line_not_parsed(void);
-	t_string_map	get_result(void) const;
+	// t_string_map	get_result(void) const;
 
 private:
 	Logger								log;
 	size_t								_idx;
 	Steps								_step;
-	// Error							_error;
 	Request*							_request;
-	// std::string							_error_str;
 	std::vector<char>					_data;
 	std::vector<char>::iterator			_data_it;
-	t_string_map						_result;
+	// t_string_map						_result;
 
 	std::string		_method;
 	std::string		_uri;
@@ -119,8 +114,6 @@ private:
 	std::string		_field_value;
 	void			_parse_field_name(char c);
 	void			_parse_field_value(char c);
-
-	bool								_found_EOL(void);
 
 	void								_print_data(void);
 

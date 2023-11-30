@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 12:18:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 20:18:46 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void RequestBuilder::parse(void) {
 }
 
 Request* RequestBuilder::build(void) {
-	t_string_map parse_result = _parser.get_result();
+	// t_string_map parse_result = _parser.get_result();
 	Logger log;
 
 	// if (_parser.error())

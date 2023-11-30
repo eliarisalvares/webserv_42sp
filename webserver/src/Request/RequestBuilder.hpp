@@ -29,19 +29,12 @@ public:
 	RequestBuilder& operator=(RequestBuilder const& copy);
 	~RequestBuilder(void);
 
-	// typedef enum e_builder_error {
-	// 	NONE,
-	// 	PARSE_ERROR,
-	// 	METHOD_NOT_ALLOWED,
-	// }           t_builder_error;
-
 	bool		read(void);
 	void		parse(void);
 	Request*	build(void);
 
 	Server*			getServer(void) const;
 	bool			is_ready(void) const;
-	// e_builder_error error(void);
 
 private:
 	RequestBuilder(void);
@@ -51,8 +44,6 @@ private:
 	bool				_ready;
 	Server*				_server;
 	Request*			_request;
-	// e_builder_error		_error;
-	// std::string			_error_str;
 
 	// parse data
 	size_t				_bytes_readed;

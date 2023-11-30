@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 12:16:04 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 19:42:02 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@ RequestParser::RequestParser(void):
 	_idx(0), _step(INIT) {
 	_request = new Request();
 	_data.clear();
-	_result.clear();
+	// _result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
 	_idx(0), _step(INIT), _request(request) {
 	_data.clear();
-	_result.clear();
+	// _result.clear();
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -38,7 +38,7 @@ RequestParser& RequestParser::operator=(RequestParser const& copy) {
 
 RequestParser::~RequestParser(void) {
 	_data.clear();
-	_result.clear();
+	// _result.clear();
 }
 
 // void RequestParser::break_data(char* buffer, size_t bytes_read) {
@@ -70,10 +70,6 @@ RequestParser::~RequestParser(void) {
 RequestParser::Steps RequestParser::step(void) {
 	return this->_step;
 }
-
-// RequestParser::Error RequestParser::error(void) {
-// 	return this->_error;
-// }
 
 // Method names are always uppercase
 // The method token is case-sensitive
@@ -223,9 +219,9 @@ void RequestParser::header(char c) {
 		_parse_field_value(c);
 }
 
-t_string_map	RequestParser::get_result(void) const {
-	return _result;  // tem problema? não vou alterar, só consultar...
-}
+// t_string_map	RequestParser::get_result(void) const {
+// 	return _result;  // tem problema? não vou alterar, só consultar...
+// }
 
 // general:
 // Each part of a HTTP request is separated by a new line
