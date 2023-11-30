@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 11:31:29 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 12:08:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,15 @@ public:
 		VERSION,
 		CR_FIRST_LINE,
 		HEADER,
+		HEADER_NAME,
+		HEADER_VALUE,
 		CR_HEADER,
 		SECOND_CR_HEADER,
-		END_HEADER,
+		END_HEADER, // necessary?
 		BODY,
 		END_BODY,  // necessary?
 		END,
-		ERROR,
+		ERROR, // necessary?
 	};
 
 	enum Error {
@@ -91,7 +93,7 @@ public:
 	void			protocol(char c);
 	void			version(char c);
 	void			check_crlf(char c);
-	void			header(void);
+	void			header(char c);
 	Steps			step(void);
 	// Error	error(void);
 
@@ -113,6 +115,10 @@ private:
 	std::string		_uri;
 	std::string		_protocol;
 	std::string		_version;
+	std::string		_field_name;
+	std::string		_field_value;
+	void			_parse_field_name(char c);
+	void			_parse_field_value(char c);
 
 	bool								_found_EOL(void);
 

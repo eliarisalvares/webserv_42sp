@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 11:36:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 12:18:39 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,34 +64,48 @@ bool RequestBuilder::read(void) {
 
 void RequestBuilder::parse(void) {
 	size_t i = 0;
+	char c;
 
 	while (i < _bytes_readed && !_ready) {
+		c = _buffer[i];
 		try {
 			switch (_parser.step())
 			{
 				case RequestParser::INIT:
 				case RequestParser::METHOD:
-					_parser.method(_buffer[i]);
+					_parser.method(c);
 					break;
 				case RequestParser::URI:
-					_parser.uri(_buffer[i]);
+					_parser.uri(c);
 					break;
 				case RequestParser::PROTOCOL:
-					_parser.protocol(_buffer[i]);
+					_parser.protocol(c);
 					break;
 				case RequestParser::VERSION:
-					_parser.version(_buffer[i]);
+					_parser.version(c);
 					break;
 				case RequestParser::CR_FIRST_LINE:
-					_parser.check_crlf(_buffer[i]);
+					_parser.check_crlf(c);
 					break;
 				case RequestParser::HEADER:
-					_parser.header();
+					_parser.header(c);
+					break;
+				case RequestParser::HEADER_NAME:
+					_parser.header(c);
+					break;
+				case RequestParser::HEADER_VALUE:
+					_parser.header(c);
+					break;
+				case RequestParser::CR_HEADER:
+					_parser.check_crlf(c);
+					break;
+				case RequestParser::SECOND_CR_HEADER:
+					_parser.check_crlf(c);
 					break;
 				case RequestParser::BODY:
-				case RequestParser::END:
-					_ready = true;
-					break;
+				// case RequestParser::END:
+				// 	_ready = true;
+				// 	break;
 				case RequestParser::ERROR:
 					_request->setError(true);
 					_ready = true;
@@ -108,6 +122,8 @@ void RequestBuilder::parse(void) {
 			log.error("error on request parsing: ");
 			log.error(e.what());
 		}
+		if (_parser.step() == RequestParser::END)
+			_ready = true;
 		i++;
 	}
 	memset(_buffer, 0, _bytes_readed);

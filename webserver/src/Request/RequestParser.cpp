@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 11:35:20 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 12:16:04 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ RequestParser::Steps RequestParser::step(void) {
 // 	return this->_error;
 // }
 
+// Method names are always uppercase
 // The method token is case-sensitive
 // When a request method is received that is unrecognized or not implemented by an origin
 // server, the origin server SHOULD respond with the 501 (Not Implemented) status code.
@@ -96,6 +97,13 @@ void RequestParser::method(char c) {
 	}
 }
 
+// URI enconding (tb serve pra POST) - não entendi se posso receber https
+// URI normalization:
+// normalizing the scheme and host to lowercase
+// normalizing the port to remove any leading zeros.
+// If port is elided from the URI, the default port for that scheme is used
+// o host pode ser um IP, que pode estar em ipv4 ou ipv6...
+// It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
 void RequestParser::uri(char c) {
 	if (c != SP) // make first validation
 		_uri.push_back(c);
@@ -108,6 +116,8 @@ void RequestParser::uri(char c) {
 		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 }
+
+// The HTTP version always takes the form "HTTP/x.x", uppercase
 void RequestParser::protocol(char c) {
 	static int n = 0;
 	// static std::string protocol; // testar se dá pra usar
@@ -143,6 +153,7 @@ void RequestParser::version(char c) {
 	}
 }
 
+//Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
 void RequestParser::check_crlf(char c) {
 	if (c != LF) {
 		_step = ERROR; // acho que vai poder tirar isso
@@ -152,9 +163,15 @@ void RequestParser::check_crlf(char c) {
 		switch (_step)
 		{
 		case CR_FIRST_LINE:
+			log.debug("CRLF first line");
+			_step = HEADER;
+			break;
+		case CR_HEADER:
+			log.debug("CRLF header");
 			_step = HEADER;
 			break;
 		case SECOND_CR_HEADER:
+			log.debug("CRLF end header");
 			_step = END; //
 			break;
 		default:
@@ -163,125 +180,47 @@ void RequestParser::check_crlf(char c) {
 	}
 }
 
-//Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
-// Method names are always uppercase
-// URI enconding (tb serve pra POST) - não entendi se posso receber https
-// URI normalization:
-// normalizing the scheme and host to lowercase
-// normalizing the port to remove any leading zeros.
-// If port is elided from the URI, the default port for that scheme is used
-// o host pode ser um IP, que pode estar em ipv4 ou ipv6...
-// It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
-// The HTTP version always takes the form "HTTP/x.x", uppercase
-// void RequestParser::first_line(void) {
-// 	std::string method;
-// 	std::string uri;
-// 	std::string protocol;
-// 	std::string version;
-// 	std::vector<char>::iterator it;
-
-// 	// separar os parsers para evitar receber um monte de dado inválido sem CRLF
-// 	log.debug("first_line");
-// 	if (_found_EOL()) {
-// 		log.debug("Found EOL");
-// 		for (it = _data.begin(); it != _data_it && *it != SP; ++it)
-// 			method.push_back(*it);
-// 		log.debug(method);
-// 		while (*it == SP)
-// 			++it;
-// 		for (; it != _data_it && *it != SP; ++it)
-// 			uri.push_back(*it);
-// 		log.debug(uri);
-// 		while (*it == SP)
-// 			++it;
-// 		for (; it != _data_it && *it != '/'; ++it)
-// 			protocol.push_back(*it);
-// 		log.debug(protocol);
-// 		++it;
-// 		if (it != _data_it && *it == '/') {
-// 			++it;
-// 			for (; it != _data_it; ++it)
-// 				version.push_back(*it);
-// 			log.debug(version);
-// 		}
-// 		_step = HEADER;
-// 		_data.erase(_data.begin(), _data_it + 2);
-// 		_result.insert(t_string_pair("method", method));
-// 		_result.insert(t_string_pair("uri", uri));
-// 		_result.insert(t_string_pair("protocol", protocol));
-// 		_result.insert(t_string_pair("version", version));
-// 	}
-// }
-
-bool RequestParser::_found_EOL(void) {
-	std::vector<char>::iterator end = _data.end();
-
-	for(_data_it = _data.begin(); _data_it != end; ++_data_it) {
-		if (*_data_it == CR) {
-			// log.debug("found CR");
-			break;
-		}
-		if (*_data_it == LF) {
-			// log.debug("found LF without CR");
-			// talvez o CR não seja necessário; checar na RFC se pode aceitar só o \n
-			// _error = LF_WITHOUT_CR;
-			_step = END;
-			return false;
-		}
+void RequestParser::_parse_field_name(char c) {
+	if (c != COLON) // make first validation
+		_field_name.push_back(c);
+	else {
+		log.debug(_field_name);
+		_step = HEADER_VALUE;
+		// salvar o valor
+		_field_name.clear();
 	}
-	if (_data_it == end)
-		return false;
-	if (*_data_it == CR) {
-		if (*(_data_it + 1) == LF) {
-			// log.debug("found LF");
-			// _step = CRLF;
-			return true;
-		}
-		else if (_data_it + 1 == end)
-			return false;
-		else {
-			// _error = CR_WITHOUT_LF;
-			_step = END;
-			return false;
-		}
+}
+
+void RequestParser::_parse_field_value(char c) {
+	if (c == SP)
+		return ;
+	if (c == CR) {
+		log.debug(_field_value);
+		_step = CR_HEADER;
+		// salvar o valor
+		_field_value.clear();
 	}
-	(void)_idx;
-	return false;
+	else
+		_field_value.push_back(c);
 }
 
 // Field name:
 // The requested field name. It MUST conform to the field-name syntax defined
 // in Section 5.1, and it SHOULD be restricted to just letters, digits,
 // and hyphen ('-') characters, with the first character being a letter.
-void RequestParser::header(void) {
-	std::vector<char>::iterator it;
-	std::string header_name;
-	std::string header_value;
-
-	log.debug("parsing header");
-	while (_found_EOL()) {
-		log.debug("Found EOL");
-		for (it = _data.begin(); it != _data_it && *it != COLON; ++it)
-			header_name.push_back(*it);
-		log.debug(header_name);
-		if (*it == COLON)
-			++it;
-		while (*it == SP)
-			++it;
-		for (; it != _data_it; ++it)
-			header_value.push_back(*it);
-		log.debug(header_value);
-		_result.insert(t_string_pair(header_name, header_value));
-		it += 2;
-		_data.erase(_data.begin(), it);
-		header_name.clear();
-		header_value.clear();
-		if (*it == CR && *(it + 1) == LF) {
-			log.info("end of headers - remaining data:");
-			// _print_data();
-			_step = END;  ///////////////////////
-		}  // double CRFL
+void RequestParser::header(char c) {
+	if (_step == HEADER) {
+		if (c == CR) {
+			_step = SECOND_CR_HEADER;
+			return ;
+		}
+		else
+			_step = HEADER_NAME;
 	}
+	if (_step == HEADER_NAME)
+		_parse_field_name(c);
+	else if (_step == HEADER_VALUE)
+		_parse_field_value(c);
 }
 
 t_string_map	RequestParser::get_result(void) const {
