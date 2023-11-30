@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>42 - Webserv</title>
+        <style>
+            body {
+                background-color: #FFFFFF;
+                color: #000000;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 14px;
+                line-height: 1.5;
+                margin: 0;
+                padding: 0;
+            }
+            #header {
+                background-color: #FF69B4;
+                color: #FFFFFF;
+                padding: 10px;
+                text-align: center;
+            }
+            #content {
+                padding: 10px;
+            }
+        </style>
+            <script>
+                // This function will be called when the button is clicked
+                function makeRequest() {
+                    fetch('http://localhost:8080')
+                        .then(response => response.text())
+                        .then(data => {
+                            document.getElementById('content').innerHTML = data;
+                        })
+                        .catch(error => {
+                            document.getElementById('content').innerHTML = 'Something went wrong';
+                        });
+                }
+            </script>
+    </head>
+    <body>
+        <div id="header">
+            <h1>42 - Webserver</h1>
+        </div>
+        <div id="content">
+            <p>Webserv is a simple webserver written in C++.</p>
+            <p>It is able to handle multiple connections at the same time.</p>
+            <p>It supports GET, POST and DELETE requests.</p>
+
+            </div>
+        <!-- center div -->
+        <div id="button" style="text-align: center;">
+            <button onclick="makeRequest()">Tente fazer uma requisição</button>
+        </div>
+    </body>
+</html>
