@@ -6,12 +6,15 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 22:35:57 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/29 23:18:16 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTP_HPP
 # define HTTP_HPP
+
+# include <set>
+# include <string>
 
 namespace http {
 	typedef enum e_status {
@@ -41,6 +44,14 @@ namespace http {
 	typedef enum e_content_type {
 
 	}			t_content_type;
+
+	// all methods in HTTP
+	std::set<std::string>				_fill_methods(void);
+	static std::set<std::string> const	methods = http::_fill_methods();
+
+	// headers that needs a validation - não sei se isso vai ser útil
+	std::set<std::string>				_fill_headers(void);
+	static std::set<std::string> const	headers = http::_fill_headers();
 }
 
 #endif
