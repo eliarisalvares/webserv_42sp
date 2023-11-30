@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/29 23:41:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 02:36:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,15 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 
 bool RequestBuilder::read(void) {
 	Logger log;
-	int nbytes;
 	int error;
 
 	log.debug("reading data and saving it...");
-	nbytes = recv(_fd, _buffer, _server->getBufferSize(), 0);
+	_bytes_readed = recv(_fd, _buffer, _server->getBufferSize(), 0);
 	error = errno;
 
-	if (nbytes <= 0) {
-		std::cout << "error: " << errno << std::endl;
-		if (nbytes == 0) {
+	if (_bytes_readed <= 0) {
+		std::cout << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
+		if (_bytes_readed == 0) {
 			log.warning("client connection closed:");
 			printf(GREY "socket %d hung up\n" "RESET", this->_fd);
 		} else
@@ -60,25 +59,48 @@ bool RequestBuilder::read(void) {
 		return false;
 	}
 
-	_parser.break_data(_buffer, nbytes);
-	memset(_buffer, 0, nbytes);
 	return true;
 }
 
 void RequestBuilder::parse(void) {
-	if (_parser.step() == RequestParser::METHOD) {
-		_parser.first_line();
+	size_t i = 0;
+
+	while (i < _bytes_readed) {
+		switch (_parser.step())
+		{
+			case RequestParser::INIT:
+			case RequestParser::METHOD:
+				_parser.method(_buffer[i]);
+				break;
+			case RequestParser::URI:
+				_parser.uri(_buffer[i]);
+				break;
+			case RequestParser::PROTOCOL:
+				_parser.protocol(_buffer[i]);
+				break;
+			case RequestParser::VERSION:
+				_parser.version(_buffer[i]);
+				break;
+			case RequestParser::HEADER:
+				_parser.header();
+				break;
+			case RequestParser::BODY:
+			case RequestParser::END:
+				_ready = true;
+			default:
+				break;
+		}
+		if (_parser.error()) {
+			_ready = true;
+			_error = PARSE_ERROR; // pode ter outros
+			_error_str = "parser error"; // alterar isso aqui
+			break;
+		}
+		if (_ready)
+			break;
+		i++;
 	}
-	if (_parser.step() == RequestParser::HEADER) {
-		_parser.header();
-	}
-	if (_parser.error()) {
-		_ready = true;
-		_error = PARSE_ERROR; // pode ter outros
-		_error_str = "parser error"; // alterar isso aqui
-	}
-	if (_parser.step() == RequestParser::END)
-		_ready = true;
+	memset(_buffer, 0, _bytes_readed);
 }
 
 Request* RequestBuilder::build(void) {

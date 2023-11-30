@@ -6,21 +6,21 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/29 23:40:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 02:43:15 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 
 RequestParser::RequestParser(void):
-	_idx(0), _step(METHOD), _error(NONE) {
+	_idx(0), _step(INIT), _error(NONE) {
 	_request = new Request();
 	_data.clear();
 	_result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
-	_idx(0), _step(METHOD), _error(NONE), _request(request) {
+	_idx(0), _step(INIT), _error(NONE), _request(request) {
 	_data.clear();
 	_result.clear();
 }
@@ -41,31 +41,31 @@ RequestParser::~RequestParser(void) {
 	_result.clear();
 }
 
-void RequestParser::break_data(char* buffer, size_t bytes_read) {
-	for (size_t i = 0; i < bytes_read; ++i)
-		_data.push_back(buffer[i]);
+// void RequestParser::break_data(char* buffer, size_t bytes_read) {
+// 	for (size_t i = 0; i < bytes_read; ++i)
+// 		_data.push_back(buffer[i]);
 
-	if (DEBUG) {
-		std::cout << GREY << "Received/remaining data:\n";
-		_print_data();
-	}
-}
+// 	if (DEBUG) {
+// 		std::cout << GREY << "Received/remaining data:\n";
+// 		_print_data();
+// 	}
+// }
 
-void RequestParser::_print_data(void) {
-	std::vector<char>::iterator it, end = _data.end();
+// void RequestParser::_print_data(void) {
+// 	std::vector<char>::iterator it, end = _data.end();
 
-	if (DEBUG) {
-		for(it = _data.begin(); it != end; ++it) {
-			if (*it == CR)
-				std::cout << " CR";
-			else if (*it == LF)
-				std::cout << "LF" << *it;
-			else
-				std::cout << *it;
-		}
-		std::cout << RESET << std::endl;
-	}
-}
+// 	if (DEBUG) {
+// 		for(it = _data.begin(); it != end; ++it) {
+// 			if (*it == CR)
+// 				std::cout << " CR";
+// 			else if (*it == LF)
+// 				std::cout << "LF" << *it;
+// 			else
+// 				std::cout << *it;
+// 		}
+// 		std::cout << RESET << std::endl;
+// 	}
+// }
 
 RequestParser::e_steps RequestParser::step(void) {
 	return this->_step;
@@ -75,7 +75,79 @@ RequestParser::e_parser_error RequestParser::error(void) {
 	return this->_error;
 }
 
+// The method token is case-sensitive
+// When a request method is received that is unrecognized or not implemented by an origin
+// server, the origin server SHOULD respond with the 501 (Not Implemented) status code.
+// When a request method is received that is known by an origin
+// server but not allowed for the target resource, the origin server
+// SHOULD respond with the 405 (Method Not Allowed) status code.
+void RequestParser::method(char c) {
+	_step = METHOD;
+	if (c != SP && c >= 'A' && c <= 'Z')
+		_method.push_back(c);
+	else if (c == SP) {
+		_request->setMethod(GET); // ver se vou fazer isso aqui e lógica
+		_step = URI;
+		log.debug(_method);
+	}
+	else {
+		_step = ERROR;
+		_error = INVALID_METHOD_TOKEN;
+		_request->setMethod(INVALID_METHOD);  // precisa?
+		_request->setStatusCode(http::BAD_REQUEST);
+		_request->setError(true);
+	}
+}
 
+void RequestParser::uri(char c) {
+	if (c != SP) // make first validation
+		_uri.push_back(c);
+	else if (c == SP) {
+		log.debug(_uri);
+		_step = PROTOCOL;
+	}
+	else {
+		_step = ERROR;
+		_request->setStatusCode(http::BAD_REQUEST);
+		_request->setError(true);
+	}
+}
+void RequestParser::protocol(char c) {
+	static int n = 0;
+	// static std::string protocol; // testar se dá pra usar
+
+	if (c != '/' && n < 4) {
+		_protocol.push_back(c);
+		n++;
+	}
+	else if (c == '/') {
+		_step = VERSION;
+		log.debug(_protocol);
+	} // checkar _protocol == "HTTP"
+	else {
+		_step = ERROR;
+		_error = INVALID_METHOD_TOKEN;
+		_request->setStatusCode(http::BAD_REQUEST);
+		_request->setError(true);
+	}
+}
+
+// se número - verificar se é versão suportada
+// outro caracter - Bad Request
+void RequestParser::version(char c) {
+	if (c != SP && ((c >= '0' && c <= '1') || c == '.')) // checkar para número
+		_version.push_back(c);
+	else if (c == SP) {
+		// if _version != "1.1"
+		_step = HEADER;
+		log.debug(_version);
+	}
+	else {
+		_step = ERROR;
+		_request->setStatusCode(http::BAD_REQUEST);
+		_request->setError(true);
+	}
+}
 
 //Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
 // Method names are always uppercase
@@ -87,45 +159,45 @@ RequestParser::e_parser_error RequestParser::error(void) {
 // o host pode ser um IP, que pode estar em ipv4 ou ipv6...
 // It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
 // The HTTP version always takes the form "HTTP/x.x", uppercase
-void RequestParser::first_line(void) {
-	std::string method;
-	std::string uri;
-	std::string protocol;
-	std::string version;
-	std::vector<char>::iterator it;
+// void RequestParser::first_line(void) {
+// 	std::string method;
+// 	std::string uri;
+// 	std::string protocol;
+// 	std::string version;
+// 	std::vector<char>::iterator it;
 
-	// separar os parsers para evitar receber um monte de dado inválido sem CRLF
-	log.debug("first_line");
-	if (_found_EOL()) {
-		log.debug("Found EOL");
-		for (it = _data.begin(); it != _data_it && *it != SP; ++it)
-			method.push_back(*it);
-		log.debug(method);
-		while (*it == SP)
-			++it;
-		for (; it != _data_it && *it != SP; ++it)
-			uri.push_back(*it);
-		log.debug(uri);
-		while (*it == SP)
-			++it;
-		for (; it != _data_it && *it != '/'; ++it)
-			protocol.push_back(*it);
-		log.debug(protocol);
-		++it;
-		if (it != _data_it && *it == '/') {
-			++it;
-			for (; it != _data_it; ++it)
-				version.push_back(*it);
-			log.debug(version);
-		}
-		_step = HEADER;
-		_data.erase(_data.begin(), _data_it + 2);
-		_result.insert(t_string_pair("method", method));
-		_result.insert(t_string_pair("uri", uri));
-		_result.insert(t_string_pair("protocol", protocol));
-		_result.insert(t_string_pair("version", version));
-	}
-}
+// 	// separar os parsers para evitar receber um monte de dado inválido sem CRLF
+// 	log.debug("first_line");
+// 	if (_found_EOL()) {
+// 		log.debug("Found EOL");
+// 		for (it = _data.begin(); it != _data_it && *it != SP; ++it)
+// 			method.push_back(*it);
+// 		log.debug(method);
+// 		while (*it == SP)
+// 			++it;
+// 		for (; it != _data_it && *it != SP; ++it)
+// 			uri.push_back(*it);
+// 		log.debug(uri);
+// 		while (*it == SP)
+// 			++it;
+// 		for (; it != _data_it && *it != '/'; ++it)
+// 			protocol.push_back(*it);
+// 		log.debug(protocol);
+// 		++it;
+// 		if (it != _data_it && *it == '/') {
+// 			++it;
+// 			for (; it != _data_it; ++it)
+// 				version.push_back(*it);
+// 			log.debug(version);
+// 		}
+// 		_step = HEADER;
+// 		_data.erase(_data.begin(), _data_it + 2);
+// 		_result.insert(t_string_pair("method", method));
+// 		_result.insert(t_string_pair("uri", uri));
+// 		_result.insert(t_string_pair("protocol", protocol));
+// 		_result.insert(t_string_pair("version", version));
+// 	}
+// }
 
 bool RequestParser::_found_EOL(void) {
 	std::vector<char>::iterator end = _data.end();
@@ -192,7 +264,7 @@ void RequestParser::header(void) {
 		header_value.clear();
 		if (*it == CR && *(it + 1) == LF) {
 			log.info("end of headers - remaining data:");
-			_print_data();
+			// _print_data();
 			_step = END;  ///////////////////////
 		}  // double CRFL
 	}

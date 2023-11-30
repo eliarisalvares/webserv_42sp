@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/29 23:39:43 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 02:17:33 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ public:
 	~RequestParser(void);
 
 	typedef enum e_steps {
-		ERROR,
+		INIT,
 		FIRST_LINE,
 		METHOD,
 		URI,
@@ -53,13 +53,14 @@ public:
 		BODY,
 		END_BODY,  // necessary?
 		END,
-	}           t_steps;
+		ERROR,
+	}			t_steps;
 
 	typedef enum e_parser_error {
 		NONE,
 		LF_WITHOUT_CR,
 		CR_WITHOUT_LF,
-		INVALID_METHOD,
+		INVALID_METHOD_TOKEN,
 		INVALID_URI,
 		INVALID_PROTOCOL,
 		INVALID_HTTP_VERSION,
@@ -82,6 +83,10 @@ public:
 
 	void			break_data(char* buffer, size_t bytes_read);
 	void			first_line(void);
+	void			method(char c);
+	void			uri(char c);
+	void			protocol(char c);
+	void			version(char c);
 	void			header(void);
 	e_steps			step(void);
 	e_parser_error	error(void);
@@ -100,9 +105,15 @@ private:
 	std::vector<char>::iterator			_data_it;
 	t_string_map						_result;
 
+	std::string		_method;
+	std::string		_uri;
+	std::string		_protocol;
+	std::string		_version;
+
 	bool								_found_EOL(void);
 
 	void								_print_data(void);
+
 };
 
 #endif

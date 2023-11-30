@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 23:15:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 02:16:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ typedef enum requestMethod {
 	GET,
 	POST,
 	DELETE,
-	NOT_IMPLEMENTED
+	NOT_ALLOWED, // 405
+	NOT_IMPLEMENTED, // 501
+	INVALID_METHOD, // 400
 }			requestMethod;
 
 class Request {
