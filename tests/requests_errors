@@ -1,0 +1,36 @@
+GET HTTP/1.1
+GET / HTTP
+GET / HTTP/1.1 \r\nHost: test.com
+GET / HTTP/1.1 \\r\\n
+GE.T / HTTP/1.1
+GET / HTTP/sfe
+400 Bad Request
+
+GET / ggg/1.1
+GET / http/1.1
+GET / http/2.0
+404 Not Found
+(não faz sentido...)
+
+GET / HTTP/2.0
+GET / HTTP/5.0
+505 HTTP Version Not Supported
+
+"PUT / HTTP/1.1
+(CRLF)"
+"GET / HTTP/1.1
+(CRLF)"
+(sem header Host)
+400 Bad Request
+
+"CONNECT / HTTP/1.1
+Host: test.com"
+405 Not Allowed
+(o mesmo com POST, PUT... - tem que ter o header do Host, se não cai no caso acima)
+
+"GET / HTTP/1.1
+host: ewfa.com
+Content-Length: jheiuhryiue"
+(invalid Content-Length)
+400 Bad Request
+

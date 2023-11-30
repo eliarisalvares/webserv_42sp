@@ -1,0 +1,20 @@
+"GET / HTTP/1.1
+Host: test.com"
+HTTP/1.1 200 OK
+
+"GET / HTTP/1.1
+Host: test.com
+Accept-Language: pt"
+HTTP/1.1 200 OK
+(devolveu em inglês)
+
+"GET / HTTP/1.1
+host: tes.com
+Accept-Charset: dsjkf"
+HTTP/1.1 200 OK
+
+"GET / HTTP/1.1
+Host: sfsd.com
+dedaef: ferfre"
+HTTP/1.1 200 OK
+
