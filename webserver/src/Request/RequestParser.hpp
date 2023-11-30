@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 10:50:25 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 11:31:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,10 @@ public:
 		URI,
 		PROTOCOL,
 		VERSION,
+		CR_FIRST_LINE,
 		HEADER,
+		CR_HEADER,
+		SECOND_CR_HEADER,
 		END_HEADER,
 		BODY,
 		END_BODY,  // necessary?
@@ -87,6 +90,7 @@ public:
 	void			uri(char c);
 	void			protocol(char c);
 	void			version(char c);
+	void			check_crlf(char c);
 	void			header(void);
 	Steps			step(void);
 	// Error	error(void);

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 11:18:35 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 11:35:20 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void RequestParser::protocol(char c) {
 	static int n = 0;
 	// static std::string protocol; // testar se dá pra usar
 
-	if (c != '/' && n < 4) {
+	if (c != '/') {
 		_protocol.push_back(c);
 		n++;
 	}
@@ -129,16 +129,37 @@ void RequestParser::protocol(char c) {
 // se número - verificar se é versão suportada
 // outro caracter - Bad Request
 void RequestParser::version(char c) {
-	if (c != SP && ((c >= '0' && c <= '1') || c == '.')) // checkar para número
+	// if (c != SP && ((c >= '0' && c <= '1') || c == '.')) // checkar para número
+	if (c != CR)
 		_version.push_back(c);
-	else if (c == SP) {
+	else if (c == CR) {
 		// if _version != "1.1"
-		_step = HEADER;
+		_step = CR_FIRST_LINE;
 		log.debug(_version);
 	}
 	else {
 		_step = ERROR; // acho que vai poder tirar isso
 		throw http::InvalidRequest(http::BAD_REQUEST);
+	}
+}
+
+void RequestParser::check_crlf(char c) {
+	if (c != LF) {
+		_step = ERROR; // acho que vai poder tirar isso
+		throw http::InvalidRequest(http::BAD_REQUEST);
+	}
+	else {
+		switch (_step)
+		{
+		case CR_FIRST_LINE:
+			_step = HEADER;
+			break;
+		case SECOND_CR_HEADER:
+			_step = END; //
+			break;
+		default:
+			break;
+		}
 	}
 }
 
