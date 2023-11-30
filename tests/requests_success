@@ -18,3 +18,11 @@ Host: sfsd.com
 dedaef: ferfre"
 HTTP/1.1 200 OK
 
+"GET     /    HTTP/1.1
+Host: jjjjj"
+(espaços entre os campos, incluindo no final - início dá erro)
+"GET / HTTP/1.1
+host:     fdjhg"
+(espaços entre os campos, incluindo no final - início tem uma lógica que pode dar erro)
+HTTP/1.1 200 OK
+

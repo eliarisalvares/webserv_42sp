@@ -34,3 +34,8 @@ Content-Length: jheiuhryiue"
 (invalid Content-Length)
 400 Bad Request
 
+"     GET / HTTP/1.1"  - OK, retornando erro
+"GET / HTTP/1.1
+ Host: ggf"
+(espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
+400 Bad Request

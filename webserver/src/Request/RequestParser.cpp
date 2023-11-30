@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 19:42:02 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 20:43:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,15 @@ RequestParser::Steps RequestParser::step(void) {
 	return this->_step;
 }
 
+// general:
+// Parts of request line is separated by a space character.
+// Technically there should be only one space though I've seen badly malformed requests that send multiple spaces.
+// Browsers will never send more than one space
+// nginx aceita vários espaços e nós tb estamos aceitando
+// não aceita espaço no início da primeira linha e das linhas de header
+
+// The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
+
 // Method names are always uppercase
 // The method token is case-sensitive
 // When a request method is received that is unrecognized or not implemented by an origin
@@ -83,6 +92,10 @@ void RequestParser::method(char c) {
 	if (c != SP && c >= 'A' && c <= 'Z')
 		_method.push_back(c);
 	else if (c == SP) {
+		if (_method.size() == 0) {
+			_step = ERROR; // acho que vai poder tirar isso
+			throw http::InvalidRequest(http::BAD_REQUEST);
+		}
 		_request->setMethod(GET); // ver se vou fazer isso aqui e lógica
 		_step = URI;
 		log.debug(_method);
@@ -149,7 +162,10 @@ void RequestParser::version(char c) {
 	}
 }
 
-//Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
+// Each part of a HTTP request is separated by a new line
+// Note: Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline
+// Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
+// lidando apenas com CRLF por hora, verificar se no 
 void RequestParser::check_crlf(char c) {
 	if (c != LF) {
 		_step = ERROR; // acho que vai poder tirar isso
@@ -223,15 +239,12 @@ void RequestParser::header(char c) {
 // 	return _result;  // tem problema? não vou alterar, só consultar...
 // }
 
-// general:
-// Each part of a HTTP request is separated by a new line
-// Note: Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline
-// Parts of request line is separated by a space character. Technically there should be only one space though I've seen badly malformed requests that send multiple spaces. Browsers will never send more than one space
 
-// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
-// The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
+
+
 
 // headers
+// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
 // servers should treat headers as an unordered set
 // one line per header, of the form "Header-Name: value", ending with CRLF
 // you should handle LF correctly
