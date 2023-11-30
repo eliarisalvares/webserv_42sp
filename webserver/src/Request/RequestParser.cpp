@@ -6,21 +6,21 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 02:43:15 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:49:45 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 
 RequestParser::RequestParser(void):
-	_idx(0), _step(INIT), _error(NONE) {
+	_idx(0), _step(INIT) {
 	_request = new Request();
 	_data.clear();
 	_result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
-	_idx(0), _step(INIT), _error(NONE), _request(request) {
+	_idx(0), _step(INIT), _request(request) {
 	_data.clear();
 	_result.clear();
 }
@@ -67,13 +67,13 @@ RequestParser::~RequestParser(void) {
 // 	}
 // }
 
-RequestParser::e_steps RequestParser::step(void) {
+RequestParser::Steps RequestParser::step(void) {
 	return this->_step;
 }
 
-RequestParser::e_parser_error RequestParser::error(void) {
-	return this->_error;
-}
+// RequestParser::Error RequestParser::error(void) {
+// 	return this->_error;
+// }
 
 // The method token is case-sensitive
 // When a request method is received that is unrecognized or not implemented by an origin
@@ -92,7 +92,6 @@ void RequestParser::method(char c) {
 	}
 	else {
 		_step = ERROR;
-		_error = INVALID_METHOD_TOKEN;
 		_request->setMethod(INVALID_METHOD);  // precisa?
 		_request->setStatusCode(http::BAD_REQUEST);
 		_request->setError(true);
@@ -126,9 +125,7 @@ void RequestParser::protocol(char c) {
 	} // checkar _protocol == "HTTP"
 	else {
 		_step = ERROR;
-		_error = INVALID_METHOD_TOKEN;
 		_request->setStatusCode(http::BAD_REQUEST);
-		_request->setError(true);
 	}
 }
 
@@ -210,7 +207,7 @@ bool RequestParser::_found_EOL(void) {
 		if (*_data_it == LF) {
 			// log.debug("found LF without CR");
 			// talvez o CR não seja necessário; checar na RFC se pode aceitar só o \n
-			_error = LF_WITHOUT_CR;
+			// _error = LF_WITHOUT_CR;
 			_step = END;
 			return false;
 		}
@@ -226,7 +223,7 @@ bool RequestParser::_found_EOL(void) {
 		else if (_data_it + 1 == end)
 			return false;
 		else {
-			_error = CR_WITHOUT_LF;
+			// _error = CR_WITHOUT_LF;
 			_step = END;
 			return false;
 		}

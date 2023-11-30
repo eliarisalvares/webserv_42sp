@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 02:36:47 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:23:54 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,14 +87,13 @@ void RequestBuilder::parse(void) {
 			case RequestParser::BODY:
 			case RequestParser::END:
 				_ready = true;
+				break;
+			case RequestParser::ERROR:
+				_request->setError(true);
+				_ready = true;
+				break;
 			default:
 				break;
-		}
-		if (_parser.error()) {
-			_ready = true;
-			_error = PARSE_ERROR; // pode ter outros
-			_error_str = "parser error"; // alterar isso aqui
-			break;
 		}
 		if (_ready)
 			break;
@@ -107,8 +106,8 @@ Request* RequestBuilder::build(void) {
 	t_string_map parse_result = _parser.get_result();
 	Logger log;
 
-	if (_parser.error())
-		_request->setError(true);
+	// if (_parser.error())
+	// 	_request->setError(true);
 	this->_ready = false;
 	return _request;
 }

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 02:17:33 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 10:50:25 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ public:
 	RequestParser& operator=(RequestParser const& copy);
 	~RequestParser(void);
 
-	typedef enum e_steps {
+	enum Steps {
 		INIT,
 		FIRST_LINE,
 		METHOD,
@@ -54,9 +54,9 @@ public:
 		END_BODY,  // necessary?
 		END,
 		ERROR,
-	}			t_steps;
+	};
 
-	typedef enum e_parser_error {
+	enum Error {
 		NONE,
 		LF_WITHOUT_CR,
 		CR_WITHOUT_LF,
@@ -64,7 +64,7 @@ public:
 		INVALID_URI,
 		INVALID_PROTOCOL,
 		INVALID_HTTP_VERSION,
-	}           t_parser_error;
+	};
 
 	typedef enum e_abnf_rules {
 		ALPHA, // (letters)
@@ -88,8 +88,8 @@ public:
 	void			protocol(char c);
 	void			version(char c);
 	void			header(void);
-	e_steps			step(void);
-	e_parser_error	error(void);
+	Steps			step(void);
+	// Error	error(void);
 
 	bool			first_line_not_parsed(void);
 	t_string_map	get_result(void) const;
@@ -97,10 +97,10 @@ public:
 private:
 	Logger								log;
 	size_t								_idx;
-	t_steps								_step;
-	t_parser_error						_error;
+	Steps								_step;
+	// Error							_error;
 	Request*							_request;
-	std::string							_error_str;
+	// std::string							_error_str;
 	std::vector<char>					_data;
 	std::vector<char>::iterator			_data_it;
 	t_string_map						_result;
