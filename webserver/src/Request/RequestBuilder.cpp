@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 11:59:57 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:00:54 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void RequestBuilder::parse(void) {
 					_parser.check_first_line();
 					break;
 				case RequestParser::CR_FIRST_LINE:
-					_parser.check_crlf(_buffer[i]);
+					_parser.check_crlf(c);
 					break;
 				case RequestParser::HEADER:
 					_parser.header(c);
