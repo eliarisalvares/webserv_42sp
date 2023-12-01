@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 20:43:47 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 21:02:48 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ RequestParser::Steps RequestParser::step(void) {
 // Technically there should be only one space though I've seen badly malformed requests that send multiple spaces.
 // Browsers will never send more than one space
 // nginx aceita vários espaços e nós tb estamos aceitando
-// não aceita espaço no início da primeira linha e das linhas de header
+// não aceita espaço no início da primeira linha (não é letra maiúscula)
 
 // The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
 
@@ -89,7 +89,7 @@ RequestParser::Steps RequestParser::step(void) {
 // SHOULD respond with the 405 (Method Not Allowed) status code.
 void RequestParser::method(char c) {
 	_step = METHOD;
-	if (c != SP && c >= 'A' && c <= 'Z')
+	if (c >= 'A' && c <= 'Z')
 		_method.push_back(c);
 	else if (c == SP) {
 		if (_method.size() == 0) {
@@ -165,7 +165,8 @@ void RequestParser::version(char c) {
 // Each part of a HTTP request is separated by a new line
 // Note: Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline
 // Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
-// lidando apenas com CRLF por hora, verificar se no 
+// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
+// lidando apenas com CRLF por hora, verificar no RFC
 void RequestParser::check_crlf(char c) {
 	if (c != LF) {
 		_step = ERROR; // acho que vai poder tirar isso
@@ -192,34 +193,13 @@ void RequestParser::check_crlf(char c) {
 	}
 }
 
-void RequestParser::_parse_field_name(char c) {
-	if (c != COLON) // make first validation
-		_field_name.push_back(c);
-	else {
-		log.debug(_field_name);
-		_step = HEADER_VALUE;
-		// salvar o valor
-		_field_name.clear();
-	}
-}
-
-void RequestParser::_parse_field_value(char c) {
-	if (c == SP)
-		return ;
-	if (c == CR) {
-		log.debug(_field_value);
-		_step = CR_HEADER;
-		// salvar o valor
-		_field_value.clear();
-	}
-	else
-		_field_value.push_back(c);
-}
-
-// Field name:
-// The requested field name. It MUST conform to the field-name syntax defined
-// in Section 5.1, and it SHOULD be restricted to just letters, digits,
-// and hyphen ('-') characters, with the first character being a letter.
+// headers
+// servers should treat headers as an unordered set
+// one line per header, of the form "Header-Name: value", ending with CRLF
+// you should handle LF correctly
+// The header name is not case-sensitive (though the value may be) - Header
+// name can be either title-case or lowercase or mixed, all are valid
+// HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
 void RequestParser::header(char c) {
 	if (_step == HEADER) {
 		if (c == CR) {
@@ -235,22 +215,13 @@ void RequestParser::header(char c) {
 		_parse_field_value(c);
 }
 
-// t_string_map	RequestParser::get_result(void) const {
-// 	return _result;  // tem problema? não vou alterar, só consultar...
-// }
+// Field name:
+// The requested field name. It MUST conform to the field-name syntax defined
+// in Section 5.1, and it SHOULD be restricted to just letters, digits,
+// and hyphen ('-') characters, with the first character being a letter.
 
-
-
-
-
-// headers
-// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
-// servers should treat headers as an unordered set
-// one line per header, of the form "Header-Name: value", ending with CRLF
-// you should handle LF correctly
-// The header name is not case-sensitive (though the value may be) - Header
-// name can be either title-case or lowercase or mixed, all are valid
-// Any number of spaces or tabs may be between the ":" and the value
+// nos headers parece considerar um espaço no começo do nome do header como parte dele
+// interpreta " Host" e não "Host" (dá erro porque considera que o header não está incluso)
 // Header lines beginning with space or tab are actually part of the previous header line, folded into multiple lines for easy reading.
 // the following two headers are equivalent:
 
@@ -258,8 +229,36 @@ void RequestParser::header(char c) {
 // HEADER1:    some-long-value-1a,
 //             some-long-value-1b
 
-// HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
+void RequestParser::_parse_field_name(char c) {
+	if (c != COLON) // make first validation
+		_field_name.push_back(c);
+	else {
+		log.debug(_field_name);
+		_step = HEADER_VALUE;
+		// salvar o valor
+		_field_name.clear();
+	}
+}
 
+// Any number of spaces or tabs may be between the ":" and the value
+void RequestParser::_parse_field_value(char c) {
+	if (c == SP)
+		return ;
+	if (c == CR) {
+		log.debug(_field_value);
+		_step = CR_HEADER;
+		// salvar o valor
+		_field_value.clear();
+	}
+	else
+		_field_value.push_back(c);
+}
+
+// t_string_map	RequestParser::get_result(void) const {
+// 	return _result;  // tem problema? não vou alterar, só consultar...
+// }
+
+// Body
 // If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
 // Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
 // Content-Length: header gives the number of bytes in the body.
