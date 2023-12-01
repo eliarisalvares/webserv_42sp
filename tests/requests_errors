@@ -61,3 +61,6 @@ Content-Length: jheiu"
 400 Bad Request
 
 
+"GET / HTTP/1.1
+host"
+400 Bad Request

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/01 00:11:49 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 02:06:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ private:
 	Server*					_server;
 	int						_fd;
 	bool					_error;
-	http::RequestMethod			_method;
+	http::RequestMethod		_method;
 	http::HttpStatus		_status_code;
 	std::string				_uri;
 	bool					_is_chuncked;

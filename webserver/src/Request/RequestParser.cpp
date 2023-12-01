@@ -229,6 +229,11 @@ void RequestParser::_parse_field_name(char c) {
 		log.debug(_field_name);
 		_step = HEADER_VALUE;
 	}
+	// checkar espaços -> significa que é continuação do header anterior
+	// se for o primeiro, guarda com espaço
+
+	// if (c == CR)
+	// erro - não, ele ignora, a não ser que seja um header que tem validação
 }
 
 // Any number of spaces or tabs may be between the ":" and the value
@@ -273,7 +278,15 @@ void RequestParser::_add_header(void) {
 
 void RequestParser::check_headers(void) {
 	// check se tem body -> passa _step = BODY (ver onde entra)
+
 	// 1 - verificar se tem o header obrigatório host
+	std::map<std::string, std::vector<std::string> >::iterator it;
+
+	it = _headers.find("host");
+	if (it == _headers.end()) {
+		throw http::InvalidRequest(http::BAD_REQUEST);
+	}
+
 	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
 	_print_headers();
 
