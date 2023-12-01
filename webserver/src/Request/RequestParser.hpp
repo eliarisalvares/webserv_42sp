@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:05:18 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:07:32 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,10 +122,14 @@ private:
 	// static int const			_right_version;
 
 	// headers
-	std::string		_field_name;
-	std::string		_field_value;
-	void			_parse_field_name(char c);
-	void			_parse_field_value(char c);
+	std::string							_field_name;
+	std::string							_field_value;
+	std::string							_last_header;
+	std::map<std::string, std::vector<std::string> >	_headers;
+	void								_add_header(void);
+	void								_print_headers(void);
+	void								_parse_field_name(char c);
+	void								_parse_field_value(char c);
 
 	static std::string const	_right_protocol;
 	// static int const			_right_version;
