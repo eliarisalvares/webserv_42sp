@@ -22,8 +22,8 @@ GeneralException::GeneralException(Errors const error) {
 const char* GeneralException::what() const throw() {
 	switch (_error)
 	{
-	case TEST:
-		return "Erro de teste";
+	case INVALID_METHOD:
+		return "Invalid method";
 	default:
 		return "GeneralException";
 	}

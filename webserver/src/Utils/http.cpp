@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 11:15:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 01:22:14 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,52 @@ std::set<std::string> _fill_methods(void) {
 	std::string methods_names[] = {
 		"GET",
 		"POST",
-		"PUT",
-		"PATCH",
 		"DELETE",
-		"HEAD",
-		"CONNECT",
-		"OPTIONS",
-		"TRACE",
+		// "PUT",
+		// "PATCH",
+		// "HEAD",
+		// "CONNECT",
+		// "OPTIONS",
+		// "TRACE",
 	};
-	std::set<std::string> methods (methods_names, methods_names + 9);
+	std::set<std::string> methods (methods_names, methods_names + 3);
 	return methods;
+}
+
+std::map<std::string, RequestMethod> _fill_map_method_str_to_enum(void) {
+	std::map<std::string, RequestMethod> str_to_enum;
+
+	str_to_enum.insert(std::make_pair("GET", GET));
+	str_to_enum.insert(std::make_pair("POST", POST));
+	str_to_enum.insert(std::make_pair("DELETE", DELETE));
+	return str_to_enum;
+}
+
+std::map<RequestMethod, std::string> _fill_map_method_enum_to_str(void) {
+	std::map<RequestMethod, std::string> enum_to_str;
+
+	enum_to_str.insert(std::make_pair(GET, "GET"));
+	enum_to_str.insert(std::make_pair(POST, "POST"));
+	enum_to_str.insert(std::make_pair(DELETE, "DELETE"));
+	return enum_to_str;
+}
+
+RequestMethod str_to_enum_method(std::string method) {
+	std::map<std::string, RequestMethod>::const_iterator it;
+
+	it = map_str_to_enum_method.find(method);
+	if (it == map_str_to_enum_method.end())
+		throw utils::GeneralException(utils::INVALID_METHOD);
+	return it->second;
+}
+
+std::string enum_to_str_method(RequestMethod method) {
+	std::map<RequestMethod, std::string>::const_iterator it;
+
+	it = map_enum_to_str_method.find(method);
+	if (it == map_enum_to_str_method.end())
+		throw utils::GeneralException(utils::INVALID_METHOD);
+	return it->second;
 }
 
 // headers that needs a validation - não sei se isso vai ser útil

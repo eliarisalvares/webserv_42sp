@@ -92,9 +92,13 @@ public:
 	void			uri(char c);
 	void			protocol(char c);
 	void			version(char c);
-	void			check_crlf(char c);
 	void			header(char c);
 	void			body(char c);
+
+	void			check_crlf(char c);
+	void			check_first_line(void);
+	void			check_headers(void);
+
 	// void			break_data(char* buffer, size_t bytes_read);
 
 	// t_string_map	get_result(void) const;

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 10:23:00 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 00:27:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Request::Request(void):
 	_fd(0),
 	_error(false),
-	_method(GET),
+	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
 	_is_chuncked(false),
@@ -27,7 +27,7 @@ Request::Request(int fd, Server* server):
 	_server(server),
 	_fd(fd),
 	_error(false),
-	_method(GET),
+	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
 	_is_chuncked(false),
@@ -54,7 +54,7 @@ Server* Request::server(void) const {
 	return this->_server;
 }
 
-requestMethod Request::method(void) const {
+http::RequestMethod Request::method(void) const {
 	return this->_method;
 }
 
@@ -88,7 +88,7 @@ size_t Request::content_length(void) const {
 }
 
 /********************************** SETTERS **********************************/
-void Request::setMethod(requestMethod method) {
+void Request::setMethod(http::RequestMethod method) {
 	this->_method = method;
 }
 
