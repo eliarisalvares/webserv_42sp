@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:04:52 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:05:18 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,9 @@ private:
 	std::string		_uri;
 	std::string		_protocol;
 	std::string		_version;
+
+	static std::string const	_right_protocol;
+	// static int const			_right_version;
 
 	// headers
 	std::string		_field_name;
