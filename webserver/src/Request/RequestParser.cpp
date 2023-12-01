@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/01 01:41:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 03:17:14 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,20 @@ std::string const RequestParser::_right_protocol = "HTTP";
 RequestParser::RequestParser(void):
 	_idx(0), _step(INIT) {
 	_request = new Request();
+	_field_name.clear();
+	_field_value.clear();
+	_last_header.clear();
+	_headers.clear();
 	_body.clear();
 	// _result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
 	_idx(0), _step(INIT), _request(request) {
+	_field_name.clear();
+	_field_value.clear();
+	_last_header.clear();
+	_headers.clear();
 	_body.clear();
 	// _result.clear();
 }
@@ -220,29 +228,54 @@ void RequestParser::_parse_field_name(char c) {
 	else {
 		log.debug(_field_name);
 		_step = HEADER_VALUE;
-		// salvar o valor
-		_field_name.clear();
 	}
 }
 
 // Any number of spaces or tabs may be between the ":" and the value
 void RequestParser::_parse_field_value(char c) {
-	if (c == SP)
+	if (c == SP || c == TAB)
 		return ;
 	if (c == CR) {
 		log.debug(_field_value);
 		_step = CR_HEADER;
-		// salvar o valor
-		_field_value.clear();
+		// _last_header = _field_name; // verificar se faz deep copy...
+		_add_header();
 	}
 	else
 		_field_value.push_back(c);
+}
+
+static unsigned char c_tolower(unsigned char c) { return std::tolower(c); }
+void RequestParser::_add_header(void) {
+	std::map<std::string, std::vector<std::string> >::iterator it;
+
+	std::transform(
+		_field_name.begin(),
+		_field_name.end(),
+		_field_name.begin(),
+		&c_tolower
+	);
+	_last_header = _field_name; // verificar se faz deep copy...
+	it = _headers.find(_field_name);
+	if (it == _headers.end()) {
+		// não tem o header
+		std::vector<std::string> v;
+
+		v.clear();
+		v.push_back(_field_value);
+		_headers.insert(std::make_pair(_field_name, v));
+	}
+	else // tem o header
+		it->second.push_back(_field_value); // assumindo que ele já estará limpo de espaços e tabs no início
+	_field_value.clear();
+	_field_name.clear();
 }
 
 void RequestParser::check_headers(void) {
 	// check se tem body -> passa _step = BODY (ver onde entra)
 	// 1 - verificar se tem o header obrigatório host
 	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
+	_print_headers();
 
 	// 3 - verificar se o método é permitido:
 	try {
@@ -264,6 +297,29 @@ void RequestParser::check_headers(void) {
 	_request->setUri(_uri);
 
 	// version
+}
+
+void RequestParser::_print_headers(void) {
+	if (DEBUG) {
+		std::map<std::string, std::vector<std::string> >::iterator it, end;
+		std::vector<std::string>::iterator v_it, v_end;
+		int i;
+
+		end = _headers.end();
+		std::cout << GREY
+				<< "------------------------------------------------------\n"
+				<< BLUE << "Headers saved:\n" << GREY;
+		for (it = _headers.begin(); it != end; ++it) {
+			i = 1;
+			std::cout << it->first << ": ";
+			v_end = it->second.end();
+			for (v_it = it->second.begin(); v_it != v_end; ++v_it)
+				std::cout << i << ". " << *v_it << " | ";
+			std::cout << std::endl;
+		}
+		std::cout << "------------------------------------------------------\n";
+		std::cout << RESET << std::endl;
+	}
 }
 
 // t_string_map	RequestParser::get_result(void) const {

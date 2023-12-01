@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 23:34:58 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 03:35:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <vector>
 # include <string>
 # include <iostream>
+# include <algorithm> // transform
 
 # include "Logger.hpp"
 # include "http.hpp"
@@ -26,6 +27,7 @@
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
+# define TAB '\t'
 
 // others
 # define COLON ':'
@@ -120,10 +122,14 @@ private:
 	// static int const			_right_version;
 
 	// headers
-	std::string		_field_name;
-	std::string		_field_value;
-	void			_parse_field_name(char c);
-	void			_parse_field_value(char c);
+	std::string							_field_name;
+	std::string							_field_value;
+	std::string							_last_header;
+	std::map<std::string, std::vector<std::string> >	_headers;
+	void								_add_header(void);
+	void								_print_headers(void);
+	void								_parse_field_name(char c);
+	void								_parse_field_value(char c);
 
 	// body
 	std::vector<char>					_body;
