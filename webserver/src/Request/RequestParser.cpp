@@ -6,11 +6,14 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 21:55:53 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 00:01:45 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
+
+std::string const RequestParser::_right_protocol = "HTTP";
+// int const RequestParser::_right_version = 1;
 
 RequestParser::RequestParser(void):
 	_idx(0), _step(INIT) {
@@ -66,18 +69,13 @@ void RequestParser::method(char c) {
 	if (c >= 'A' && c <= 'Z')
 		_method.push_back(c);
 	else if (c == SP) {
-		if (_method.size() == 0) {
-			_step = ERROR; // acho que vai poder tirar isso
+		if (_method.size() == 0) // " GET..." - iniciando com espaço
 			throw http::InvalidRequest(http::BAD_REQUEST);
-		}
-		_request->setMethod(GET); // ver se vou fazer isso aqui e lógica
 		_step = URI;
 		log.debug(_method);
 	}
-	else {
-		_step = ERROR; // acho que vai poder tirar isso
+	else // caracteres diferentes de letras maiúsculas
 		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
 }
 
 // URI enconding (tb serve pra POST) - não entendi se posso receber https
@@ -94,10 +92,8 @@ void RequestParser::uri(char c) {
 		log.debug(_uri);
 		_step = PROTOCOL;
 	}
-	else {
-		_step = ERROR; // acho que vai poder tirar isso
+	else
 		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
 }
 
 // The HTTP version always takes the form "HTTP/x.x", uppercase
@@ -110,13 +106,14 @@ void RequestParser::protocol(char c) {
 		n++;
 	}
 	else if (c == '/') {
+		if (_protocol.compare(_right_protocol) != 0)
+			throw http::InvalidRequest(http::NOT_FOUND); // erro que o nginx retorna
+			// throw http::InvalidRequest(http::BAD_REQUEST); // eu acho mais adequado
 		_step = VERSION;
 		log.debug(_protocol);
 	} // checkar _protocol == "HTTP"
-	else {
-		_step = ERROR; // acho que vai poder tirar isso
+	else
 		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
 }
 
 // se número - verificar se é versão suportada
@@ -130,10 +127,8 @@ void RequestParser::version(char c) {
 		_step = CR_FIRST_LINE;
 		log.debug(_version);
 	}
-	else {
-		_step = ERROR; // acho que vai poder tirar isso
+	else
 		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
 }
 
 // Each part of a HTTP request is separated by a new line
@@ -143,7 +138,6 @@ void RequestParser::version(char c) {
 // lidando apenas com CRLF por hora, verificar no RFC
 void RequestParser::check_crlf(char c) {
 	if (c != LF) {
-		_step = ERROR; // acho que vai poder tirar isso
 		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 	else {

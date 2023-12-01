@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 21:59:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 23:34:58 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,9 @@ private:
 	std::string		_uri;
 	std::string		_protocol;
 	std::string		_version;
+
+	static std::string const	_right_protocol;
+	// static int const			_right_version;
 
 	// headers
 	std::string		_field_name;
