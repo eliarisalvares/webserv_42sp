@@ -39,3 +39,25 @@ Content-Length: jheiuhryiue"
  Host: ggf"
 (espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
 400 Bad Request
+
+GET / QWER/1.1
+GET / http/1.1
+404 Not Found
+vou implementar como Bad Request, pra mim faz mais sentido
+parece que ele interpreta como se fosse parte da URI, mas tem espaço...
+
+
+- ordem da check_headers():
+Primeiro parece checar os headers
+"GER / HTTP/1.1
+sffj: fwfkl"
+400 Bad Request
+"GER / HTTP/1.1
+Host: ksfl"
+405 Not Allowed
+"GER / HTTP/1.1
+Host: dsjfsdk
+Content-Length: jheiu"
+400 Bad Request
+
+

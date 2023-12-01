@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/01 00:01:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 01:41:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,12 @@ void RequestParser::check_crlf(char c) {
 	}
 }
 
+void RequestParser::check_first_line(void) {
+	// method
+	// uri
+	// version
+}
+
 // headers
 // servers should treat headers as an unordered set
 // one line per header, of the form "Header-Name: value", ending with CRLF
@@ -231,6 +237,33 @@ void RequestParser::_parse_field_value(char c) {
 	}
 	else
 		_field_value.push_back(c);
+}
+
+void RequestParser::check_headers(void) {
+	// check se tem body -> passa _step = BODY (ver onde entra)
+	// 1 - verificar se tem o header obrigatório host
+	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
+
+	// 3 - verificar se o método é permitido:
+	try {
+		// esse check vai ter que levar em conta também o location
+		_request->setMethod(http::str_to_enum_method(_method));
+	} catch(const utils::GeneralException& e) {
+		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
+	} catch(const std::exception& e) {
+		log.error("error on request parsing: ");
+		log.error(e.what());
+		_request->setError(true);
+		_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+		_step = END;
+	}
+
+	// ver onde a verificação da uri entra
+	// uri
+	// not found here
+	_request->setUri(_uri);
+
+	// version
 }
 
 // t_string_map	RequestParser::get_result(void) const {

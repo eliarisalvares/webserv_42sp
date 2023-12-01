@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 21:56:56 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 01:38:22 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void RequestBuilder::parse(void) {
 					break;
 				case RequestParser::CR_FIRST_LINE:
 					_parser.check_crlf(c);
-					// outros checks da primeira linha
+					_parser.check_first_line();
 					break;
 				case RequestParser::HEADER:
 					_parser.header(c);
@@ -102,9 +102,7 @@ void RequestBuilder::parse(void) {
 					break;
 				case RequestParser::SECOND_CR_HEADER:
 					_parser.check_crlf(c);
-					// check se tem body -> passa _step = BODY
-					// check se tem o header obrigatório "host" - setar na Request
-					// check de alguns headers
+					_parser.check_headers();
 					break;
 				case RequestParser::BODY:
 					_parser.body(c);
@@ -134,6 +132,9 @@ void RequestBuilder::parse(void) {
 		} catch (std::exception& e) {
 			log.error("error on request parsing: ");
 			log.error(e.what());
+			_request->setError(true);
+			_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+			_ready = true;
 		}
 		if (_parser.step() == RequestParser::END)
 			_ready = true;
