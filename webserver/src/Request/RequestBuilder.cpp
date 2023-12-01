@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 20:18:46 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 21:56:56 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ void RequestBuilder::parse(void) {
 					break;
 				case RequestParser::CR_FIRST_LINE:
 					_parser.check_crlf(c);
+					// outros checks da primeira linha
 					break;
 				case RequestParser::HEADER:
 					_parser.header(c);
@@ -101,15 +102,27 @@ void RequestBuilder::parse(void) {
 					break;
 				case RequestParser::SECOND_CR_HEADER:
 					_parser.check_crlf(c);
+					// check se tem body -> passa _step = BODY
+					// check se tem o header obrigatório "host" - setar na Request
+					// check de alguns headers
 					break;
 				case RequestParser::BODY:
-				// case RequestParser::END:
+					_parser.body(c);
+					break;
+				case RequestParser::BODY_NEW_LINE:
+					_parser.body(c);
+					break;
+				case RequestParser::CR_BODY:
+					_parser.check_crlf(c);
+					break;
+				case RequestParser::SECOND_CR_BODY:
+					_parser.check_crlf(c);
+					// validação extra do body aqui
+					break;
+				// case RequestParser::ERROR:
+				// 	_request->setError(true);
 				// 	_ready = true;
 				// 	break;
-				case RequestParser::ERROR:
-					_request->setError(true);
-					_ready = true;
-					break;
 				default:
 					break;
 			}

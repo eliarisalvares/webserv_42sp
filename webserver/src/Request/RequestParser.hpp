@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 19:42:15 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 21:59:39 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,10 @@ public:
 		HEADER_VALUE,
 		CR_HEADER,
 		SECOND_CR_HEADER,
-		END_HEADER, // necessary?
 		BODY,
-		END_BODY,  // necessary?
+		BODY_NEW_LINE,
+		CR_BODY,
+		SECOND_CR_BODY,
 		END,
 		ERROR, // necessary?
 	};
@@ -86,14 +87,15 @@ public:
 		VCHAR, //(any visible US-ASCII character)
 	}           t_abnf_rules;
 
-	void			break_data(char* buffer, size_t bytes_read);
+	Steps			step(void);
 	void			method(char c);
 	void			uri(char c);
 	void			protocol(char c);
 	void			version(char c);
 	void			check_crlf(char c);
 	void			header(char c);
-	Steps			step(void);
+	void			body(char c);
+	// void			break_data(char* buffer, size_t bytes_read);
 
 	// t_string_map	get_result(void) const;
 
@@ -102,20 +104,24 @@ private:
 	size_t								_idx;
 	Steps								_step;
 	Request*							_request;
-	std::vector<char>					_data;
-	std::vector<char>::iterator			_data_it;
 	// t_string_map						_result;
 
+	// request first line
 	std::string		_method;
 	std::string		_uri;
 	std::string		_protocol;
 	std::string		_version;
+
+	// headers
 	std::string		_field_name;
 	std::string		_field_value;
 	void			_parse_field_name(char c);
 	void			_parse_field_value(char c);
 
-	void								_print_data(void);
+	// body
+	std::vector<char>					_body;
+	std::vector<char>::iterator			_body_it;
+	void								_print_body(void);
 
 };
 

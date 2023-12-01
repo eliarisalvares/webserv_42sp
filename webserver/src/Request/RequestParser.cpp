@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/30 21:02:48 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/11/30 21:55:53 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 RequestParser::RequestParser(void):
 	_idx(0), _step(INIT) {
 	_request = new Request();
-	_data.clear();
+	_body.clear();
 	// _result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
 	_idx(0), _step(INIT), _request(request) {
-	_data.clear();
+	_body.clear();
 	// _result.clear();
 }
 
@@ -37,35 +37,9 @@ RequestParser& RequestParser::operator=(RequestParser const& copy) {
 }
 
 RequestParser::~RequestParser(void) {
-	_data.clear();
+	_body.clear();
 	// _result.clear();
 }
-
-// void RequestParser::break_data(char* buffer, size_t bytes_read) {
-// 	for (size_t i = 0; i < bytes_read; ++i)
-// 		_data.push_back(buffer[i]);
-
-// 	if (DEBUG) {
-// 		std::cout << GREY << "Received/remaining data:\n";
-// 		_print_data();
-// 	}
-// }
-
-// void RequestParser::_print_data(void) {
-// 	std::vector<char>::iterator it, end = _data.end();
-
-// 	if (DEBUG) {
-// 		for(it = _data.begin(); it != end; ++it) {
-// 			if (*it == CR)
-// 				std::cout << " CR";
-// 			else if (*it == LF)
-// 				std::cout << "LF" << *it;
-// 			else
-// 				std::cout << *it;
-// 		}
-// 		std::cout << RESET << std::endl;
-// 	}
-// }
 
 RequestParser::Steps RequestParser::step(void) {
 	return this->_step;
@@ -185,7 +159,18 @@ void RequestParser::check_crlf(char c) {
 			break;
 		case SECOND_CR_HEADER:
 			log.debug("CRLF end header");
-			_step = END; //
+			_step = END; // mudar para BODY?
+			// por hora:
+			// BODY para testar body;
+			// END para retornar a resposta sem ficar travando
+			break;
+		case CR_BODY:
+			log.debug("CRLF body");
+			_step = BODY_NEW_LINE;
+			break;
+		case SECOND_CR_BODY:
+			log.debug("CRLF end body");
+			_step = END;
 			break;
 		default:
 			break;
@@ -266,6 +251,57 @@ void RequestParser::_parse_field_value(char c) {
 // A HTTP request is terminated by two newlines
 // Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
 
+void RequestParser::body(char c) {
+	if (_step == BODY_NEW_LINE) {
+		if (c == CR) {
+			_step = SECOND_CR_BODY;
+			if (DEBUG) {
+				std::cout << GREY << "Received body:\n";
+				_print_body();
+			}
+			return ;
+		}
+		else
+			_step = BODY;
+	}
+	if (_step == BODY) {
+		if (c == CR)
+			_step = CR_BODY;
+		else
+			_body.push_back(c);
+	}
+	// if (_step == HEADER_NAME)
+	// 	_parse_field_name(c);
+	// else if (_step == HEADER_VALUE)
+	// 	_parse_field_value(c);
+}
+
+void RequestParser::_print_body(void) {
+	std::vector<char>::iterator it, end = _body.end();
+
+	if (DEBUG) {
+		for(it = _body.begin(); it != end; ++it) {
+			if (*it == CR)
+				std::cout << " CR";
+			else if (*it == LF)
+				std::cout << "LF" << *it;
+			else
+				std::cout << *it;
+		}
+		std::cout << RESET << std::endl;
+	}
+}
+
+// void RequestParser::break_data(char* buffer, size_t bytes_read) {
+// 	for (size_t i = 0; i < bytes_read; ++i)
+// 		_body.push_back(buffer[i]);
+
+// 	if (DEBUG) {
+// 		std::cout << GREY << "Received/remaining data:\n";
+// 		_print_body();
+// 	}
+// }
+
 // The most common use of POST, by far, is to submit HTML form data to CGI scripts. In this case, the Content-Type: header is usually application/x-www-form-urlencoded, and the Content-Length: header gives the length of the URL-encoded form data
 // Ex:
 // POST /path/script.cgi HTTP/1.0
@@ -276,7 +312,9 @@ void RequestParser::_parse_field_value(char c) {
 
 // home=Cosby&favorite+flavor=flies
 
-// You can use a POST request to send whatever data you want, not just form submissions. Just make sure the sender and the receiving program agree on the format.
+
+// You can use a POST request to send whatever data you want, not just form submissions.
+// Just make sure the sender and the receiving program agree on the format.
 
 
 // URL encoding
