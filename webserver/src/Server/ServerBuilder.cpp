@@ -64,7 +64,7 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 			// 1K is the minimal size
 			//range from 1K to 1000K -> pass this info ahead
 			bodySize = ftstring::strtoi(bodySizeString);
-			log.debug("client_max_body_size successfully setted from .conf file.");
+			log.debug("client_max_body_size setted from .conf file.");
 		}
 		if (input[index].substr(0, 7) == "location ")
 			extraBrackets++;
@@ -87,7 +87,7 @@ std::string	getRootConf(std::vector<std::string> input, int index) {
 		if (input[i].substr(0, 5) == "root ") {
 			//check if name makes sense? idk
 			root = input[i].substr(5);
-			log.debug("Root setted.");
+			log.debug("Root setted from .conf file..");
 		}
 		if (input[index].substr(0, 7) == "location ")
 			extraBrackets++;
@@ -111,7 +111,7 @@ std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) 
 		if (input[i].substr(0, 7) == "server_name ") {
 			name = input[i].substr(7);
 			serverName = ftstring::split(name, ' ');
-			log.debug("Server name successfully setted from .conf file.");
+			log.debug("Server name setted from .conf file.");
 		}
 		if (input[index].substr(0, 7) == "location ")
 			extraBrackets++;
@@ -121,6 +121,23 @@ std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) 
 			break ;
 	}
 	return (serverName);
+}
+
+t_location	getLocConf(std::vector<std::string> input, int index) {
+	//deal with location :')
+	t_location					location;
+	Logger						log;
+
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr() == "server {")
+			i++ ;
+		if (input[i].substr(0, 7) == "location ") {
+			//do stuff
+		}
+		if (input[index].substr() == "}")
+			break ;
+	}
+	return (location);
 }
 
 const char* PortNotFoundErrorExeption::what() const throw() {

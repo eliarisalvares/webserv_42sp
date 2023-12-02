@@ -6,13 +6,9 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 13:31:42 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 14:49:42 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/*
-Server Class
-*/
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
@@ -22,10 +18,9 @@ Server Class
 # include <sys/socket.h> // socket(), bind(), listen(), accept()
 # include <netinet/in.h> // struct sockaddr_in
 # include <stdio.h> // errors
-# include <map>
-# include <set>
 # include "ServerParser.hpp"
 # include "ServerBuilder.hpp"
+# include "http.hpp"
 
 # define BUFFSIZE 256 //buffersize ?
 # define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size -> in KILOBYTES?
@@ -39,20 +34,6 @@ Server Class
 # define METHODS "GET, POST, DELETE" //allowed_methods
 # define ERROR_PAGES "404 404.html" //error_pages
 
-typedef struct	s_location
-{
-	std::string								location;
-	std::string								root;
-	std::set<std::string>					allowed_methods;
-	std::set<std::string>					cgi_pass;
-	std::vector<std::string>				http_methods;
-	std::pair<unsigned int, std::string>	http_redirection;
-	// std::string								response_is_dir;
-	// std::string								directory_listing;
-	// std::set<std::string>                required_cookie;
-	// std::vector<t_cookie>                set_cookie;
-}				t_location;
-
 class Server {
 	friend class Response;
 	public:
@@ -64,6 +45,7 @@ class Server {
 		Server& operator=(Server const& copy);
 
 		void	configSocket(int port);
+		void	setBasics(void);
 		void	setBufferSize(int size);
 		void	setSocket(int port);
 		void	setBodySize(int size);
@@ -90,7 +72,6 @@ class Server {
 		std::string					getName(int index);
 		std::map<int, std::string>	getErrorPages(void) const;
 
-		
 		static std::string	getServerName(void);
 		static std::string	getCurrentPort(void);
 		static std::string	getAllowedMethods(void);
@@ -100,15 +81,15 @@ class Server {
 		int										_client_max_body_size;
 		int										_port;  // único item obrigatório no arquivo
 		int										_socket;
-		std::string								_cgi_location;
+		std::string								_cgi;
 		std::string								_root;  // geral do server; cada location vai poder ter um root diferente
 		std::string								_uploadPath;
-		std::set<std::string>					_allowed_methods;
+		std::set<std::string>					_allowed_methods; //std::set<std::string> _fill_methods(void)
 		std::set<std::string>					_index; //autoindex
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
-		std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> remover?
+		std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> colocar dentro de locations
 		// o que sabemos que falta: redirect -> for locations is ok
 };
 

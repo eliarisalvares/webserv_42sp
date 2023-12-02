@@ -17,7 +17,7 @@ int	Server::getBodySize(void) const {
 }
 
 std::string	Server::getCGILoc(void) const {
-	return this->_cgi_location;
+	return this->_cgi;
 }
 
 std::string	Server::getRoot(void) const {
@@ -56,7 +56,7 @@ std::map<int, std::string>	Server::getErrorPages(void) const {
 	return this->_error_pages;
 }
 
-
+//---------------------------------------------------/
 std::string	Server::getServerName(void) {
 	return (SERVER_NAME);
 }
