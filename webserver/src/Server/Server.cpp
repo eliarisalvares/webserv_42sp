@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 18:30:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 19:47:30 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,35 +24,36 @@ Server::Server(int port): _port(port) {
 
 Server::Server(std::vector<std::string> input, size_t index) {
 	setBasics();
-	_server_name.push_back(SERVER_NAME);
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
 		if (input[i].substr(0, 7) == "listen ") {
-			_port = obtainPort(input, index);
+			_port = obtainPort(input, i);
 			setSocket(_port);
 		}
 		if (input[i].substr(0, 12) == "server_name ")
-			setName(obtainName(input, index));
+			setName(obtainName(input, i));
 		if (input[i].substr(0, 21) == "client_max_body_size ")
-			setBodySize(obtainBodySize(input, index));
+			setBodySize(obtainBodySize(input, i));
 		if (input[i].substr(0, 5) == "root ")
-			setRoot(obtainRoot(input, index));
+			setRoot(obtainRoot(input, i));
 		if (input[i].substr(0, 9) == "location ") {
+			_locations.push_back(obtainLoc(input, i));
 			while (input[i].substr() != "}")
 				i++;
-			_locations.push_back(obtainLoc(input, index));
 		}
 		if (input[i].substr(0, 4) == "cgi ")
-			setCGI(obtainCGI(input, index));
+			setCGI(obtainCGI(input, i));
 		if (input[i].substr(0, 16) == "allowed_methods ") {
 			_allowed_methods.clear();
-			setMethods(obtainMethod(input, index));
+			setMethods(obtainMethod(input, i));
 		}
+		if (input[i].substr(0, 11) == "error_page ")
+			addErrorPages(obtainErrorPages(input, i));
+		
 		//_bufferSize;
 		// _uploadPath;
-		// _allowed_methods; //std::set<std::string> _fill_methods(void)
-		// _index; //autoindex
+		// _index;
 		// _error_pages;
 	}
 	configSocket(_port);
@@ -82,10 +83,10 @@ void	Server::setBasics() {
 	errors.insert(std::pair<int, std::string>(404, "404.html"));
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
-	setRoot(LOCATION);
+	setRoot(ROOT);
 	setCGI(ftstring::split(".py python3", ' '));
 	setErrorPages(errors);
-	setUpPath(ROOT);
+	setUpPath("/content/"); //idk
 	setMethods(http::methods);
 	// setIndex(std::set<std::string> index);
 	setName(serverName);

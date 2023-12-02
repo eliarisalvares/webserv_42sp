@@ -17,8 +17,8 @@ CXXDEBUG = -D DEBUG=true
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 				$(UTILS)
 WEBSERV =		WebServ.cpp
-SERVER =		Server.cpp ServerParser.cpp ServerBuilder.cpp ServerGetters.cpp \
-				ServerSetters.cpp
+SERVER =		Server.cpp ServerParser.cpp server_builder.cpp server_getters.cpp \
+				server_setters.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
