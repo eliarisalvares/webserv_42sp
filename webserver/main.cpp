@@ -6,11 +6,12 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 15:56:09 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 11:38:36 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "src/WebServ/WebServ.hpp"
 
 int	main(int argc, char *argv[]) {
 	Logger log;
