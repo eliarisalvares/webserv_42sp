@@ -38,6 +38,7 @@ t_location					obtainLoc(std::vector<std::string> input, int index);
 std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index);
 std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index);
+std::set<std::string>		obtainIndex(std::vector<std::string> input, int index);
 
 typedef unsigned int uint_t;
 

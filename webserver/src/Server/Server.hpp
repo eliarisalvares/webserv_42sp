@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 19:40:51 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 20:53:54 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class Server {
 		Server(Server const& copy);
 		Server& operator=(Server const& copy);
 
+		void	setPort(std::vector<std::string> input, int index);
 		void	configSocket(int port);
 		void	setBasics(void);
 		void	setBufferSize(int size);
