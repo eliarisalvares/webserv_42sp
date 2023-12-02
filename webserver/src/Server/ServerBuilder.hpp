@@ -14,6 +14,8 @@ int							getBodySizeConf(std::vector<std::string> input, int index);
 std::string					getRootConf(std::vector<std::string> input, int index);
 std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
 
+typedef unsigned int uint_t;
+
 class PortNotFoundErrorExeption : public std::exception {
 	virtual const char* what(void) const throw();
 };
