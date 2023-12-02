@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 17:57:30 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 19:40:51 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,20 @@
 # include <netinet/in.h> // struct sockaddr_in
 # include <stdio.h> // errors
 # include "ServerParser.hpp"
-# include "ServerBuilder.hpp"
+# include "server_builder.hpp"
 # include "http.hpp"
 
 # define BUFFSIZE 256 //buffersize ?
-# define CLIENT_MAX_BODY_SIZE 100 //client_max_body_size -> in KILOBYTES?
-# define TIMEOUT 5000 // precisa colocar?
-# define LOCATION "/" // vai ser definida através de mts possibilidades (kill me pls)
-# define ROOT "content" //root
-# define SERVER_NAME "WebWizards" ///server_name
-# define CGI_EXECUTOR "python3" //cgi
+# define CLIENT_MAX_BODY_SIZE 1000 //in bytes
 # define CGI_LOCATION "/cgi"
-# define SERVER_PORT "8080" //listen
-# define METHODS "GET, POST, DELETE" //allowed_methods
+# define CGI_EXECUTOR "python3"
 # define ERROR_PAGES "404 404.html" //error_pages
+# define LOCATION "/" 
+# define METHODS "GET, POST, DELETE" //allowed_methods
+# define ROOT "content"
+# define SERVER_NAME "WebWizards"
+# define SERVER_PORT "8080"
+# define TIMEOUT 5000 // precisa colocar?
 
 class Server {
 	friend class Response;
@@ -51,6 +51,7 @@ class Server {
 		void	setBodySize(int size);
 		void	setRoot(std::string root);
 		void	setCGI(std::vector<std::string> cgi);
+		void	addErrorPages(std::pair<int, std::string> paired);
 		void	setErrorPages(std::map<int, std::string> errorPages);
 		void	setUpPath(std::string path);
 		void	setMethods(std::set<std::string> methods);
@@ -81,10 +82,11 @@ class Server {
 		int										_client_max_body_size;
 		int										_port;  // único item obrigatório no arquivo
 		int										_socket;
-		std::string								_root;  // geral do server; cada location vai poder ter um root diferente
+		t_permissions							_permit; //autoindex && directory_listing
+		std::string								_root;
 		std::string								_uploadPath;
-		std::set<std::string>					_allowed_methods; //std::set<std::string> _fill_methods(void)
-		std::set<std::string>					_index; //autoindex
+		std::set<std::string>					_allowed_methods;
+		std::set<std::string>					_index;
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_cgi;
 		std::vector<std::string>				_server_name;
