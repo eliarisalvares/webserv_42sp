@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 13:15:55 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 13:31:42 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ class Server {
 		void	configSocket(int port);
 		void	setBufferSize(int size);
 		void	setSocket(int port);
-		void	setBufferSize(int size);
 		void	setBodySize(int size);
 		void	setRoot(std::string root);
 		void	setCGILocation(std::string cgi);
@@ -76,9 +75,22 @@ class Server {
 		void	setIndex(std::set<std::string> index);
 		void	setName(std::vector<std::string> name);
 
-		int		getSocket(void) const;
-		int		getPort(void) const;
-		int		getBufferSize(void) const;
+		int							getSocket(void) const;
+		int							getPort(void) const;
+		int							getBufferSize(void) const;
+		int							getBodySize(void) const;
+		std::string					getCGILoc(void) const;
+		std::string					getRoot(void) const;
+		std::string					getUpPath(void) const;
+		std::set<std::string>		getMethods(void) const;
+		std::set<std::string>		getIndex(void) const;
+		std::vector<t_location>		getLocations(void);
+		t_location					getLocations(int index);
+		std::vector<std::string>	getName(void);
+		std::string					getName(int index);
+		std::map<int, std::string>	getErrorPages(void) const;
+
+		
 		static std::string	getServerName(void);
 		static std::string	getCurrentPort(void);
 		static std::string	getAllowedMethods(void);
@@ -96,7 +108,7 @@ class Server {
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
-		// std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> remover?
+		std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> remover?
 		// o que sabemos que falta: redirect -> for locations is ok
 };
 
