@@ -81,13 +81,19 @@ void RequestParser::method(char c) {
 	if (c >= 'A' && c <= 'Z')
 		_method.push_back(c);
 	else if (c == SP) {
-		if (_method.size() == 0) // " GET..." - iniciando com espaço
+		if (_method.size() == 0) {
+			log.debug("error: invalid method: method token begins with space");
 			throw http::InvalidRequest(http::BAD_REQUEST);
+		}
 		_step = URI;
-		log.debug(_method);
+		log.debug("method", _method);
 	}
-	else // caracteres diferentes de letras maiúsculas
+	else {
+		log.debug(
+			"error: invalid method: caracter is not upper case alphabetic"
+		);
 		throw http::InvalidRequest(http::BAD_REQUEST);
+	}
 }
 
 // URI enconding (tb serve pra POST) - não entendi se posso receber https
@@ -137,7 +143,7 @@ void RequestParser::version(char c) {
 	else if (c == CR) {
 		// if _version != "1.1"
 		_step = CR_FIRST_LINE;
-		log.debug(_version);
+		log.debug("version", _version);
 	}
 	else
 		throw http::InvalidRequest(http::BAD_REQUEST);
@@ -230,7 +236,7 @@ void RequestParser::_parse_field_name(char c) {
 	if (c != COLON) // make first validation
 		_field_name.push_back(c);
 	else {
-		log.debug(_field_name);
+		log.debug("key", _field_name);
 		_step = HEADER_VALUE;
 	}
 	// checkar espaços -> significa que é continuação do header anterior
@@ -245,7 +251,7 @@ void RequestParser::_parse_field_value(char c) {
 	if (c == SP || c == TAB)
 		return ;
 	if (c == CR) {
-		log.debug(_field_value);
+		log.debug("value", _field_value);
 		_step = CR_HEADER;
 		// _last_header = _field_name; // verificar se faz deep copy...
 		_add_header();
@@ -288,6 +294,7 @@ void RequestParser::check_headers(void) {
 
 	it = _headers.find("host");
 	if (it == _headers.end()) {
+		log.debug("error: header 'host' not found");
 		throw http::InvalidRequest(http::BAD_REQUEST);
 	}
 

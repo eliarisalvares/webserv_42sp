@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 14:25:01 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/02 18:18:07 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 }
 
 bool RequestBuilder::read(void) {
-	Logger log;
 	int error;
 
 	log.debug("reading data and saving it...");
@@ -48,10 +47,10 @@ bool RequestBuilder::read(void) {
 	error = errno;
 
 	if (_bytes_readed <= 0) {
-		std::cout << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
+		std::cout << ORANGE << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
 		if (_bytes_readed == 0) {
-			log.warning("client connection closed:");
-			printf(GREY "socket %d hung up\n" "RESET", this->_fd);
+			log.warning_no_lf("client connection closed: ");
+			printf(GREY "socket %d hung up\n" RESET, this->_fd); // podemos usar a printf (por ser cpp)?
 		} else
 			log.strerror("recv", error);
 
