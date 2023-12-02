@@ -76,7 +76,7 @@ std::string	getRootConf(std::vector<std::string> input, int index) {
 		if (input[i].substr(0, 5) == "root ") {
 			//check if name makes sense? idk
 			root = input[i].substr(5);
-			log.debug("Root setted from .conf file..");
+			log.debug("Root setted from .conf file.");
 		}
 		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
 			break ;
@@ -143,6 +143,33 @@ t_location	getLocConf(std::vector<std::string> input, int index) {
 	return (location);
 }
 
+std::set<std::string>	getMethConf(std::vector<std::string> input, int index) {
+	std::set<std::string>		methods;
+	std::vector<std::string>	words;
+	Logger					log;
+
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr() == "server {")
+			i++ ;
+		if (input[i].substr(0, 16) == "allowed_methods ") {
+			//check if name makes sense? idk
+			words = ftstring::split(input[i].substr(16), ' ');
+			if (words.size() <= 0 || words.size() >= 4)
+				throw InvalidNbrMethodsException();
+			for (size_t j = 0; j < words.size(); j++) {
+				if (words[j] == "GET" || words[j] == "POST" || words[j] == "DELETE")
+					methods.insert(words[j]);
+				else
+					throw InvalidMethodsException();
+			}
+			log.debug("Allowed Methods setted from .conf file.");
+		}
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
+			break ;
+	}
+	return (methods);
+}
+
 const char* PortNotFoundErrorExeption::what() const throw() {
 	return ("Invalid Port found.");
 }
@@ -157,4 +184,12 @@ const char* CGIMissconfigurationException::what() const throw() {
 
 const char* CGINotSupportedException::what() const throw() {
 	return ("CGI mode not supported by webserv.");
+}
+
+const char* InvalidNbrMethodsException::what() const throw() {
+	return ("Wrong values for Allowed Methods.");
+}
+
+const char* InvalidMethodsException::what() const throw() {
+	return ("Invalid Allowed Method.");
 }
