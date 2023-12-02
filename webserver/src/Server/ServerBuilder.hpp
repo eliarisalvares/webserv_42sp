@@ -30,13 +30,13 @@ typedef struct	s_location
 	// std::string								directory_listing;
 }				t_location;
 
-int							getPortConf(std::vector<std::string> input, int index);
-int							getBodySizeConf(std::vector<std::string> input, int index);
-std::string					getRootConf(std::vector<std::string> input, int index);
-std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
-t_location					getLocConf(std::vector<std::string> input, int index);
-std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index);
-std::set<std::string>		getMethConf(std::vector<std::string> input, int index);
+int							obtainPort(std::vector<std::string> input, int index);
+int							obtainBodySize(std::vector<std::string> input, int index);
+std::string					obtainRoot(std::vector<std::string> input, int index);
+std::vector<std::string>	obtainName(std::vector<std::string> input, int index);
+t_location					obtainLoc(std::vector<std::string> input, int index);
+std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index);
+std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 
 typedef unsigned int uint_t;
 
