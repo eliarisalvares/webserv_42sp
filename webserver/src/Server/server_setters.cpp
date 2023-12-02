@@ -1,5 +1,16 @@
 #include "Server.hpp"
 
+void	Server::setPort(std::vector<std::string> input, int index) {
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr() == "server {")
+			i++ ;
+		if (input[i].substr(0, 7) == "listen ") {
+			_port = obtainPort(input, i);
+			setSocket(_port);
+		}
+	}
+}
+
 void	Server::setSocket(int port) {
 	this->_socket = port;
 }

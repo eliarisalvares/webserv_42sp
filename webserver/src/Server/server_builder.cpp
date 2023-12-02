@@ -130,6 +130,21 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 	return (paired);
 }
 
+std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
+	std::set<std::string>		value;
+	std::vector<std::string>	words;
+	Logger						log;
+
+	if (input[index].substr(0, 6) == "index ") {
+		words = ftstring::split(input[index].substr(16), ' ');
+		for (size_t j = 0; j < words.size(); j++) {
+			value.insert(words[j]);
+		}
+		log.debug("Index setted from .conf file.");
+	}
+	return (value);
+}
+
 //-------------------------------EXCEPTIONS-------------------------//
 const char* PortNotFoundErrorExeption::what() const throw() {
 	return ("Invalid Port found.");

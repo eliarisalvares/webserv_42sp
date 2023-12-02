@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 19:47:30 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 20:54:18 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 Server::Server(void) { }
 
 Server::Server(int port): _port(port) {
-	configSocket(port);
 	setBasics();
+	configSocket(port);
 	_location_root.clear();
 	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
@@ -24,13 +24,10 @@ Server::Server(int port): _port(port) {
 
 Server::Server(std::vector<std::string> input, size_t index) {
 	setBasics();
+	setPort(input, index);
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
-		if (input[i].substr(0, 7) == "listen ") {
-			_port = obtainPort(input, i);
-			setSocket(_port);
-		}
 		if (input[i].substr(0, 12) == "server_name ")
 			setName(obtainName(input, i));
 		if (input[i].substr(0, 21) == "client_max_body_size ")
@@ -50,11 +47,11 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		}
 		if (input[i].substr(0, 11) == "error_page ")
 			addErrorPages(obtainErrorPages(input, i));
-		
+		if (input[i].substr(0, 6) == "index ")
+			setIndex(obtainIndex(input, i));
+
 		//_bufferSize;
 		// _uploadPath;
-		// _index;
-		// _error_pages;
 	}
 	configSocket(_port);
 	_location_root.clear();
@@ -76,19 +73,18 @@ Server& Server::operator=(Server const & copy) {
 
 void	Server::setBasics() {
 	std::vector<std::string>	serverName;
-	std::map<int, std::string>	errors;
+	std::set<std::string>		index;
 
 	serverName.push_back(SERVER_NAME);
-	errors.clear();
-	errors.insert(std::pair<int, std::string>(404, "404.html"));
+	index.insert("http");
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
 	setCGI(ftstring::split(".py python3", ' '));
-	setErrorPages(errors);
+	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	setUpPath("/content/"); //idk
 	setMethods(http::methods);
-	// setIndex(std::set<std::string> index);
+	setIndex(index);
 	setName(serverName);
 }
 

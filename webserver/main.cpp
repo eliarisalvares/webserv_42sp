@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 11:38:36 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 20:42:55 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int	main(int argc, char *argv[]) {
 	try {
 		port.setConf(argv[1]);
 		webserv.create_servers(port.getConf());
+		log.info("webserv configured.");
 	}
 	catch (std::exception & e) {
 		log.error(e.what());
