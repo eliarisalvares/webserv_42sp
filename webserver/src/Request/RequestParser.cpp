@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:11:08 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 15:04:23 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,12 @@ RequestParser::~RequestParser(void) {
 	// _result.clear();
 }
 
-RequestParser::Steps RequestParser::step(void) {
+RequestParser::Step RequestParser::step(void) const {
 	return this->_step;
+}
+
+void RequestParser::setStep(Step s) {
+	this->_step = s;
 }
 
 // general:
@@ -297,11 +301,7 @@ void RequestParser::check_headers(void) {
 	} catch(const utils::GeneralException& e) {
 		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
 	} catch(const std::exception& e) {
-		log.error("error on request parsing: ");
-		log.error(e.what());
-		_request->setError(true);
-		_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
-		_step = END;
+		throw e;
 	}
 
 	// ver onde a verificação da uri entra

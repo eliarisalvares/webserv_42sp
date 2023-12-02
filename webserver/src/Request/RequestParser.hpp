@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:10:58 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 15:05:11 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ public:
 	RequestParser& operator=(RequestParser const& copy);
 	~RequestParser(void);
 
-	enum Steps {
+	enum Step {
 		INIT,
 		FIRST_LINE,
 		METHOD,
@@ -89,7 +89,8 @@ public:
 		VCHAR, //(any visible US-ASCII character)
 	}           t_abnf_rules;
 
-	Steps			step(void);
+	Step			step(void) const;
+	void			setStep(Step s);
 	void			method(char c);
 	void			uri(char c);
 	void			protocol(char c);
@@ -108,7 +109,7 @@ public:
 private:
 	Logger								log;
 	size_t								_idx;
-	Steps								_step;
+	Step								_step;
 	Request*							_request;
 	// t_string_map						_result;
 
