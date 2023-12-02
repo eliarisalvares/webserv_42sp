@@ -17,7 +17,7 @@ void	Server::setRoot(std::string root) {
 }
 
 void	Server::setCGILocation(std::string cgi) {
-	this->_cgi_location = cgi;
+	this->_cgi = cgi;
 }
 
 void	Server::setErrorPages(std::map<int, std::string> errorPages) {

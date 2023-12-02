@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/29 15:25:52 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 15:06:27 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,43 @@ Server::Server(void) { }
 
 Server::Server(int port): _port(port) {
 	configSocket(port);
-	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
-	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
-	_server_name.push_back(SERVER_NAME);
-	_root = ROOT;
-	_cgi_location = CGI_LOCATION;
+	setBasics();
 	_location_root.clear();
 	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
-	_client_max_body_size = CLIENT_MAX_BODY_SIZE;
+	setBasics();
 	_server_name.push_back(SERVER_NAME);
-	_root = ROOT;
-	_cgi_location = CGI_LOCATION;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
-		if (input[i].substr(0, 7) == "listen ")
+		if (input[i].substr(0, 7) == "listen ") {
 			_port = getPortConf(input, index);
+			setSocket(_port);
+		}
 		if (input[i].substr(0, 12) == "server_name ")
-			_server_name = getNameConf(input, index);
+			setName(getNameConf(input, index));
 		if (input[i].substr(0, 21) == "client_max_body_size ")
-			_client_max_body_size = getBodySizeConf(input, index);
+			setBodySize(getBodySizeConf(input, index));
 		if (input[i].substr(0, 5) == "root ")
 			_root = getRootConf(input, index);
+		if (input[i].substr(0, 9) == "location ") {
+			while (input[i].substr() != "}")
+				i++;
+			_locations.push_back(getLocConf(input, index));
+		}
+		//_bufferSize;
+		// _cgi_location;
+		// _root;  // geral do server; cada location vai poder ter um root diferente
+		// _uploadPath;
+		// _allowed_methods; //std::set<std::string> _fill_methods(void)
+		// _index; //autoindex
+		// _locations;
+		// _error_pages;
 	}
 	configSocket(_port);
-	setBufferSize(BUFFSIZE); // pelo que eu entendi esse valor pode ser um input no arquivo de config
 	_location_root.clear();
 	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
@@ -60,6 +68,24 @@ Server& Server::operator=(Server const & copy) {
 		setBufferSize(copy.getBufferSize());
 	}
 	return *this;
+}
+
+void	Server::setBasics() {
+	std::vector<std::string>	serverName;
+	std::map<int, std::string>	errors;
+
+	serverName.push_back(SERVER_NAME);
+	errors.empty();
+	errors.insert(std::pair<int, std::string>(404, "404.html"));
+	setBufferSize(BUFFSIZE);
+	setBodySize(CLIENT_MAX_BODY_SIZE);
+	setRoot(LOCATION);
+	setCGILocation(".cgi");
+	setErrorPages(errors);
+	setUpPath(ROOT);
+	// setMethods(http::_fill_methods);
+	// setIndex(std::set<std::string> index);
+	setName(serverName);
 }
 
 // vamos usar para cada server do arquivo de config
