@@ -1,25 +1,6 @@
 #include "ServerBuilder.hpp"
 
-// 		if (input[i].substr(0, 12) == "error_pages ") {
-// 			server["error_pages"] = input[i].substr(12);
-// 			log.debug("Error pages setted.");
-// 		}
-// 		if (input[i].substr(0, 16) == "allowed_methods ") {
-// 			server["allowed_methods"] = input[i].substr(16);
-// 			log.debug("Methods allowed setted.");
-// 		}
-// 		if (input[i].substr(0, 9) == "location ") {
-// 			functionLocationDeal(&server, input, i);
-// 			while (input[i].substr() != "}")
-// 				i++;
-// 		}
-// 		if (input[i].substr() == "}")
-// 			break ;
-// 	}
-// 	return server;
-// }
-
-int	getPortConf(std::vector<std::string> input, int index) {
+int	obtainPort(std::vector<std::string> input, int index) {
 	int		port;
 	Logger	log;
 
@@ -42,7 +23,7 @@ int	getPortConf(std::vector<std::string> input, int index) {
 
 // Sets the maximum body size for client requests.
 // Megabytes, M, and Kilobytes, K, are the accepted units.
-int	getBodySizeConf(std::vector<std::string> input, int index) {
+int	obtainBodySize(std::vector<std::string> input, int index) {
 	int			bodySize;
 	std::string	bodySizeString;
 	Logger		log;
@@ -52,7 +33,7 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 			i++ ;
 		if (input[i].substr(0, 21) == "client_max_body_size ") {
 			bodySizeString = input[i].substr(21);
-			//read size, get M or K -> 1M is the limit
+			//read size, obtain M or K -> 1M is the limit
 			//check string for the letter -> give error if letter is different than M or K
 			//if bigger than 1M -> give error
 			// 1K is the minimal size
@@ -66,7 +47,7 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 	return (bodySize);
 }
 
-std::string	getRootConf(std::vector<std::string> input, int index) {
+std::string	obtainRoot(std::vector<std::string> input, int index) {
 	std::string	root;
 	Logger		log;
 
@@ -84,7 +65,7 @@ std::string	getRootConf(std::vector<std::string> input, int index) {
 	return (root);
 }
 
-std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index) {
+std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
 	Logger						log;
@@ -107,7 +88,7 @@ std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index) {
 	return (serverName);
 }
 
-std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) {
+std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
 	Logger						log;
@@ -126,7 +107,7 @@ std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) 
 	return (serverName);
 }
 
-t_location	getLocConf(std::vector<std::string> input, int index) {
+t_location	obtainLoc(std::vector<std::string> input, int index) {
 	//deal with location :')
 	t_location					location;
 	Logger						log;
@@ -143,7 +124,7 @@ t_location	getLocConf(std::vector<std::string> input, int index) {
 	return (location);
 }
 
-std::set<std::string>	getMethConf(std::vector<std::string> input, int index) {
+std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 	std::set<std::string>		methods;
 	std::vector<std::string>	words;
 	Logger					log;

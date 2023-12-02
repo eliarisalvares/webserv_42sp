@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 18:18:58 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 18:30:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,25 +29,25 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr() == "server {")
 			i++ ;
 		if (input[i].substr(0, 7) == "listen ") {
-			_port = getPortConf(input, index);
+			_port = obtainPort(input, index);
 			setSocket(_port);
 		}
 		if (input[i].substr(0, 12) == "server_name ")
-			setName(getNameConf(input, index));
+			setName(obtainName(input, index));
 		if (input[i].substr(0, 21) == "client_max_body_size ")
-			setBodySize(getBodySizeConf(input, index));
+			setBodySize(obtainBodySize(input, index));
 		if (input[i].substr(0, 5) == "root ")
-			setRoot(getRootConf(input, index));
+			setRoot(obtainRoot(input, index));
 		if (input[i].substr(0, 9) == "location ") {
 			while (input[i].substr() != "}")
 				i++;
-			_locations.push_back(getLocConf(input, index));
+			_locations.push_back(obtainLoc(input, index));
 		}
 		if (input[i].substr(0, 4) == "cgi ")
-			setCGI(getCGIConf(input, index));
+			setCGI(obtainCGI(input, index));
 		if (input[i].substr(0, 16) == "allowed_methods ") {
 			_allowed_methods.clear();
-			setMethods(getMethConf(input, index));
+			setMethods(obtainMethod(input, index));
 		}
 		//_bufferSize;
 		// _uploadPath;
