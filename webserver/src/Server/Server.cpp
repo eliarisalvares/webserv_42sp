@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 17:58:26 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 18:18:58 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,21 +37,22 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 21) == "client_max_body_size ")
 			setBodySize(getBodySizeConf(input, index));
 		if (input[i].substr(0, 5) == "root ")
-			_root = getRootConf(input, index);
+			setRoot(getRootConf(input, index));
 		if (input[i].substr(0, 9) == "location ") {
 			while (input[i].substr() != "}")
 				i++;
 			_locations.push_back(getLocConf(input, index));
 		}
 		if (input[i].substr(0, 4) == "cgi ")
-			_cgi = getCGIConf(input, index);
+			setCGI(getCGIConf(input, index));
+		if (input[i].substr(0, 16) == "allowed_methods ") {
+			_allowed_methods.clear();
+			setMethods(getMethConf(input, index));
+		}
 		//_bufferSize;
-		// _cgi;
-		// _root;  // geral do server; cada location vai poder ter um root diferente
 		// _uploadPath;
 		// _allowed_methods; //std::set<std::string> _fill_methods(void)
 		// _index; //autoindex
-		// _locations;
 		// _error_pages;
 	}
 	configSocket(_port);
@@ -77,7 +78,7 @@ void	Server::setBasics() {
 	std::map<int, std::string>	errors;
 
 	serverName.push_back(SERVER_NAME);
-	errors.empty();
+	errors.clear();
 	errors.insert(std::pair<int, std::string>(404, "404.html"));
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
@@ -85,7 +86,7 @@ void	Server::setBasics() {
 	setCGI(ftstring::split(".py python3", ' '));
 	setErrorPages(errors);
 	setUpPath(ROOT);
-	// setMethods(http::_fill_methods);
+	setMethods(http::methods);
 	// setIndex(std::set<std::string> index);
 	setName(serverName);
 }

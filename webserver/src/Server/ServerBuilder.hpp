@@ -11,6 +11,12 @@
 # include "Logger.hpp"
 # include "http.hpp"
 
+typedef struct	s_permissions
+{
+	bool	autoindex;
+	bool	directory_listing;
+}				t_permissions;
+
 typedef struct	s_location
 {
 	std::string								location;
@@ -19,6 +25,7 @@ typedef struct	s_location
 	std::set<std::string>					cgi;
 	std::vector<std::string>				http_methods;
 	std::pair<unsigned int, std::string>	http_redirection;
+	t_permissions							permit;
 	// std::string								response_is_dir;
 	// std::string								directory_listing;
 }				t_location;
@@ -29,6 +36,7 @@ std::string					getRootConf(std::vector<std::string> input, int index);
 std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
 t_location					getLocConf(std::vector<std::string> input, int index);
 std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index);
+std::set<std::string>		getMethConf(std::vector<std::string> input, int index);
 
 typedef unsigned int uint_t;
 
@@ -45,6 +53,14 @@ class CGIMissconfigurationException : public std::exception {
 };
 
 class CGINotSupportedException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class InvalidNbrMethodsException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class InvalidMethodsException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
