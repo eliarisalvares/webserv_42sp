@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:08:46 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:09:19 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,136 +397,6 @@ void RequestParser::_print_body(void) {
 // 		_print_body();
 // 	}
 // }
-RequestParser::e_parser_error RequestParser::error(void) {
-	return this->_error;
-}
-
-
-
-//Initial lines and headers should end in CRLF, though you should gracefully handle lines ending in just LF.
-// Method names are always uppercase
-// URI enconding (tb serve pra POST) - não entendi se posso receber https
-// URI normalization:
-// normalizing the scheme and host to lowercase
-// normalizing the port to remove any leading zeros.
-// If port is elided from the URI, the default port for that scheme is used
-// o host pode ser um IP, que pode estar em ipv4 ou ipv6...
-// It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
-// The HTTP version always takes the form "HTTP/x.x", uppercase
-void RequestParser::first_line(void) {
-	std::string method;
-	std::string uri;
-	std::string protocol;
-	std::string version;
-	std::vector<char>::iterator it;
-
-	// separar os parsers para evitar receber um monte de dado inválido sem CRLF
-	log.debug("first_line");
-	if (_found_EOL()) {
-		log.debug("Found EOL");
-		for (it = _data.begin(); it != _data_it && *it != SP; ++it)
-			method.push_back(*it);
-		log.debug(method);
-		while (*it == SP)
-			++it;
-		for (; it != _data_it && *it != SP; ++it)
-			uri.push_back(*it);
-		log.debug(uri);
-		while (*it == SP)
-			++it;
-		for (; it != _data_it && *it != '/'; ++it)
-			protocol.push_back(*it);
-		log.debug(protocol);
-		// ++it;
-		if (it != _data_it && *it == '/') {
-			++it;
-			for (; it != _data_it; ++it)
-				version.push_back(*it);
-			log.debug(version);
-		}
-		_step = HEADER;
-		_data.erase(_data.begin(), _data_it + 2);
-		_result.insert(t_string_pair("method", method));
-		_result.insert(t_string_pair("uri", uri));
-		_result.insert(t_string_pair("protocol", protocol));
-		_result.insert(t_string_pair("version", version));
-	}
-}
-
-bool RequestParser::_found_EOL(void) {
-	std::vector<char>::iterator end = _data.end();
-
-	for(_data_it = _data.begin(); _data_it != end; ++_data_it) {
-		if (*_data_it == CR) {
-			// log.debug("found CR");
-			break;
-		}
-		if (*_data_it == LF) {
-			// log.debug("found LF without CR");
-			// talvez o CR não seja necessário; checar na RFC se pode aceitar só o \n
-			_error = LF_WITHOUT_CR;
-			_step = END;
-			return false;
-		}
-	}
-	if (_data_it == end)
-		return false;
-	if (*_data_it == CR) {
-		if (*(_data_it + 1) == LF) {
-			// log.debug("found LF");
-			// _step = CRLF;
-			return true;
-		}
-		else if (_data_it + 1 == end)
-			return false;
-		else {
-			_error = CR_WITHOUT_LF;
-			_step = END;
-			return false;
-		}
-	}
-	(void)_idx;
-	return false;
-}
-
-// Field name:
-// The requested field name. It MUST conform to the field-name syntax defined
-// in Section 5.1, and it SHOULD be restricted to just letters, digits,
-// and hyphen ('-') characters, with the first character being a letter.
-void RequestParser::header(void) {
-	std::vector<char>::iterator it;
-	std::string header_name;
-	std::string header_value;
-
-	log.debug("parsing header");
-	while (_found_EOL()) {
-		log.debug("Found EOL");
-		for (it = _data.begin(); it != _data_it && *it != COLON; ++it)
-			header_name.push_back(*it);
-		log.debug(header_name);
-		if (*it == COLON)
-			++it;
-		while (*it == SP)
-			++it;
-		for (; it != _data_it; ++it)
-			header_value.push_back(*it);
-		log.debug(header_value);
-		_result.insert(t_string_pair(header_name, header_value));
-		it += 2;
-		_data.erase(_data.begin(), it);
-		header_name.clear();
-		header_value.clear();
-		if (*it == CR && *(it + 1) == LF) {
-			log.info("end of headers - remaining data:");
-			_print_data();
-			_step = END;  ///////////////////////
-		}  // double CRFL
-	}
-}
-
-t_string_map	RequestParser::get_result(void) const {
-	return _result;  // tem problema? não vou alterar, só consultar...
-}
 
 // general:
 // Each part of a HTTP request is separated by a new line

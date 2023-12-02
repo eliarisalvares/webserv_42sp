@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 10:53:04 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 11:45:35 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ Server Class
 # define SERVER_PORT "8080" //listen
 # define METHODS "GET, POST, DELETE" //allowed_methods
 # define ERROR_PAGES "404 404.html" //error_pages
-
 
 typedef struct	s_location
 {

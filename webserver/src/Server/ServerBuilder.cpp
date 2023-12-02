@@ -63,7 +63,7 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 			//if bigger than 1M -> give error
 			// 1K is the minimal size
 			//range from 1K to 1000K -> pass this info ahead
-			bodySize = ftstring::itostr(bodySizeString);
+			bodySize = ftstring::strtoi(bodySizeString);
 			log.debug("client_max_body_size successfully setted from .conf file.");
 		}
 		if (input[index].substr(0, 7) == "location ")
@@ -86,7 +86,7 @@ std::string	getRootConf(std::vector<std::string> input, int index) {
 			i++ ;
 		if (input[i].substr(0, 5) == "root ") {
 			//check if name makes sense? idk
-			root = = input[i].substr(5);
+			root = input[i].substr(5);
 			log.debug("Root setted.");
 		}
 		if (input[index].substr(0, 7) == "location ")
