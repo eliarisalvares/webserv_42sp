@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 15:06:27 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 17:58:26 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,10 @@ Server::Server(std::vector<std::string> input, size_t index) {
 				i++;
 			_locations.push_back(getLocConf(input, index));
 		}
+		if (input[i].substr(0, 4) == "cgi ")
+			_cgi = getCGIConf(input, index);
 		//_bufferSize;
-		// _cgi_location;
+		// _cgi;
 		// _root;  // geral do server; cada location vai poder ter um root diferente
 		// _uploadPath;
 		// _allowed_methods; //std::set<std::string> _fill_methods(void)
@@ -80,7 +82,7 @@ void	Server::setBasics() {
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(LOCATION);
-	setCGILocation(".cgi");
+	setCGI(ftstring::split(".py python3", ' '));
 	setErrorPages(errors);
 	setUpPath(ROOT);
 	// setMethods(http::_fill_methods);

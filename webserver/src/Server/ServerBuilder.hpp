@@ -28,6 +28,7 @@ int							getBodySizeConf(std::vector<std::string> input, int index);
 std::string					getRootConf(std::vector<std::string> input, int index);
 std::vector<std::string>	getNameConf(std::vector<std::string> input, int index);
 t_location					getLocConf(std::vector<std::string> input, int index);
+std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index);
 
 typedef unsigned int uint_t;
 
@@ -36,6 +37,14 @@ class PortNotFoundErrorExeption : public std::exception {
 };
 
 class PortNeedsSudoExeption : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class CGIMissconfigurationException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class CGINotSupportedException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 

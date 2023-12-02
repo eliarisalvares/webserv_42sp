@@ -21,7 +21,6 @@
 
 int	getPortConf(std::vector<std::string> input, int index) {
 	int		port;
-	int		extraBrackets = 0;
 	Logger	log;
 
 	for (size_t i = index; i < input.size(); i++) {
@@ -35,11 +34,7 @@ int	getPortConf(std::vector<std::string> input, int index) {
 				throw PortNeedsSudoExeption();
 			log.debug("Port successfully setted from .conf file.");
 		}
-		if (input[index].substr(0, 7) == "location ")
-			extraBrackets++;
-		if (input[index].substr() == "}")
-			extraBrackets--;
-		if (input[index].substr() == "}" && !extraBrackets)
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
 			break ;
 	}
 	return (port);
@@ -50,7 +45,6 @@ int	getPortConf(std::vector<std::string> input, int index) {
 int	getBodySizeConf(std::vector<std::string> input, int index) {
 	int			bodySize;
 	std::string	bodySizeString;
-	int			extraBrackets = 0;
 	Logger		log;
 
 	for (size_t i = index; i < input.size(); i++) {
@@ -66,11 +60,7 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 			bodySize = ftstring::strtoi(bodySizeString);
 			log.debug("client_max_body_size setted from .conf file.");
 		}
-		if (input[index].substr(0, 7) == "location ")
-			extraBrackets++;
-		if (input[index].substr() == "}")
-			extraBrackets--;
-		if (input[index].substr() == "}" && !extraBrackets)
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
 			break ;
 	}
 	return (bodySize);
@@ -78,7 +68,6 @@ int	getBodySizeConf(std::vector<std::string> input, int index) {
 
 std::string	getRootConf(std::vector<std::string> input, int index) {
 	std::string	root;
-	int			extraBrackets = 0;
 	Logger		log;
 
 	for (size_t i = index; i < input.size(); i++) {
@@ -89,20 +78,38 @@ std::string	getRootConf(std::vector<std::string> input, int index) {
 			root = input[i].substr(5);
 			log.debug("Root setted from .conf file..");
 		}
-		if (input[index].substr(0, 7) == "location ")
-			extraBrackets++;
-		if (input[index].substr() == "}")
-			extraBrackets--;
-		if (input[index].substr() == "}" && !extraBrackets)
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
 			break ;
 	}
 	return (root);
 }
 
+std::vector<std::string>	getCGIConf(std::vector<std::string> input, int index) {
+	std::string					name;
+	std::vector<std::string>	serverName;
+	Logger						log;
+
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr() == "server {")
+			i++ ;
+		if (input[i].substr(0, 4) == "cgi ") {
+			name = input[i].substr(4);
+			serverName = ftstring::split(name, ' ');
+			if (serverName.size() != 2)
+				throw CGIMissconfigurationException();
+			else if (serverName[0] != ".py" || serverName[1] != "python3")
+				throw CGINotSupportedException();
+			log.debug("CGI setted from .conf file.");
+		}
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
+			break ;
+	}
+	return (serverName);
+}
+
 std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
-	int							extraBrackets = 0;
 	Logger						log;
 
 	for (size_t i = index; i < input.size(); i++) {
@@ -113,11 +120,7 @@ std::vector<std::string>	getNameConf(std::vector<std::string> input, int index) 
 			serverName = ftstring::split(name, ' ');
 			log.debug("Server name setted from .conf file.");
 		}
-		if (input[index].substr(0, 7) == "location ")
-			extraBrackets++;
-		if (input[index].substr() == "}")
-			extraBrackets--;
-		if (input[index].substr() == "}" && !extraBrackets)
+		if (input[index].substr() == "}" || input[index].substr(0, 7) == "location ")
 			break ;
 	}
 	return (serverName);
@@ -141,9 +144,17 @@ t_location	getLocConf(std::vector<std::string> input, int index) {
 }
 
 const char* PortNotFoundErrorExeption::what() const throw() {
-	return ("Invalid Port found");
+	return ("Invalid Port found.");
 }
 
 const char* PortNeedsSudoExeption::what() const throw() {
-	return ("Sudo required to run");
+	return ("Sudo required to run.");
+}
+
+const char* CGIMissconfigurationException::what() const throw() {
+	return ("Wrong number of arguments in CGI.");
+}
+
+const char* CGINotSupportedException::what() const throw() {
+	return ("CGI mode not supported by webserv.");
 }

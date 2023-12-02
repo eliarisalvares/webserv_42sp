@@ -16,7 +16,7 @@ void	Server::setRoot(std::string root) {
 	this->_root = root;
 }
 
-void	Server::setCGILocation(std::string cgi) {
+void	Server::setCGI(std::vector<std::string> cgi) {
 	this->_cgi = cgi;
 }
 
