@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 14:49:42 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 17:57:30 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class Server {
 		void	setSocket(int port);
 		void	setBodySize(int size);
 		void	setRoot(std::string root);
-		void	setCGILocation(std::string cgi);
+		void	setCGI(std::vector<std::string> cgi);
 		void	setErrorPages(std::map<int, std::string> errorPages);
 		void	setUpPath(std::string path);
 		void	setMethods(std::set<std::string> methods);
@@ -61,13 +61,13 @@ class Server {
 		int							getPort(void) const;
 		int							getBufferSize(void) const;
 		int							getBodySize(void) const;
-		std::string					getCGILoc(void) const;
 		std::string					getRoot(void) const;
 		std::string					getUpPath(void) const;
 		std::set<std::string>		getMethods(void) const;
 		std::set<std::string>		getIndex(void) const;
 		std::vector<t_location>		getLocations(void);
 		t_location					getLocations(int index);
+		std::vector<std::string>	getCGI(void) const;
 		std::vector<std::string>	getName(void);
 		std::string					getName(int index);
 		std::map<int, std::string>	getErrorPages(void) const;
@@ -81,12 +81,12 @@ class Server {
 		int										_client_max_body_size;
 		int										_port;  // único item obrigatório no arquivo
 		int										_socket;
-		std::string								_cgi;
 		std::string								_root;  // geral do server; cada location vai poder ter um root diferente
 		std::string								_uploadPath;
 		std::set<std::string>					_allowed_methods; //std::set<std::string> _fill_methods(void)
 		std::set<std::string>					_index; //autoindex
 		std::vector<t_location>					_locations;
+		std::vector<std::string>				_cgi;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
 		std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> colocar dentro de locations
