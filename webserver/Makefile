@@ -48,7 +48,8 @@ $(OBJPATH)/%.o:	%.cpp
 
 # Folder for temporary objects
 $(OBJPATH):
-		@mkdir -p $(OBJPATH)
+	@printf "$(GRAY)[ INFO ] Compiling objects with $(RESET)$(CXX) $(CXXFLAGS) \n" $@
+	@mkdir -p $(OBJPATH)
 
 # Linking the final program
 $(NAME): $(OBJPATH) $(OBJ)
