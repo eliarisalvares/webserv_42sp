@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 20:49:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 03:35:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,17 @@
 # include <vector>
 # include <string>
 # include <iostream>
+# include <algorithm> // transform
 
 # include "Logger.hpp"
+# include "http.hpp"
+# include "Request.hpp"
 
 // Special chars - ABNF Rules
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
+# define TAB '\t'
 
 // others
 # define COLON ':'
@@ -34,33 +38,41 @@ typedef std::pair<std::string, std::string>	t_string_pair;
 class RequestParser {
 public:
 	RequestParser(void);
+	RequestParser(Request* request);
 	RequestParser(RequestParser const& copy);
 	RequestParser& operator=(RequestParser const& copy);
 	~RequestParser(void);
 
-	typedef enum e_steps {
-		ERROR,
+	enum Steps {
+		INIT,
 		FIRST_LINE,
 		METHOD,
 		URI,
 		PROTOCOL,
 		VERSION,
+		CR_FIRST_LINE,
 		HEADER,
-		END_HEADER,
+		HEADER_NAME,
+		HEADER_VALUE,
+		CR_HEADER,
+		SECOND_CR_HEADER,
 		BODY,
-		END_BODY,  // necessary?
+		BODY_NEW_LINE,
+		CR_BODY,
+		SECOND_CR_BODY,
 		END,
-	}           t_steps;
+		ERROR, // necessary?
+	};
 
-	typedef enum e_parser_error {
+	enum Error {
 		NONE,
 		LF_WITHOUT_CR,
 		CR_WITHOUT_LF,
-		INVALID_METHOD,
+		INVALID_METHOD_TOKEN,
 		INVALID_URI,
 		INVALID_PROTOCOL,
 		INVALID_HTTP_VERSION,
-	}           t_parser_error;
+	};
 
 	typedef enum e_abnf_rules {
 		ALPHA, // (letters)
@@ -77,28 +89,53 @@ public:
 		VCHAR, //(any visible US-ASCII character)
 	}           t_abnf_rules;
 
-	void			break_data(char* buffer, size_t bytes_read);
-	void			first_line(void);
-	void			header(void);
-	e_steps			step(void);
-	e_parser_error	error(void);
+	Steps			step(void);
+	void			method(char c);
+	void			uri(char c);
+	void			protocol(char c);
+	void			version(char c);
+	void			header(char c);
+	void			body(char c);
 
-	bool			first_line_not_parsed(void);
-	t_string_map	get_result(void) const;
+	void			check_crlf(char c);
+	void			check_first_line(void);
+	void			check_headers(void);
+
+	// void			break_data(char* buffer, size_t bytes_read);
+
+	// t_string_map	get_result(void) const;
 
 private:
 	Logger								log;
 	size_t								_idx;
-	t_steps								_step;
-	t_parser_error						_error;
-	std::string							_error_str;
-	std::vector<char>					_data;
-	std::vector<char>::iterator			_data_it;
-	t_string_map						_result;
+	Steps								_step;
+	Request*							_request;
+	// t_string_map						_result;
 
-	bool								_found_EOL(void);
+	// request first line
+	std::string		_method;
+	std::string		_uri;
+	std::string		_protocol;
+	std::string		_version;
 
-	void								_print_data(void);
+	static std::string const	_right_protocol;
+	// static int const			_right_version;
+
+	// headers
+	std::string							_field_name;
+	std::string							_field_value;
+	std::string							_last_header;
+	std::map<std::string, std::vector<std::string> >	_headers;
+	void								_add_header(void);
+	void								_print_headers(void);
+	void								_parse_field_name(char c);
+	void								_parse_field_value(char c);
+
+	// body
+	std::vector<char>					_body;
+	std::vector<char>::iterator			_body_it;
+	void								_print_body(void);
+
 };
 
 #endif

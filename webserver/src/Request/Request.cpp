@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 23:16:38 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/01 00:27:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Request::Request(void):
 	_fd(0),
 	_error(false),
-	_method(GET),
+	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
 	_is_chuncked(false),
@@ -27,7 +27,7 @@ Request::Request(int fd, Server* server):
 	_server(server),
 	_fd(fd),
 	_error(false),
-	_method(GET),
+	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
 	_is_chuncked(false),
@@ -54,7 +54,7 @@ Server* Request::server(void) const {
 	return this->_server;
 }
 
-requestMethod Request::method(void) const {
+http::RequestMethod Request::method(void) const {
 	return this->_method;
 }
 
@@ -63,7 +63,7 @@ int Request::fd(void) const {
 	return this->_fd;
 }
 
-http::e_status Request::status_code(void) const {
+http::HttpStatus Request::status_code(void) const {
 	return this->_status_code;
 }
 
@@ -79,7 +79,7 @@ bool Request::is_chuncked(void) const {
 	return this->_is_chuncked;
 }
 
-http::e_content_type Request::content_type(void) const {
+http::ContentType Request::content_type(void) const {
 	return this->_content_type;
 }
 
@@ -88,11 +88,11 @@ size_t Request::content_length(void) const {
 }
 
 /********************************** SETTERS **********************************/
-void Request::setMethod(requestMethod method) {
+void Request::setMethod(http::RequestMethod method) {
 	this->_method = method;
 }
 
-void Request::setStatusCode(http::e_status status) {
+void Request::setStatusCode(http::HttpStatus status) {
 	this->_status_code = status;
 }
 
@@ -108,7 +108,7 @@ void Request::setChuncked(bool is_chuncked) {
 	this->_is_chuncked = is_chuncked;
 }
 
-void Request::setContentType(http::e_content_type type) {
+void Request::setContentType(http::ContentType type) {
 	this->_content_type = type;
 }
 
