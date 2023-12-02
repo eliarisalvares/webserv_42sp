@@ -1,17 +1,61 @@
 #include "Server.hpp"
 
 int	Server::getSocket(void) const {
-	return (this->_socket);
+	return this->_socket;
 }
 
 int	Server::getBufferSize(void) const {
 	return this->_bufferSize;
 }
 
-
 int	Server::getPort(void) const {
 	return this->_port;
 }
+
+int	Server::getBodySize(void) const {
+	return this->_client_max_body_size;
+}
+
+std::string	Server::getCGILoc(void) const {
+	return this->_cgi_location;
+}
+
+std::string	Server::getRoot(void) const {
+	return this->_root;
+}
+
+std::string	Server::getUpPath(void) const {
+	return this->_uploadPath;
+}
+
+std::set<std::string>	Server::getMethods(void) const {
+	return this->_allowed_methods;
+}
+
+std::set<std::string>	Server::getIndex(void) const {
+	return this->_index;
+}
+
+std::vector<t_location>	Server::getLocations(void) {
+	return this->_locations;
+}
+
+t_location	Server::getLocations(int index) {
+	return this->_locations[index];
+}
+
+std::vector<std::string>	Server::getName(void) {
+	return this->_server_name;
+}
+
+std::string	Server::getName(int index) {
+	return this->_server_name[index];
+}
+
+std::map<int, std::string>	Server::getErrorPages(void) const {
+	return this->_error_pages;
+}
+
 
 std::string	Server::getServerName(void) {
 	return (SERVER_NAME);
@@ -24,17 +68,3 @@ std::string	Server::getCurrentPort(void) {
 std::string	Server::getAllowedMethods(void) {
 	return (METHODS);
 }
-
-
-// int										_bufferSize;
-// int										_client_max_body_size;
-// int										_port;  // único item obrigatório no arquivo
-// int										_socket;
-// std::string								_cgi_location;
-// std::string								_root;  // geral do server; cada location vai poder ter um root diferente
-// std::string								_uploadPath;
-// std::set<std::string>					_allowed_methods;
-// std::set<std::string>					_index; //autoindex
-// std::vector<t_location>					_locations;
-// std::vector<std::string>				_server_name;
-// std::map<int, std::string>				_error_pages;
