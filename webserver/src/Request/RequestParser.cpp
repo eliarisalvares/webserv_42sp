@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:09:19 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:11:08 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,36 +397,6 @@ void RequestParser::_print_body(void) {
 // 		_print_body();
 // 	}
 // }
-
-// general:
-// Each part of a HTTP request is separated by a new line
-// Note: Technically they should be \r\n but you are strongly encouraged to also accept \n as a newline
-// Parts of request line is separated by a space character. Technically there should be only one space though I've seen badly malformed requests that send multiple spaces. Browsers will never send more than one space
-
-// Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
-// The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
-
-// headers
-// one line per header, of the form "Header-Name: value", ending with CRLF
-// you should handle LF correctly
-// The header name is not case-sensitive (though the value may be) - Header
-// name can be either title-case or lowercase or mixed, all are valid
-// Any number of spaces or tabs may be between the ":" and the value
-// Header lines beginning with space or tab are actually part of the previous header line, folded into multiple lines for easy reading.
-// the following two headers are equivalent:
-
-// Header1: some-long-value-1a, some-long-value-1b
-// HEADER1:    some-long-value-1a,
-//             some-long-value-1b
-
-// HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
-
-// If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
-// Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
-// Content-Length: header gives the number of bytes in the body.
-
-// A HTTP request is terminated by two newlines
-// Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
 
 // The most common use of POST, by far, is to submit HTML form data to CGI scripts. In this case, the Content-Type: header is usually application/x-www-form-urlencoded, and the Content-Length: header gives the length of the URL-encoded form data
 // Ex:
