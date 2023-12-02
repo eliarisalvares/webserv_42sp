@@ -1,3 +1,10 @@
+#colors
+GREEN			= \033[0;32m
+YELLOW			= \033[0;38;5;184m
+CYAN			= \033[0;36m
+GRAY			= \033[0;90m
+RESET			= \033[0m
+
 ################################################################################
 ##                                 COMPILATION                                ##
 ################################################################################
@@ -36,7 +43,8 @@ all: $(NAME)
 
 # Folder for temporary objects
 $(OBJPATH)/%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
+	@$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
+	@printf "$(GRAY)[ INFO ] Generating $(CYAN)$(NAME)$(GRAY) objects... $(YELLOW)%-33.33s\n$(RESET)" $@
 
 # Folder for temporary objects
 $(OBJPATH):
@@ -44,7 +52,8 @@ $(OBJPATH):
 
 # Linking the final program
 $(NAME): $(OBJPATH) $(OBJ)
-	$(CXX) $(OBJ) -o $(NAME)
+	@$(CXX) $(OBJ) -o $(NAME)
+	@echo "$(CYAN)$(NAME)$(GRAY): $(GREEN)Done$(GRAY)!$(RESET)"
 
 # Compiling the source files
 # %.o: %.cpp
@@ -52,12 +61,14 @@ $(NAME): $(OBJPATH) $(OBJ)
 
 # Removing all object files
 clean:
-	rm -f $(OBJ)
+	@rm -f $(OBJ)
+	@echo "$(GRAY)[ INFO ] Cleaning objects$(RESET)"
 
 # Removing all object files and the executable
 fclean: clean
-	rm -f $(NAME)
-	rm -rf $(OBJPATH)
+	@rm -f $(NAME)
+	@rm -rf $(OBJPATH)
+	@echo "$(GRAY)[ INFO ] Cleaning executable$(RESET)"
 
 # Rebuilding the entire program
 re: fclean all
