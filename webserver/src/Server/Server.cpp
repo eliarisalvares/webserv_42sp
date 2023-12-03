@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/03 15:36:38 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 16:15:54 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	Server::setBasics() {
 	t_location					location;
 
 	serverName.push_back(SERVER_NAME);
-	index.insert("http");
+	index.insert("index.html");
 	location = initLocation();
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
@@ -87,7 +87,7 @@ void	Server::setBasics() {
 	setCGI(ftstring::split(".py python3", ' '));
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	_locations.push_back(location);
-	setUpPath("/content/"); //idk
+	setUpPath("/content/upload/"); //idk
 	setMethods(http::methods);
 	setIndex(index);
 	setName(serverName);
