@@ -88,10 +88,13 @@ void RequestParser::method(char c) {
 		_step = URI;
 		log.debug("method", _method);
 	}
+	else if (c == HTAB)
+		_invalid_request(
+			"invalid method/uri separator: horizontal tab", http::BAD_REQUEST
+		);
 	else
 		_invalid_request(
-			"invalid method: caracter is not upper case alphabetic",
-			http::BAD_REQUEST
+			"invalid method: character is not upper case", http::BAD_REQUEST
 		);
 }
 
@@ -110,7 +113,10 @@ void RequestParser::uri(char c) {
 	if (c != SP) { // make first validation
 		if (init_uri) {
 			if (c == HTAB)
-				_invalid_request("invalid method/uri separator: tab", http::BAD_REQUEST);
+				_invalid_request(
+					"invalid method/uri separator: horizontal tab",
+					http::BAD_REQUEST
+				);
 			init_uri = false;
 		}
 		_uri.push_back(c);
@@ -144,6 +150,10 @@ void RequestParser::protocol(char c) {
 		log.debug("protocol", _protocol);
 		init_protocol = true;
 	}
+	else if (c == SP)
+		_invalid_request("invalid space in HTTP protocol", http::BAD_REQUEST);
+	else if (_protocol.compare(_right_protocol) == 0)
+		_invalid_request("missing HTTP version", http::BAD_REQUEST);
 	else
 		_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 }
@@ -152,18 +162,33 @@ void RequestParser::protocol(char c) {
 // HTTP's version number consists of two decimal digits separated by a "."
 // (period or decimal point)
 void RequestParser::version(char c) {
+	int size;
+
 	if (std::isdigit(c) || (c == POINT && !_version.empty()))
 		_version.push_back(c);
 	else if (c == CR) {
-		if (_version.size() < 3)
+		size = _version.size();
+		if (size == 3) {
+			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
+				_step = CR_FIRST_LINE;
+				log.debug("version", _version);
+			}
+			else
+				_invalid_request(
+					HTTP_VERSION, _version, http::HTTP_VERSION_NOT_SUPPORTED
+				);
+		}
+		else if (
+			size == 0
+			|| (size == 1 && _version[0] == '1')
+			|| (size == 2 && _version[0] == '1' && _version[1] == POINT)
+		)
 			_invalid_request(HTTP_VERSION, _version, http::BAD_REQUEST);
-		else if (_version[0] != '1' || _version[1] != POINT || _version[2] != '1')
+		else
 			_invalid_request(HTTP_VERSION, _version, http::HTTP_VERSION_NOT_SUPPORTED);
-		_step = CR_FIRST_LINE;
-		log.debug("version", _version);
 	}
 	else
-		_invalid_request(HTTP_VERSION, _version, http::BAD_REQUEST);
+		_invalid_request(HTTP_VERSION, http::BAD_REQUEST);
 }
 
 // Each part of a HTTP request is separated by a new line
@@ -205,12 +230,6 @@ void RequestParser::check_crlf(char c) {
 			break;
 		}
 	}
-}
-
-void RequestParser::check_first_line(void) {
-	// method
-	// uri
-	// version
 }
 
 // headers
@@ -270,7 +289,6 @@ void RequestParser::_parse_field_value(char c) {
 	if (c == CR) {
 		log.debug("value", _field_value);
 		_step = CR_HEADER;
-		// _last_header = _field_name; // verificar se faz deep copy...
 		_add_header();
 	}
 	else
@@ -415,6 +433,16 @@ void RequestParser::_invalid_request(
 	http::HttpStatus error_code
 ) {
 	log.warning("request parser: " + description, value);
+	throw http::InvalidRequest(error_code);
+}
+
+void RequestParser::_invalid_request(
+	std::string const description,
+	char const c,
+	http::HttpStatus error_code
+) {
+	log.warning_no_lf("request parser: " + description);
+	std::cout << GREY << c << std::endl;
 	throw http::InvalidRequest(error_code);
 }
 
