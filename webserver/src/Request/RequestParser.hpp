@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 01:55:59 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 03:16:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ public:
 	void			body(char c);
 
 	void			check_crlf(char c);
-	void			check_first_line(void);
 	void			check_headers(void);
 
 	// void			break_data(char* buffer, size_t bytes_read);
@@ -145,6 +144,11 @@ private:
 	void	_invalid_request(
 		std::string const description,
 		std::string const value,
+		http::HttpStatus error_code
+	);
+	void	_invalid_request(
+		std::string const description,
+		char const c,
 		http::HttpStatus error_code
 	);
 	void	_invalid_request(
