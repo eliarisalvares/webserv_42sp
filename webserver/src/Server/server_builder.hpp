@@ -23,10 +23,11 @@ typedef struct	s_location
 	std::string								location; // "/"
 	std::string								root; // "/content"
 	std::set<std::string>					allowed_methods; //std::set<std::string> _fill_methods(void)
-	std::set<std::string>					cgi; // .py python3
-	std::vector<std::string>				http_methods;
-	std::pair<unsigned int, std::string>	http_redirection;
-	t_permissions							permit;
+	std::string								index;
+	// std::set<std::string>					cgi; // .py python3
+	// std::vector<std::string>				http_methods;
+	// std::pair<unsigned int, std::string>	http_redirection;
+	// t_permissions							permit;
 	// std::string								response_is_dir;
 	// std::string								directory_listing;
 }				t_location;
