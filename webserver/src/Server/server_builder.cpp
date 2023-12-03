@@ -45,11 +45,13 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 }
 
 std::string	obtainRoot(std::vector<std::string> input, int index) {
-	std::string	root;
-	Logger		log;
+	std::string					root;
+	std::vector<std::string>	words;
+	Logger						log;
 
 	if (input[index].substr(0, 5) == "root ") {
-		root = input[index].substr(5);
+		words = ftstring::split(input[index].substr(5), ' ');
+		root = "/content" + words[0];
 		//check if root makes sense/exists
 		log.debug("Root setted from .conf file.");
 	}
@@ -92,7 +94,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	Logger						log;
 	std::vector<std::string>	locName;
 
-
+	location.root = "/content";
+	location.allowed_methods = http::methods;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
@@ -101,7 +104,12 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		}
 		if (input[i] == "}")
 			break ;
+		if (input[i].substr(0, 5) == "root ")
+			location.root = obtainRoot(input, i);
+		if (input[i].substr(0, 16) == "allowed_methods ")
+			location.allowed_methods = obtainMethod(input, i);
 	}
+	std::cout << YELLOW << "location " << location.location << " root " << location.root << RESET << std::endl;
 	log.debug("Location saved", location.location);
 	return (location);
 }

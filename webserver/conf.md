@@ -1,4 +1,6 @@
 Definições já fixadas.
+Os caminhos setados terão que ser existentes e estarão no ``/content``.
+As páginas de erro deverão estar no caminho ``/content/error_pages/``
 
 ```# Configuração mínima para o webserv rodar
 
