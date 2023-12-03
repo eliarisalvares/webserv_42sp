@@ -6,6 +6,7 @@ t_location	initLocation(void) {
 	location.allowed_methods = http::methods;
 	location.location = LOCATION;
 	location.root = "/content";
+	location.index.insert("/content/index.html");
 	return (location);
 }
 
@@ -24,21 +25,29 @@ int	obtainPort(std::vector<std::string> input, int index) {
 	return (port);
 }
 
-// Sets the maximum body size for client requests.
-// Megabytes, M, and Kilobytes, K, are the accepted units.
 int	obtainBodySize(std::vector<std::string> input, int index) {
-	int			bodySize;
-	std::string	bodySizeString;
-	Logger		log;
+	int							bodySize;
+	std::string					bodySizeString;
+	std::vector<std::string>	words;
+	Logger						log;
 
 	if (input[index].substr(0, 21) == "client_max_body_size ") {
-		bodySizeString = input[index].substr(21);
-		//read size, obtain M or K -> 1M is the limit
-		//check string for the letter -> give error if letter is different than M or K
-		//if bigger than 1M -> give error
-		// 1K is the minimal size
-		//range from 1K to 1000K -> pass this info ahead
+		words = ftstring::split(input[index].substr(21), ' ');
+		bodySizeString = words[0];
 		bodySize = ftstring::strtoi(bodySizeString);
+		switch (bodySizeString.at(bodySizeString.length() - 1))
+		{
+		case 'M':
+			bodySize *= 1000000;
+			break;
+		case 'K':
+			bodySize *= 1000;
+			break;
+		default:
+			break;
+		}
+		if (bodySize > 1000000)
+			throw TooLargeException();
 		log.debug("client_max_body_size setted from .conf file.");
 	}
 	return (bodySize);
@@ -94,13 +103,11 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	Logger						log;
 	std::vector<std::string>	locName;
 
-	location.root = "/content";
-	location.allowed_methods = http::methods;
+	location = initLocation();
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
 			location.location = locName[0];
-			//do stuff
 		}
 		if (input[i] == "}")
 			break ;
@@ -108,8 +115,10 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.root = obtainRoot(input, i);
 		if (input[i].substr(0, 16) == "allowed_methods ")
 			location.allowed_methods = obtainMethod(input, i);
+		if (input[i].substr(0, 6) == "index ")
+			location.index = obtainIndex(input, i);
+		// faltam todas as infos referentes a response ->http methods, cgi, redirecionamento, permissões, ?
 	}
-	std::cout << YELLOW << "location " << location.location << " root " << location.root << RESET << std::endl;
 	log.debug("Location saved", location.location);
 	return (location);
 }
@@ -144,9 +153,10 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 		words = ftstring::split(input[index].substr(11), ' ');
 		if (words.size() != 2)
 			throw PortNeedsSudoExeption();
-		nbr = ftstring::strtoi(words[0]); //verificar se o numero de erro é valido
-		//verificar arquivo (words[1]);
-		paired = std::make_pair(nbr, words[1]);
+		nbr = ftstring::strtoi(words[0]);
+		//verificar se o numero de erro é valido
+		//verificar arquivo -> existe e é valido ("/content/error_pages/" + words[1]);
+		paired = std::make_pair(nbr, "/content/error_pages/" + words[1]);
 		log.debug("Error page setted from .conf file.");
 	}
 	return (paired);
@@ -160,7 +170,8 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 6) == "index ") {
 		words = ftstring::split(input[index].substr(16), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
-			value.insert(words[j]);
+			value.insert("/content/" + words[j]);
+			//verificar se arquivo existe e tem permissão
 		}
 		log.debug("Index setted from .conf file.");
 	}
@@ -190,4 +201,8 @@ const char* InvalidNbrMethodsException::what() const throw() {
 
 const char* InvalidMethodsException::what() const throw() {
 	return ("Invalid Allowed Method.");
+}
+
+const char* TooLargeException::what() const throw() {
+	return ("Size of client body too large.");
 }

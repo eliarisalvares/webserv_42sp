@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 13:14:00 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 16:19:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,26 @@ int	checkFileName(std::string fileName) {
 	return (false);
 }
 
-bool	checkFile(const std::string& fileName)
-{
+bool	checkFileWorks(const std::string& fileName) {
+	Logger	log;
+	std::ifstream file;
+
+	file.open(fileName.c_str());
+	if (file.fail()){
+		log.error("Could not open file.");
+		file.close();
+		return (false);
+	}
+	if (file.peek() == EOF){
+		log.error("Empty file.");
+		file.close();
+		return (false);
+	}
+	file.close();
+	return (true);
+}
+
+bool	checkFile(const std::string& fileName) {
 	Logger	log;
 	std::ifstream file;
 

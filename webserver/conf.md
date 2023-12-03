@@ -69,3 +69,9 @@ Definições ainda em processo de parseamento
 		autoindex true			# habilita listagem de diretórios
 	}
 ```
+
+Definições:
+
+- client_max_body_size:
+	Sets the maximum body size for client requests in bytes.
+	Megabytes, M, and Kilobytes, K, are the accepted units.

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/10 15:57:06 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 16:19:25 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,5 @@
 
 class	Server;
 class	ServerParser;
-
-bool	checkArgs(int argc, char *argv[]);
 
 #endif
