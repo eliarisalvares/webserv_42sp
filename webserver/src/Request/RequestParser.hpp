@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 15:05:11 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 01:55:59 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,15 @@
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
-# define TAB '\t'
+# define HTAB '\t'
 
 // others
 # define COLON ':'
+# define POINT '.'
+# define SLASH '/'
+
+// error messages
+# define HTTP_VERSION "invalid HTTP version"
 
 typedef std::map<std::string, std::string>	t_string_map;
 typedef std::pair<std::string, std::string>	t_string_pair;
@@ -82,7 +87,7 @@ public:
 		DIGIT, // (decimal 0-9)
 		DQUOTE, // (double quote)
 		HEXDIG, // (hexadecimal 0-9/A-F/a-f)
-		HTAB, // (horizontal tab)
+		// HTAB, // (horizontal tab)
 		// LF, // (line feed)
 		OCTET, // (any 8-bit sequence of data)
 		// SP, // (space)
@@ -120,7 +125,6 @@ private:
 	std::string		_version;
 
 	static std::string const	_right_protocol;
-	// static int const			_right_version;
 
 	// headers
 	std::string							_field_name;
@@ -136,6 +140,17 @@ private:
 	std::vector<char>					_body;
 	std::vector<char>::iterator			_body_it;
 	void								_print_body(void);
+
+	// throw exceptions
+	void	_invalid_request(
+		std::string const description,
+		std::string const value,
+		http::HttpStatus error_code
+	);
+	void	_invalid_request(
+		std::string const description,
+		http::HttpStatus error_code
+	);
 
 };
 
