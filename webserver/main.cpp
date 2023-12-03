@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 20:42:55 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 15:29:08 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,29 +32,29 @@ int	main(int argc, char *argv[]) {
 	}
 	(void)port;
 
-	bool	first_init = true;
+	// bool	first_init = true;
 
-	// o servidor deve sempre restartar em caso de algum erro na execução
-	while (true) {
-		try {
-			// create servers and sockets for each server
-			if (first_init)
-			{
-				// webserv.create_servers(port.getServersConf()); //send port.servers
-				first_init = false;
-			}
-			else
-				webserv.restart_socket_servers(); // criar os sockets novamente
-			webserv.init();
+	// // o servidor deve sempre restartar em caso de algum erro na execução
+	// while (true) {
+	// 	try {
+	// 		// create servers and sockets for each server
+	// 		if (first_init)
+	// 		{
+	// 			// webserv.create_servers(port.getServersConf()); //send port.servers
+	// 			first_init = false;
+	// 		}
+	// 		else
+	// 			webserv.restart_socket_servers(); // criar os sockets novamente
+	// 		webserv.init();
 
-			// main loop
-			webserv.run();
+	// 		// main loop
+	// 		webserv.run();
 
-		} catch (std::exception & e) {
-			log.error(e.what());
-			webserv.clean(); // para limparmos tudo que precisará ser limpo
-		}
-	}
+	// 	} catch (std::exception & e) {
+	// 		log.error(e.what());
+	// 		webserv.clean(); // para limparmos tudo que precisará ser limpo
+	// 	}
+	// }
 
 	return 0;
 }
