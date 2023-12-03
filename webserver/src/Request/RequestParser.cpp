@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:11:08 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 04:00:32 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 
 std::string const RequestParser::_right_protocol = "HTTP";
-// int const RequestParser::_right_version = 1;
 
 RequestParser::RequestParser(void):
 	_idx(0), _step(INIT) {
@@ -52,8 +51,12 @@ RequestParser::~RequestParser(void) {
 	// _result.clear();
 }
 
-RequestParser::Steps RequestParser::step(void) {
+RequestParser::Step RequestParser::step(void) const {
 	return this->_step;
+}
+
+void RequestParser::setStep(Step s) {
+	this->_step = s;
 }
 
 // general:
@@ -77,13 +80,22 @@ void RequestParser::method(char c) {
 	if (c >= 'A' && c <= 'Z')
 		_method.push_back(c);
 	else if (c == SP) {
-		if (_method.size() == 0) // " GET..." - iniciando com espaço
-			throw http::InvalidRequest(http::BAD_REQUEST);
+		if (_method.size() == 0)
+			_invalid_request(
+				"invalid method: method token begins with space",
+				http::BAD_REQUEST
+			);
 		_step = URI;
-		log.debug(_method);
+		log.debug("method", _method);
 	}
-	else // caracteres diferentes de letras maiúsculas
-		throw http::InvalidRequest(http::BAD_REQUEST);
+	else if (c == HTAB)
+		_invalid_request(
+			"invalid method/uri separator: horizontal tab", http::BAD_REQUEST
+		);
+	else
+		_invalid_request(
+			"invalid method: character is not upper case", http::BAD_REQUEST
+		);
 }
 
 // URI enconding (tb serve pra POST) - não entendi se posso receber https
@@ -94,49 +106,89 @@ void RequestParser::method(char c) {
 // o host pode ser um IP, que pode estar em ipv4 ou ipv6...
 // It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
 void RequestParser::uri(char c) {
-	if (c != SP) // make first validation
+	static bool init_uri = true;
+
+	if (c == SP && init_uri)
+		return ;
+	if (c != SP) { // make first validation
+		if (init_uri) {
+			if (c == HTAB)
+				_invalid_request(
+					"invalid method/uri separator: horizontal tab",
+					http::BAD_REQUEST
+				);
+			init_uri = false;
+		}
 		_uri.push_back(c);
+	}
 	else if (c == SP) {
-		log.debug(_uri);
+		log.debug("uri", _uri);
 		_step = PROTOCOL;
+		init_uri = true;
 	}
 	else
-		throw http::InvalidRequest(http::BAD_REQUEST);
+		_invalid_request("invalid uri", _uri, http::BAD_REQUEST);
 }
 
 // The HTTP version always takes the form "HTTP/x.x", uppercase
 void RequestParser::protocol(char c) {
-	static int n = 0;
+	static bool init_protocol = true;
 	// static std::string protocol; // testar se dá pra usar
 
-	if (c != '/') {
+	if (c == SP && init_protocol)
+		return ;
+	if (c != SLASH && c != CR && c != SP) {
+		if (init_protocol)
+			init_protocol = false;
 		_protocol.push_back(c);
-		n++;
 	}
-	else if (c == '/') {
+	else if (c == SLASH) {
 		if (_protocol.compare(_right_protocol) != 0)
-			throw http::InvalidRequest(http::NOT_FOUND); // erro que o nginx retorna
-			// throw http::InvalidRequest(http::BAD_REQUEST); // eu acho mais adequado
+			_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
+			// throw http::InvalidRequest(http::NOT_FOUND); // nginx
 		_step = VERSION;
-		log.debug(_protocol);
-	} // checkar _protocol == "HTTP"
+		log.debug("protocol", _protocol);
+		init_protocol = true;
+	}
+	else if (c == SP)
+		_invalid_request("invalid space in HTTP protocol", http::BAD_REQUEST);
+	else if (_protocol.compare(_right_protocol) == 0)
+		_invalid_request("missing HTTP version", http::BAD_REQUEST);
 	else
-		throw http::InvalidRequest(http::BAD_REQUEST);
+		_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 }
 
-// se número - verificar se é versão suportada
-// outro caracter - Bad Request
+// RFC 9110 - item 2.5. Protocol Version:
+// HTTP's version number consists of two decimal digits separated by a "."
+// (period or decimal point)
 void RequestParser::version(char c) {
-	// if (c != SP && ((c >= '0' && c <= '1') || c == '.')) // checkar para número
-	if (c != CR)
+	int size;
+
+	if (std::isdigit(c) || (c == POINT && !_version.empty()))
 		_version.push_back(c);
 	else if (c == CR) {
-		// if _version != "1.1"
-		_step = CR_FIRST_LINE;
-		log.debug(_version);
+		size = _version.size();
+		if (size == 3) {
+			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
+				_step = CR_FIRST_LINE;
+				log.debug("version", _version);
+			}
+			else
+				_invalid_request(
+					HTTP_VERSION, _version, http::HTTP_VERSION_NOT_SUPPORTED
+				);
+		}
+		else if (
+			size == 0
+			|| (size == 1 && _version[0] == '1')
+			|| (size == 2 && _version[0] == '1' && _version[1] == POINT)
+		)
+			_invalid_request(HTTP_VERSION, _version, http::BAD_REQUEST);
+		else
+			_invalid_request(HTTP_VERSION, _version, http::HTTP_VERSION_NOT_SUPPORTED);
 	}
 	else
-		throw http::InvalidRequest(http::BAD_REQUEST);
+		_invalid_request(HTTP_VERSION, http::BAD_REQUEST);
 }
 
 // Each part of a HTTP request is separated by a new line
@@ -180,12 +232,6 @@ void RequestParser::check_crlf(char c) {
 	}
 }
 
-void RequestParser::check_first_line(void) {
-	// method
-	// uri
-	// version
-}
-
 // headers
 // servers should treat headers as an unordered set
 // one line per header, of the form "Header-Name: value", ending with CRLF
@@ -223,12 +269,24 @@ void RequestParser::header(char c) {
 //             some-long-value-1b
 
 void RequestParser::_parse_field_name(char c) {
-	if (c != COLON) // make first validation
+	if (std::isalpha(c))
 		_field_name.push_back(c);
-	else {
-		log.debug(_field_name);
+	else if (std::isdigit(c) || c == '-') {
+		if (_field_name.empty())  // nginx aceita...
+			_invalid_request("field name begins with '-'", http::BAD_REQUEST);
+		_field_name.push_back(c);
+	}
+	else if (c == COLON) {
+		log.debug("key", _field_name);
 		_step = HEADER_VALUE;
 	}
+	else if (c == CR) {
+		log.warning("field name without value: " + _field_name);
+		_step = CR_HEADER;
+		_add_header();
+	}
+	else
+		_invalid_request("field name character", c, http::BAD_REQUEST);
 	// checkar espaços -> significa que é continuação do header anterior
 	// se for o primeiro, guarda com espaço
 
@@ -238,12 +296,11 @@ void RequestParser::_parse_field_name(char c) {
 
 // Any number of spaces or tabs may be between the ":" and the value
 void RequestParser::_parse_field_value(char c) {
-	if (c == SP || c == TAB)
+	if (c == SP || c == HTAB)
 		return ;
 	if (c == CR) {
-		log.debug(_field_value);
+		log.debug("value", _field_value);
 		_step = CR_HEADER;
-		// _last_header = _field_name; // verificar se faz deep copy...
 		_add_header();
 	}
 	else
@@ -270,46 +327,43 @@ void RequestParser::_add_header(void) {
 		v.push_back(_field_value);
 		_headers.insert(std::make_pair(_field_name, v));
 	}
-	else // tem o header
-		it->second.push_back(_field_value); // assumindo que ele já estará limpo de espaços e tabs no início
+	else // tem o header - se a linha começou com espaço/tab; se não dá erro!!
+		it->second.push_back(_field_value); // assumindo que ele já estará limpo de espaços e tabs no início e fim
 	_field_value.clear();
 	_field_name.clear();
 }
 
 void RequestParser::check_headers(void) {
-	// check se tem body -> passa _step = BODY (ver onde entra)
-
 	// 1 - verificar se tem o header obrigatório host
 	std::map<std::string, std::vector<std::string> >::iterator it;
 
 	it = _headers.find("host");
-	if (it == _headers.end()) {
-		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
+	if (it == _headers.end())
+		_invalid_request("header 'host' not found", http::BAD_REQUEST);
+	else if (it->second[0].size() == 0)
+		_invalid_request("header 'host' without value", http::BAD_REQUEST);
 
 	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
+	std::cout << GREY << "host size: " << it->second.size() << std::endl;
 	_print_headers();
 
-	// 3 - verificar se o método é permitido:
+	// ver onde a verificação da uri entra - encontrar o location
+	// uri
+	// not found here
+	_request->setUri(_uri);
+
+	// 3 - verificar se o método é permitido para o location:
 	try {
 		// esse check vai ter que levar em conta também o location
 		_request->setMethod(http::str_to_enum_method(_method));
 	} catch(const utils::GeneralException& e) {
 		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
 	} catch(const std::exception& e) {
-		log.error("error on request parsing: ");
-		log.error(e.what());
-		_request->setError(true);
-		_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
-		_step = END;
+		throw e;
 	}
 
-	// ver onde a verificação da uri entra
-	// uri
-	// not found here
-	_request->setUri(_uri);
-
-	// version
+	// check se tem body -> passa _step = BODY (ver onde entra)
+	// depende do loacation, método e headers
 }
 
 void RequestParser::_print_headers(void) {
@@ -386,6 +440,33 @@ void RequestParser::_print_body(void) {
 		}
 		std::cout << RESET << std::endl;
 	}
+}
+
+void RequestParser::_invalid_request(
+	std::string const description,
+	std::string const value,
+	http::HttpStatus error_code
+) {
+	log.warning("request parser: " + description, value);
+	throw http::InvalidRequest(error_code);
+}
+
+void RequestParser::_invalid_request(
+	std::string const description,
+	char const c,
+	http::HttpStatus error_code
+) {
+	log.warning_no_lf("request parser: " + description);
+	std::cout << GREY << c << std::endl;
+	throw http::InvalidRequest(error_code);
+}
+
+void RequestParser::_invalid_request(
+	std::string const description,
+	http::HttpStatus error_code
+) {
+	log.warning("request parser: " + description);
+	throw http::InvalidRequest(error_code);
 }
 
 // void RequestParser::break_data(char* buffer, size_t bytes_read) {

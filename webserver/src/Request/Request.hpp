@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:07:47 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/02 14:13:31 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ public:
 
 	// getters
 	Server*					server(void) const;
-	http::RequestMethod			method(void) const;
+	http::RequestMethod		method(void) const;
 	int						fd(void) const;
-	http::HttpStatus			status_code(void) const;
+	http::HttpStatus		status_code(void) const;
 	std::string				uri(void) const;
 	bool					has_error(void) const;
 	bool					is_chuncked(void) const;

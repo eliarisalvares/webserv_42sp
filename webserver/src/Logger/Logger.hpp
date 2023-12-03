@@ -22,16 +22,29 @@ Class to log error, warning or debug messages
     #define DEBUG true
 # endif
 
+# define DEBUG_LOG "[ DEBUG ] "
+# define INFO_LOG "[ INFO ] "
+# define WARNING_LOG "[ WARNING ] "
+# define ERROR_LOG "[ ERROR ] "
+
 class Logger {
 public:
 	Logger(void);
 	~Logger(void);
 
 	static void error(std::string const msg);
+	static void error(std::string const msg, std::string const value);
+	static void error_no_lf(std::string const msg);
 	static void strerror(std::string const msg, int error);
 	static void warning(std::string const msg);
+	static void warning(std::string const msg, std::string const value);
+	static void warning_no_lf(std::string const msg);
 	static void info(std::string const msg);
+	static void info(std::string const msg, std::string const value);
+	static void info_no_lf(std::string const msg);
 	static void debug(std::string const msg);
+	static void debug(std::string const msg, std::string const value);
+	static void debug_no_lf(std::string const msg);
 	static void success(std::string const msg);
 	static void title(std::string const msg);
 

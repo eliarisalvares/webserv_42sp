@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:11:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 03:26:45 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 }
 
 bool RequestBuilder::read(void) {
-	Logger log;
 	int error;
 
 	log.debug("reading data and saving it...");
@@ -48,10 +47,10 @@ bool RequestBuilder::read(void) {
 	error = errno;
 
 	if (_bytes_readed <= 0) {
-		std::cout << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
+		std::cout << ORANGE << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
 		if (_bytes_readed == 0) {
-			log.warning("client connection closed:");
-			printf(GREY "socket %d hung up\n" "RESET", this->_fd);
+			log.warning_no_lf("client connection closed: ");
+			printf(GREY "socket %d hung up\n" RESET, this->_fd); // podemos usar a printf (por ser cpp)?
 		} else
 			log.strerror("recv", error);
 
@@ -86,14 +85,9 @@ void RequestBuilder::parse(void) {
 					break;
 				case RequestParser::CR_FIRST_LINE:
 					_parser.check_crlf(c);
-					_parser.check_first_line();
 					break;
 				case RequestParser::HEADER:
-					_parser.header(c);
-					break;
 				case RequestParser::HEADER_NAME:
-					_parser.header(c);
-					break;
 				case RequestParser::HEADER_VALUE:
 					_parser.header(c);
 					break;
@@ -125,16 +119,9 @@ void RequestBuilder::parse(void) {
 					break;
 			}
 		} catch (http::InvalidRequest& e) {
-			log.warning(e.what());
-			_request->setError(true);
-			_request->setStatusCode(e.get_error_code());
-			_ready = true;
+			_setRequestError(e);
 		} catch (std::exception& e) {
-			log.error("error on request parsing: ");
-			log.error(e.what());
-			_request->setError(true);
-			_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
-			_ready = true;
+			_setRequestError(e);
 		}
 		if (_parser.step() == RequestParser::END)
 			_ready = true;
@@ -147,12 +134,25 @@ Request* RequestBuilder::build(void) {
 	// t_string_map parse_result = _parser.get_result();
 	Logger log;
 
-	// if (_parser.error())
-	// 	_request->setError(true);
 	this->_ready = false;
 	return _request;
 }
 
 bool RequestBuilder::is_ready(void) const {
 	return this->_ready;
+}
+
+void RequestBuilder::_setRequestError(http::InvalidRequest& e) {
+	log.warning(e.what());
+	_request->setStatusCode(e.get_error_code());
+	_request->setError(true);
+	_parser.setStep(RequestParser::END);
+}
+
+void RequestBuilder::_setRequestError(std::exception& e) {
+	log.error("error on request parsing: ");
+	log.error(e.what());
+	_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+	_request->setError(true);
+	_parser.setStep(RequestParser::END);
 }

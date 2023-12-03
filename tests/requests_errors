@@ -1,51 +1,86 @@
-GET HTTP/1.1
-GET / HTTP
-GET / HTTP/1.1 \r\nHost: test.com
-GET / HTTP/1.1 \\r\\n
-GE.T / HTTP/1.1
-GET / HTTP/sfe
+// errors returned on first line
+
+// method
+GE.T / HTTP/1.1 - ok
+ GET / HTTP/1.1 - ok
 400 Bad Request
 
-GET / ggg/1.1
-GET / http/1.1
-GET / http/2.0
-404 Not Found
-(não faz sentido...)
+// uri
+// tem que começar com / ou http://
 
-GET / HTTP/2.0
-GET / HTTP/5.0
+// separators
+GET	/ HTTP/1.1 (tab) - ok
+GET 	/ HTTP/1.1 (space and tab) - ok
+400 Bad Request
+GET /	HTTP/1.1 (tab)
+GET / 	HTTP/1.1 (space and tab)
+404 Not Found - dar Bad Request
+(provável lógica da uri)
+
+// protocol
+GET / QWER/1.1 - ok
+GET / http/1.1 - ok
+GET / http/2.0 - ok
+GET / ggg/1.1 - ok
+404 Not Found
+(não faz sentido...) - coloquei Bad Request
+
+// version
+GET / HTTP - ok
+GET / HTTP/ - ok
+GET / HTTP/s - ok
+GET / HTTP/. - ok
+GET / HTTP/1 - ok
+GET / HTTP/1. - ok
+GET / HTTP/0 - deixei 505 Version Not Supported
+400 Bad Request
+GET / HTTP/12 - ok
+GET / HTTP/2 - ok
+GET / HTTP/2. - ok
+GET / HTTP/2e - deixei como Bad Request
+GET / HTTP/123 - ok
+GET / HTTP/1.0 - ok (nginx suporta HTTP/1.0, nós não)
+GET / HTTP/2.0 - ok
+GET / HTTP/5.0 - ok
+GET / HTTP/1.11 - ok (nginx aceita)
 505 HTTP Version Not Supported
 
-"PUT / HTTP/1.1
-(CRLF)"
-"GET / HTTP/1.1
-(CRLF)"
-(sem header Host)
+// others
+GET / HTTP/1.1 \r\nHost: test.com
+GET / HTTP/1.1 \\r\\n
 400 Bad Request
 
+// headers validation
+// host header missing/without value
+"PUT / HTTP/1.1
+(CRLF)" - ok
+"GET / HTTP/1.1
+(CRLF)" - ok
+(sem header Host)
+"GET / HTTP/1.1
+host
+(CRLF)" - ok
+"GET / HTTP/1.1
+host:
+(CRLF)" - ok
+(header Host sem valor)
+"GET / HTTP/1.1
+ Host: ggf
+(CRLF)"
+(espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
+400 Bad Request
+
+// first line validation after reading all headers
 "CONNECT / HTTP/1.1
-Host: test.com"
+Host: test.com" - ok
 405 Not Allowed
-(o mesmo com POST, PUT... - tem que ter o header do Host, se não cai no caso acima)
+(o mesmo com POST, PUT... - tem que ter o header do Host)
 
 "GET / HTTP/1.1
 host: ewfa.com
 Content-Length: jheiuhryiue"
 (invalid Content-Length)
 400 Bad Request
-
-"     GET / HTTP/1.1"  - OK, retornando erro
-"GET / HTTP/1.1
- Host: ggf"
-(espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
-400 Bad Request
-
-GET / QWER/1.1
-GET / http/1.1
-404 Not Found
-vou implementar como Bad Request, pra mim faz mais sentido
-parece que ele interpreta como se fosse parte da URI, mas tem espaço...
-
 
 - ordem da check_headers():
 Primeiro parece checar os headers
@@ -54,13 +89,10 @@ sffj: fwfkl"
 400 Bad Request
 "GER / HTTP/1.1
 Host: ksfl"
-405 Not Allowed
+405 Not Allowed - ok
 "GER / HTTP/1.1
 Host: dsjfsdk
 Content-Length: jheiu"
 400 Bad Request
 
 
-"GET / HTTP/1.1
-host"
-400 Bad Request
