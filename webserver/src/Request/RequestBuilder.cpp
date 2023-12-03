@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 18:18:07 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/02 18:30:48 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,11 +88,7 @@ void RequestBuilder::parse(void) {
 					_parser.check_first_line();
 					break;
 				case RequestParser::HEADER:
-					_parser.header(c);
-					break;
 				case RequestParser::HEADER_NAME:
-					_parser.header(c);
-					break;
 				case RequestParser::HEADER_VALUE:
 					_parser.header(c);
 					break;
