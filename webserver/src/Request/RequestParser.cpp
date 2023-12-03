@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 02:02:20 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 04:00:32 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,12 +269,24 @@ void RequestParser::header(char c) {
 //             some-long-value-1b
 
 void RequestParser::_parse_field_name(char c) {
-	if (c != COLON) // make first validation
+	if (std::isalpha(c))
 		_field_name.push_back(c);
-	else {
+	else if (std::isdigit(c) || c == '-') {
+		if (_field_name.empty())  // nginx aceita...
+			_invalid_request("field name begins with '-'", http::BAD_REQUEST);
+		_field_name.push_back(c);
+	}
+	else if (c == COLON) {
 		log.debug("key", _field_name);
 		_step = HEADER_VALUE;
 	}
+	else if (c == CR) {
+		log.warning("field name without value: " + _field_name);
+		_step = CR_HEADER;
+		_add_header();
+	}
+	else
+		_invalid_request("field name character", c, http::BAD_REQUEST);
 	// checkar espaços -> significa que é continuação do header anterior
 	// se for o primeiro, guarda com espaço
 
@@ -315,8 +327,8 @@ void RequestParser::_add_header(void) {
 		v.push_back(_field_value);
 		_headers.insert(std::make_pair(_field_name, v));
 	}
-	else // tem o header
-		it->second.push_back(_field_value); // assumindo que ele já estará limpo de espaços e tabs no início
+	else // tem o header - se a linha começou com espaço/tab; se não dá erro!!
+		it->second.push_back(_field_value); // assumindo que ele já estará limpo de espaços e tabs no início e fim
 	_field_value.clear();
 	_field_name.clear();
 }
@@ -328,8 +340,11 @@ void RequestParser::check_headers(void) {
 	it = _headers.find("host");
 	if (it == _headers.end())
 		_invalid_request("header 'host' not found", http::BAD_REQUEST);
+	else if (it->second[0].size() == 0)
+		_invalid_request("header 'host' without value", http::BAD_REQUEST);
 
 	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
+	std::cout << GREY << "host size: " << it->second.size() << std::endl;
 	_print_headers();
 
 	// ver onde a verificação da uri entra - encontrar o location
