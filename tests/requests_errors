@@ -1,43 +1,77 @@
-GET HTTP/1.1
-GET / HTTP
-GET / HTTP/1.1 \r\nHost: test.com
-GET / HTTP/1.1 \\r\\n
-GE.T / HTTP/1.1
-GET / HTTP/sfe
+// errors returned on first line
+
+// method
+GE.T / HTTP/1.1 - ok
+ GET / HTTP/1.1 - ok
 400 Bad Request
 
-GET / ggg/1.1
+// uri
+// tem que começar com / ou http://
+
+// separators
+GET	/ HTTP/1.1 (tab) - ok
+GET 	/ HTTP/1.1 (space and tab) - ok
+400 Bad Request
+GET /	HTTP/1.1 (tab)
+GET / 	HTTP/1.1 (space and tab)
+404 Not Found - dar Bad Request
+(provável lógica da uri)
+
+// protocol - ok
 GET / http/1.1
 GET / http/2.0
+GET / ggg/1.1
 404 Not Found
-(não faz sentido...)
+(não faz sentido...) - coloquei Bad Request
 
+// version
+GET / HTTP
+GET / HTTP/
+GET / HTTP/s
+GET / HTTP/.
+GET / HTTP/1
+GET / HTTP/1.
+GET / HTTP/0 - coloquei como HTTP Version Not Supported
+400 Bad Request
+GET / HTTP/12
+GET / HTTP/2
+GET / HTTP/2.
+GET / HTTP/2e - está como Bad Request
 GET / HTTP/2.0
 GET / HTTP/5.0
 505 HTTP Version Not Supported
 
-"PUT / HTTP/1.1
-(CRLF)"
-"GET / HTTP/1.1
-(CRLF)"
-(sem header Host)
+// others
+GET / HTTP/1.1 \r\nHost: test.com
+GET / HTTP/1.1 \\r\\n
 400 Bad Request
 
+// headers validation
+// host header - ok
+"PUT / HTTP/1.1
+(CRLF)" - ok
+"GET / HTTP/1.1
+(CRLF)" - ok
+"GET / HTTP/1.1
+host
+(CRLF)" - ok
+(sem header Host)
+"GET / HTTP/1.1
+ Host: ggf
+(CRLF)" - ok
+(espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
+400 Bad Request
+
+// first line validation after reading all headers
 "CONNECT / HTTP/1.1
-Host: test.com"
+Host: test.com" - ok
 405 Not Allowed
-(o mesmo com POST, PUT... - tem que ter o header do Host, se não cai no caso acima)
+(o mesmo com POST, PUT... - tem que ter o header do Host)
 
 "GET / HTTP/1.1
 host: ewfa.com
 Content-Length: jheiuhryiue"
 (invalid Content-Length)
-400 Bad Request
-
-"     GET / HTTP/1.1"  - OK, retornando erro
-"GET / HTTP/1.1
- Host: ggf"
-(espaço no começo das linhas - não! -> ele não identificou "Host", mas sim " Host")
 400 Bad Request
 
 GET / QWER/1.1
@@ -54,13 +88,10 @@ sffj: fwfkl"
 400 Bad Request
 "GER / HTTP/1.1
 Host: ksfl"
-405 Not Allowed
+405 Not Allowed - ok
 "GER / HTTP/1.1
 Host: dsjfsdk
 Content-Length: jheiu"
 400 Bad Request
 
 
-"GET / HTTP/1.1
-host"
-400 Bad Request
