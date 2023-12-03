@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 20:54:18 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 15:06:44 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
 		if (input[i].substr(0, 9) == "location ") {
-			_locations.push_back(obtainLoc(input, i));
+			addLocation(obtainLoc(input, i));
 			while (input[i].substr() != "}")
 				i++;
 		}
@@ -74,14 +74,17 @@ Server& Server::operator=(Server const & copy) {
 void	Server::setBasics() {
 	std::vector<std::string>	serverName;
 	std::set<std::string>		index;
+	t_location					location;
 
 	serverName.push_back(SERVER_NAME);
 	index.insert("http");
+	location = initLocation();
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
 	setCGI(ftstring::split(".py python3", ' '));
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
+	_locations.push_back(location);
 	setUpPath("/content/"); //idk
 	setMethods(http::methods);
 	setIndex(index);

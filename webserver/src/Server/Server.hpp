@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/02 20:53:54 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 15:09:33 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,9 @@
 # include <stdio.h> // errors
 # include "ServerParser.hpp"
 # include "server_builder.hpp"
+# include "define_server.hpp"
 # include "http.hpp"
 
-# define BUFFSIZE 256 //buffersize ?
-# define CLIENT_MAX_BODY_SIZE 1000 //in bytes
-# define CGI_LOCATION "/cgi"
-# define CGI_EXECUTOR "python3"
-# define ERROR_PAGES "404 404.html" //error_pages
-# define LOCATION "/" 
-# define METHODS "GET, POST, DELETE" //allowed_methods
-# define ROOT "content"
-# define SERVER_NAME "WebWizards"
-# define SERVER_PORT "8080"
-# define TIMEOUT 5000 // precisa colocar?
 
 class Server {
 	friend class Response;
@@ -58,6 +48,7 @@ class Server {
 		void	setMethods(std::set<std::string> methods);
 		void	setIndex(std::set<std::string> index);
 		void	setName(std::vector<std::string> name);
+		void	addLocation(t_location location);
 
 		int							getSocket(void) const;
 		int							getPort(void) const;
