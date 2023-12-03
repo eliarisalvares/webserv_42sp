@@ -39,6 +39,15 @@ void	Server::addErrorPages(std::pair<int, std::string> paired) {
 		_error_pages.insert(paired);
 }
 
+void	Server::addLocation(t_location location) {
+	for (size_t i = 0; i < _locations.size(); i++) {
+		if (_locations[i].location == location.location)
+			_locations[i] = location;
+		else
+			_locations.push_back(location);
+	}
+}
+
 void	Server::setErrorPages(std::map<int, std::string> errorPages) {
 	this->_error_pages = errorPages;
 }

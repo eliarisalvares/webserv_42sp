@@ -1,5 +1,14 @@
 #include "server_builder.hpp"
 
+t_location	initLocation(void) {
+	t_location	location;
+
+	location.allowed_methods = http::methods;
+	location.location = LOCATION;
+	location.root = "/content";
+	return (location);
+}
+
 int	obtainPort(std::vector<std::string> input, int index) {
 	int		port;
 	Logger	log;

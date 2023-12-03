@@ -7,6 +7,7 @@
 # include <vector>
 # include <map>
 # include <set>
+# include "define_server.hpp"
 # include "ftstring.hpp"
 # include "Logger.hpp"
 # include "http.hpp"
@@ -19,10 +20,10 @@ typedef struct	s_permissions
 
 typedef struct	s_location
 {
-	std::string								location;
-	std::string								root;
+	std::string								location; // "/"
+	std::string								root; // "/content"
 	std::set<std::string>					allowed_methods; //std::set<std::string> _fill_methods(void)
-	std::set<std::string>					cgi;
+	std::set<std::string>					cgi; // .py python3
 	std::vector<std::string>				http_methods;
 	std::pair<unsigned int, std::string>	http_redirection;
 	t_permissions							permit;
@@ -39,6 +40,8 @@ std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index);
 std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index);
 std::set<std::string>		obtainIndex(std::vector<std::string> input, int index);
+
+t_location					initLocation(void);
 
 typedef unsigned int uint_t;
 
