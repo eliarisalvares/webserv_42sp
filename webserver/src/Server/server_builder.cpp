@@ -88,16 +88,21 @@ std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 
 t_location	obtainLoc(std::vector<std::string> input, int index) {
 	//deal with location :')
-	t_location	location;
-	Logger		log;
+	t_location					location;
+	Logger						log;
+	std::vector<std::string>	locName;
+
 
 	for (size_t i = index; i < input.size(); i++) {
-		if (input[i].substr(0, 7) == "location ") {
+		if (input[i].substr(0, 9) == "location ") {
+			locName = ftstring::split(input[i].substr(9), ' ');
+			location.location = locName[0];
 			//do stuff
 		}
-		if (input[index].substr() == "}")
+		if (input[i] == "}")
 			break ;
 	}
+	log.debug("Location saved", location.location);
 	return (location);
 }
 

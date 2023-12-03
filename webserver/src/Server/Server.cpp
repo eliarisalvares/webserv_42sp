@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/03 15:06:44 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 15:36:38 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Server::Server(int port): _port(port) {
 Server::Server(std::vector<std::string> input, size_t index) {
 	setBasics();
 	setPort(input, index);
+	int x = 0;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -35,6 +36,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
 		if (input[i].substr(0, 9) == "location ") {
+			x++;
 			addLocation(obtainLoc(input, i));
 			while (input[i].substr() != "}")
 				i++;
