@@ -1,20 +1,7 @@
-// Simple GET request - header "host" is mandatory -ok
 "GET / HTTP/1.1
 Host: test.com"
 HTTP/1.1 200 OK
 
-// first line validation
-"GET     /    HTTP/1.1
-Host: jjjjj"
-(aceita espaços entre os campos, incluindo no final - início dá erro)
-HTTP/1.1 200 OK
-
-// HTTP version
-GET / HTTP/1.0
-GET / HTTP/1.3
-HTTP/1.1 200 OK
-
-// Headers logic validation
 "GET / HTTP/1.1
 Host: test.com
 Accept-Language: pt"
@@ -31,14 +18,14 @@ Host: sfsd.com
 dedaef: ferfre"
 HTTP/1.1 200 OK
 
+"GET     /    HTTP/1.1
+Host: jjjjj"
+(espaços entre os campos, incluindo no final - início dá erro)
 "GET / HTTP/1.1
 host:     fdjhg"
 (espaços entre os campos, incluindo no final - início tem uma lógica que pode dar erro)
 HTTP/1.1 200 OK
 
-
-the following three URIs are equivalent:
-
-   http://example.com:80/~smith/home.html
-   http://EXAMPLE.com/%7Esmith/home.html
-   http://EXAMPLE.com:/%7esmith/home.html
+GET / HTTP/1.0
+GET / HTTP/1.3
+HTTP/1.1 200 OK

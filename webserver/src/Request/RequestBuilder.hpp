@@ -33,7 +33,8 @@ public:
 	void		parse(void);
 	Request*	build(void);
 
-	bool		is_ready(void) const;
+	Server*			getServer(void) const;
+	bool			is_ready(void) const;
 
 private:
 	RequestBuilder(void);
@@ -41,15 +42,13 @@ private:
 
 	int					_fd;
 	bool				_ready;
-	Server*				_server; // talvez não seja necessário
+	Server*				_server;
 	Request*			_request;
 
 	// parse data
 	size_t				_bytes_readed;
 	char*				_buffer;
 	RequestParser		_parser;
-	void				_setRequestError(http::InvalidRequest& e);
-	void				_setRequestError(std::exception& e);
 };
 
 #endif

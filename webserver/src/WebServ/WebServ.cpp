@@ -190,7 +190,7 @@ void WebServ::_receive(int fd) {
 		// if (request_builder->is_ready())
 		// 	request_builder->build();
 	}
-	else // verificar se é a tratativa certa
+	else
 		_end_connection(fd);
 }
 

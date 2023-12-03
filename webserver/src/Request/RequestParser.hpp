@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 03:16:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/02 12:10:58 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,10 @@
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
-# define HTAB '\t'
+# define TAB '\t'
 
 // others
 # define COLON ':'
-# define POINT '.'
-# define SLASH '/'
-
-// error messages
-# define HTTP_VERSION "invalid HTTP version"
 
 typedef std::map<std::string, std::string>	t_string_map;
 typedef std::pair<std::string, std::string>	t_string_pair;
@@ -48,7 +43,7 @@ public:
 	RequestParser& operator=(RequestParser const& copy);
 	~RequestParser(void);
 
-	enum Step {
+	enum Steps {
 		INIT,
 		FIRST_LINE,
 		METHOD,
@@ -87,15 +82,14 @@ public:
 		DIGIT, // (decimal 0-9)
 		DQUOTE, // (double quote)
 		HEXDIG, // (hexadecimal 0-9/A-F/a-f)
-		// HTAB, // (horizontal tab)
+		HTAB, // (horizontal tab)
 		// LF, // (line feed)
 		OCTET, // (any 8-bit sequence of data)
 		// SP, // (space)
 		VCHAR, //(any visible US-ASCII character)
 	}           t_abnf_rules;
 
-	Step			step(void) const;
-	void			setStep(Step s);
+	Steps			step(void);
 	void			method(char c);
 	void			uri(char c);
 	void			protocol(char c);
@@ -104,6 +98,7 @@ public:
 	void			body(char c);
 
 	void			check_crlf(char c);
+	void			check_first_line(void);
 	void			check_headers(void);
 
 	// void			break_data(char* buffer, size_t bytes_read);
@@ -113,7 +108,7 @@ public:
 private:
 	Logger								log;
 	size_t								_idx;
-	Step								_step;
+	Steps								_step;
 	Request*							_request;
 	// t_string_map						_result;
 
@@ -124,6 +119,7 @@ private:
 	std::string		_version;
 
 	static std::string const	_right_protocol;
+	// static int const			_right_version;
 
 	// headers
 	std::string							_field_name;
@@ -139,22 +135,6 @@ private:
 	std::vector<char>					_body;
 	std::vector<char>::iterator			_body_it;
 	void								_print_body(void);
-
-	// throw exceptions
-	void	_invalid_request(
-		std::string const description,
-		std::string const value,
-		http::HttpStatus error_code
-	);
-	void	_invalid_request(
-		std::string const description,
-		char const c,
-		http::HttpStatus error_code
-	);
-	void	_invalid_request(
-		std::string const description,
-		http::HttpStatus error_code
-	);
 
 };
 

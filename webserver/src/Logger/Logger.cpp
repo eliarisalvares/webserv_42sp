@@ -12,63 +12,25 @@ Logger const& Logger::operator=(Logger const & copy) {
 }
 
 void Logger::error(std::string const msg) {
-	std::cerr << ORANGE << ERROR_LOG << msg << RESET << std::endl;
-}
-
-void Logger::error(std::string const msg, std::string const value) {
-	std::cerr << ORANGE << ERROR_LOG << msg << ": |" << value << "|"
-			<< RESET << std::endl;
-}
-
-void Logger::error_no_lf(std::string const msg) {
-	std::cerr << ORANGE << ERROR_LOG << msg << RESET;
+	std::cerr << ORANGE << "[ ERROR ] " << msg << RESET << std::endl;
 }
 
 void Logger::strerror(std::string const msg, int error) {
-	std::cerr << ORANGE << ERROR_LOG << msg << ": "
+	std::cerr << ORANGE << "[ ERROR ] " << msg << ": "
 		<< std::strerror(error) << RESET;
 }
 
 void Logger::warning(std::string const msg) {
-	std::cout << YELLOW << WARNING_LOG << msg << RESET << std::endl;
-}
-
-void Logger::warning(std::string const msg, std::string const value) {
-	std::cout << YELLOW << WARNING_LOG << msg << ": |" << value << "|"
-			<< RESET << std::endl;
-}
-
-void Logger::warning_no_lf(std::string const msg) {
-	std::cout << YELLOW << WARNING_LOG << msg << RESET;
+	std::cout << YELLOW << "[ WARNING ] " << msg << RESET << std::endl;
 }
 
 void Logger::info(std::string const msg) {
-	std::cout << BLUE << INFO_LOG << msg << RESET << std::endl;
-}
-
-void Logger::info(std::string const msg, std::string const value) {
-	std::cout << BLUE << INFO_LOG << msg << ": |" << value << "|"
-			<< RESET << std::endl;
-}
-
-void Logger::info_no_lf(std::string const msg) {
-	std::cout << BLUE << INFO_LOG << msg << RESET;
+	std::cout << BLUE << "[ INFO ] " << msg << RESET << std::endl;
 }
 
 void Logger::debug(std::string const msg) {
 	if (DEBUG)
-		std::cout << GREY << DEBUG_LOG << msg << RESET << std::endl;
-}
-
-void Logger::debug(std::string const msg, std::string const value) {
-	if (DEBUG)
-		std::cout << GREY << DEBUG_LOG << msg << ": |" << value << "|"
-			<< RESET << std::endl;
-}
-
-void Logger::debug_no_lf(std::string const msg) {
-	if (DEBUG)
-		std::cout << GREY << DEBUG_LOG << msg << RESET;
+		std::cout << GREY << "[ DEBUG ] " << msg << RESET << std::endl;
 }
 
 void Logger::success(std::string const msg) {
