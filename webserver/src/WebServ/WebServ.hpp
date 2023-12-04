@@ -22,6 +22,8 @@
 
 # define PORT 8080
 
+# define POLLNOEVENT 0x000
+
 // server types
 typedef std::map<std::string, std::string>	t_infoServer;
 typedef std::map<int, Server*> t_server_map;

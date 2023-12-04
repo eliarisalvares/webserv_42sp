@@ -64,13 +64,14 @@ void	WebServ::create_servers(std::vector<std::string> input) {
 }
 
 void	WebServ::init(void) {
-	struct pollfd init;
+	pollfd init;
 	t_server_iterator it, end = this->_servers.end();
 
 	// Add each server socket ("listeners")
 	for (it = this->_servers.begin(); it != end; ++it) {
 		init.fd = it->first;
 		init.events = POLLIN; // Report ready to read on incoming connection
+		init.revents = POLLNOEVENT;
 		this->_pfds.push_back(init);
 		this->_serverSockets.push_back(init.fd);
 		this->_total_fds++;
@@ -164,6 +165,7 @@ void	WebServ::_create_connection(int server_fd) {
 	} else {
 		a.fd = newfd;
 		a.events = POLLIN | POLLOUT; // Check ready-to-read + write
+		a.revents = POLLNOEVENT;
 		this->_pfds.push_back(a);
 		// ensures we keep the relation between the connection and it's server
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
