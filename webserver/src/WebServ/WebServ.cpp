@@ -82,7 +82,7 @@ void	WebServ::run(void) {
 	int poll_count, fd;
 	Logger log;
 
-	log.debug("run");
+	log.info("Running webserv...");
 	while(true) {
 		// &(*this->_pfds.begin()
 		poll_count = poll(this->_pfds.data(), this->_pfds.size(), -1);
@@ -116,8 +116,6 @@ void	WebServ::run(void) {
 					// create Request object
 					Request* request;
 					request = this->_requestBuilderMap[fd]->build();
-					log.debug("creating request...");
-					// std::cout << request << std::endl;
 
 					_respond(request);
 					delete request;
@@ -171,6 +169,7 @@ void	WebServ::_create_connection(int server_fd) {
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
 		this->_total_fds++;
 
+		log.info("New connection requested and created.");
 		// >>>>>>>>>>>>>>>>>>>>>>> remove this
 		printf("poll server: new connection from %s on socket %d\n",
 			inet_ntop(
