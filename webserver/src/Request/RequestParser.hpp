@@ -123,6 +123,8 @@ private:
 	std::string		_protocol;
 	std::string		_version;
 	static std::string const	_right_protocol;
+	void						_check_uri(void);
+	void						_check_method(void);
 
 	// headers
 	int									_header_size;
@@ -135,6 +137,7 @@ private:
 	void								_check_host(void);
 	void								_check_content_length(void);
 	void								_check_transfer_encoding(void);
+	void								_check_post_headers(void);
 	void								_parse_field_name(char c);
 	void								_parse_field_value(char c);
 
