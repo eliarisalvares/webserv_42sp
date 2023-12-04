@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 00:45:11 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 01:24:05 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ RequestParser::RequestParser(void):
 	_last_header.clear();
 	_headers.clear();
 	_has_content_length = false;
+	_is_chunked = false;
 	_content_length = 0;
 	_max_body_size = 0;
 	_body_bytes_readed = 0;
@@ -35,6 +36,7 @@ RequestParser::RequestParser(Request* request):
 	_last_header.clear();
 	_headers.clear();
 	_has_content_length = false;
+	_is_chunked = false;
 	_content_length = 0;
 	_max_body_size = request->server()->getBodySize();
 	_body_bytes_readed = 0;
@@ -381,6 +383,7 @@ void RequestParser::check_request(void) {
 	_print_headers();
 	_check_host();
 	_check_content_length();
+	_check_transfer_encoding();
 	_headers.clear();
 
 	// check if the path exists and set it; get location
@@ -422,10 +425,9 @@ void RequestParser::_check_content_length(void) {
 	it_header = _headers.find("content-length");
 	if (it_header == _headers.end())
 		return ;
-	_has_content_length = true;
-
 	if (it_header->second.size() > 1)
 		_invalid_request("'Content-Length' header", http::BAD_REQUEST);
+	_has_content_length = true;
 
 	std::string content_lenght = it_header->second[0];
 	std::string::iterator it, end = content_lenght.end();
@@ -445,6 +447,19 @@ void RequestParser::_check_content_length(void) {
 			"Content-Lenght bigger than max body size",
 			http::CONTENT_TOO_LARGE
 		);
+}
+
+void RequestParser::_check_transfer_encoding(void) {
+	std::map<std::string, std::vector<std::string> >::iterator it_header;
+
+	it_header = _headers.find("transfer-encoding");
+	if (it_header == _headers.end())
+		return ;
+	if (it_header->second.size() > 1)
+		_invalid_request("'Transfer-Encoding' header", http::BAD_REQUEST);
+	if (it_header->second[0].compare("chunked") != 0)
+		_invalid_request("Transfer-Encoding type", http::NOT_IMPLEMENTED);
+	_is_chunked = true;
 }
 
 
@@ -566,7 +581,9 @@ void RequestParser::_invalid_request(
 // 	}
 // }
 
-// The most common use of POST, by far, is to submit HTML form data to CGI scripts. In this case, the Content-Type: header is usually application/x-www-form-urlencoded, and the Content-Length: header gives the length of the URL-encoded form data
+// The most common use of POST, by far, is to submit HTML form data to CGI scripts.
+// In this case, the Content-Type: header is usually application/x-www-form-urlencoded,
+// and the Content-Length: header gives the length of the URL-encoded form data
 // Ex:
 // POST /path/script.cgi HTTP/1.0
 // From: frog@jmarshall.com
@@ -594,9 +611,15 @@ void RequestParser::_invalid_request(
 // with a length of 34.
 
 // Using GET to Submit Query or Form Data
-// You can use GET to send small amounts of data to the server. The key is to understand just what the request URI is: It's not necessarily a file name, it's a string that identifies a data resource on the server. That may be a file name, but it may also be, for example, a specific query to a specific database. The result of that query may not live in a file, but it's a data resource all the same, identified by the search engine and the query data that together produce it.
+// You can use GET to send small amounts of data to the server. The key is to
+// understand just what the request URI is: It's not necessarily a file name,
+// it's a string that identifies a data resource on the server. That may be a file
+// name, but it may also be, for example, a specific query to a specific database.
+// The result of that query may not live in a file, but it's a data resource all
+// the same, identified by the search engine and the query data that together produce it.
 
-// So, to send data to a CGI script using a GET request, include that data after the question mark in the URL (read about URL syntax for more details). For example,
+// So, to send data to a CGI script using a GET request, include that data after
+// the question mark in the URL (read about URL syntax for more details). For example:
 
 // GET /path/script.cgi?field1=value1&field2=value2 HTTP/1.0
 
@@ -614,9 +637,6 @@ void RequestParser::_invalid_request(
 
 // "Transfer-Encoding: chunked" header. All HTTP 1.1 clients must be able to receive chunked messages
 // Servers aren't required to generate chunked messages; they just have to be able to receive them.
-
-
-// GET não pode ter body -> retornar erro
 
 // POST ->
 
