@@ -13,6 +13,8 @@ NAME = webserv
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -g3
 CXXDEBUG = -D DEBUG=true
+VALGRIND = valgrind --leak-check=full --show-leak-kinds=all \
+--trace-children=yes --track-origins=yes --track-fds=yes
 
 SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 				$(UTILS)
@@ -80,5 +82,8 @@ re: fclean all
 #run the program with args
 run:
 	./$(NAME) config/testconfig.conf
+
+val:
+	$(VALGRIND) ./$(NAME) config/testconfig.conf
 
 .PHONY: all clean fclean re

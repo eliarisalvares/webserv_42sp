@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/03 16:15:54 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:10:27 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,11 @@ Server::Server(std::vector<std::string> input, size_t index) {
 	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
-Server::~Server(void) { }
+Server::~Server(void) {
+	Logger log;
+
+	log.debug("Server cleaned", _port);
+}
 
 Server::Server(Server const& copy) { (void)copy; }
 

@@ -38,12 +38,14 @@ public:
 	static void strerror(std::string const msg, int error);
 	static void warning(std::string const msg);
 	static void warning(std::string const msg, std::string const value);
+	static void warning(std::string const msg, int const value);
 	static void warning_no_lf(std::string const msg);
 	static void info(std::string const msg);
 	static void info(std::string const msg, std::string const value);
 	static void info_no_lf(std::string const msg);
 	static void debug(std::string const msg);
 	static void debug(std::string const msg, std::string const value);
+	static void debug(std::string const msg, int const value);
 	static void debug_no_lf(std::string const msg);
 	static void success(std::string const msg);
 	static void title(std::string const msg);
