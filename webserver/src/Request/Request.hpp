@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 14:13:31 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 23:57:27 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ public:
 	int						fd(void) const;
 	http::HttpStatus		status_code(void) const;
 	std::string				uri(void) const;
+	std::string				host(void) const;
+	t_location*				location(void) const;
 	bool					has_error(void) const;
 	bool					is_chuncked(void) const;
 	http::ContentType		content_type(void) const;
@@ -45,6 +47,8 @@ public:
 	void					setMethod(http::RequestMethod method);
 	void					setStatusCode(http::HttpStatus status);
 	void					setUri(std::string const uri);
+	void					setLocation(t_location* location);
+	void					setHost(std::string const host);
 	void					setError(bool has_error);
 	void					setChuncked(bool is_chuncked);
 	void					setContentType(http::ContentType type);
@@ -58,12 +62,13 @@ private:
 	http::RequestMethod		_method;
 	http::HttpStatus		_status_code;
 	std::string				_uri;
-	bool					_is_chuncked;
+	t_location*				_location;
 
 	// headers data
 	std::string				_host;
 	http::ContentType		_content_type;
 	size_t					_content_length;
+	bool					_is_chuncked;
 
 };
 

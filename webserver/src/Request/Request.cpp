@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:06:03 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 23:57:18 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ Request::Request(void):
 	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
-	_is_chuncked(false),
+	_location(NULL),
 	_host(""),
 	_content_type(),
-	_content_length(0) { }
+	_content_length(0),
+	_is_chuncked(false) { }
 
 Request::Request(int fd, Server* server):
 	_server(server),
@@ -30,10 +31,11 @@ Request::Request(int fd, Server* server):
 	_method(http::GET),
 	_status_code(http::OK),
 	_uri("/"),
-	_is_chuncked(false),
+	_location(NULL),
 	_host(""),
 	_content_type(),
-	_content_length(0) { }
+	_content_length(0),
+	_is_chuncked(false) { }
 
 Request::~Request(void) { }
 
@@ -49,7 +51,9 @@ Request const& Request::operator=(Request const & copy) {
 	return *this;
 }
 
+
 /********************************** GETTERS **********************************/
+
 Server* Request::server(void) const {
 	return this->_server;
 }
@@ -71,6 +75,14 @@ std::string Request::uri(void) const {
 	return this->_uri;
 }
 
+std::string Request::host(void) const {
+	return this->_host;
+}
+
+t_location* Request::location(void) const {
+	return this->_location;
+}
+
 bool Request::has_error(void) const {
 	return this->_error;
 }
@@ -87,7 +99,9 @@ size_t Request::content_length(void) const {
 	return this->_content_length;
 }
 
+
 /********************************** SETTERS **********************************/
+
 void Request::setMethod(http::RequestMethod method) {
 	this->_method = method;
 }
@@ -99,6 +113,15 @@ void Request::setStatusCode(http::HttpStatus status) {
 void Request::setUri(std::string const uri) {
 	this->_uri = uri;
 }
+
+void Request::setLocation(t_location* location) {
+	this->_location = location;
+}
+
+void Request::setHost(std::string const host) {
+	this->_host = host;
+}
+
 
 void Request::setError(bool has_error) {
 	this->_error = has_error;
