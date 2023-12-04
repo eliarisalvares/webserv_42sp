@@ -95,6 +95,8 @@ const char* http::InvalidRequest::what() const throw() {
       return "411 Length required";
     case http::URI_TOO_LONG:
       return "414 Request URI too long";
+    case http::CONTENT_TOO_LARGE:
+      return "501 Content Too Large";
     case http::HTTP_VERSION_NOT_SUPPORTED:
       return "505 HTTP version not supported";
     default:

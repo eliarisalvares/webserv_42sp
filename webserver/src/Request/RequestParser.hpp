@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 01:02:03 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 02:03:36 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,9 +147,11 @@ private:
 	size_t								_content_length;
 	size_t								_max_body_size;
 	size_t								_body_bytes_readed;
+	// size_t								_chunk_bytes_readed;
 	std::vector<char>					_body;
 	std::vector<char>::iterator			_body_it;
 	void								_print_body(void);
+	void								_body_chunked(char c);
 
 	// throw exceptions
 	void	_invalid_request(
