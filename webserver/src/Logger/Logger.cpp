@@ -38,6 +38,11 @@ void Logger::warning(std::string const msg, std::string const value) {
 			<< RESET << std::endl;
 }
 
+void Logger::warning(std::string const msg, int const value) {
+	std::cout << YELLOW << WARNING_LOG << msg << ": |" << value << "|"
+			<< RESET << std::endl;
+}
+
 void Logger::warning_no_lf(std::string const msg) {
 	std::cout << YELLOW << WARNING_LOG << msg << RESET;
 }
@@ -61,6 +66,12 @@ void Logger::debug(std::string const msg) {
 }
 
 void Logger::debug(std::string const msg, std::string const value) {
+	if (DEBUG)
+		std::cout << GREY << DEBUG_LOG << msg << ": |" << value << "|"
+			<< RESET << std::endl;
+}
+
+void Logger::debug(std::string const msg, int const value) {
 	if (DEBUG)
 		std::cout << GREY << DEBUG_LOG << msg << ": |" << value << "|"
 			<< RESET << std::endl;

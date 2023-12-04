@@ -128,6 +128,17 @@ void	WebServ::run(void) {
 	}
 }
 
+
+void	WebServ::stop(void) {
+	if (_servers.size()) {
+		for (size_t i = 0; i < _servers.size(); i++) {
+			if (_servers[i])
+				delete _servers[i];
+		}
+	}
+	clear_fds();
+}
+
 bool	WebServ::_is_server_socket(int fd) {
 	std::vector<int>::iterator it, end = this->_serverSockets.end();
 

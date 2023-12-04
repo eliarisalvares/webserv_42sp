@@ -6,22 +6,38 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/03 16:44:39 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 13:54:47 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include "src/WebServ/WebServ.hpp"
 
+WebServ	webserv;
+
+void interrupt(int sig)
+{
+	Logger log;
+	std::cout << '\n';
+	log.warning("Received signal ", sig + 128);
+	webserv.stop();
+	exit(0);
+}
+
 int	main(int argc, char *argv[]) {
 	Logger log;
+
+	struct sigaction interruptHandler;
+	interruptHandler.sa_handler = interrupt;
+	sigemptyset(&interruptHandler.sa_mask);
+	interruptHandler.sa_flags = 0;
+	sigaction(SIGINT, &interruptHandler, 0);
 
 	if (!checkArgs(argc, argv))
 		return 1;
 
-	WebServ	webserv;
-	ServerParser	port;
 	try {
+		ServerParser	port;
 		port.setConf(argv[1]);
 		webserv.create_servers(port.getConf());
 		log.info("webserv configured.");

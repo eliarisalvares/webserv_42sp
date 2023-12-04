@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 16:19:34 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:15:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define UTILS_HPP
 
 # include <string>
+# include <unistd.h> // close()
 
 namespace utils {
 
@@ -36,5 +37,6 @@ class utils::GeneralException: public std::exception {
 
 bool	checkFileWorks(const std::string& fileName);
 bool	checkArgs(int argc, char *argv[]);
+void	clear_fds(void);
 
 #endif
