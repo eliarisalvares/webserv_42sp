@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 19:50:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 23:38:16 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,25 +107,21 @@ public:
 	void			body(char c);
 
 	void			check_crlf(char c);
-	void			check_headers(void);
+	void			check_request(void);
 
 	// void			break_data(char* buffer, size_t bytes_read);
-
-	// t_string_map	get_result(void) const;
 
 private:
 	Logger								log;
 	size_t								_idx;
 	Step								_step;
 	Request*							_request;
-	// t_string_map						_result;
 
 	// request first line
 	std::string		_method;
 	std::string		_uri;
 	std::string		_protocol;
 	std::string		_version;
-
 	static std::string const	_right_protocol;
 
 	// headers
@@ -142,6 +138,9 @@ private:
 	void								_parse_field_value(char c);
 
 	// body
+	size_t								_content_length;
+	size_t								_max_body_size;
+	size_t								_body_bytes_readed;
 	std::vector<char>					_body;
 	std::vector<char>::iterator			_body_it;
 	void								_print_body(void);
