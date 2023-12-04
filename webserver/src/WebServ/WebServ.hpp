@@ -55,8 +55,6 @@ public:
 	void	clean(void);
 	void	restart_socket_servers(void);
 
-	Logger	log;
-
 private:
 	// we want only one instance of WebServ, without copy
 	WebServ(WebServ const& copy);

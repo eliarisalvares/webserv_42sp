@@ -12,7 +12,6 @@ t_location	initLocation(void) {
 
 int	obtainPort(std::vector<std::string> input, int index) {
 	int		port;
-	Logger	log;
 
 	if (input[index].substr(0, 7) == "listen ") {
 		port = ftstring::strtoi(input[index].substr(7));
@@ -20,7 +19,7 @@ int	obtainPort(std::vector<std::string> input, int index) {
 			throw PortNotFoundErrorExeption();
 		if (port < 1024)
 			throw PortNeedsSudoExeption();
-		log.debug("Port successfully setted from .conf file.");
+		Logger::debug("Port successfully setted from .conf file.");
 	}
 	return (port);
 }
@@ -29,7 +28,6 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 	int							bodySize;
 	std::string					bodySizeString;
 	std::vector<std::string>	words;
-	Logger						log;
 
 	if (input[index].substr(0, 21) == "client_max_body_size ") {
 		words = ftstring::split(input[index].substr(21), ' ');
@@ -48,7 +46,7 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 		}
 		if (bodySize > 1000000)
 			throw TooLargeException();
-		log.debug("client_max_body_size setted from .conf file.");
+		Logger::debug("client_max_body_size setted from .conf file.");
 	}
 	return (bodySize);
 }
@@ -56,13 +54,12 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 std::string	obtainRoot(std::vector<std::string> input, int index) {
 	std::string					root;
 	std::vector<std::string>	words;
-	Logger						log;
 
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
 		root = "/content" + words[0];
 		//check if root makes sense/exists
-		log.debug("Root setted from .conf file.");
+		Logger::debug("Root setted from .conf file.");
 	}
 	return (root);
 }
@@ -70,7 +67,6 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
-	Logger						log;
 
 	if (input[index].substr(0, 4) == "cgi ") {
 		name = input[index].substr(4);
@@ -79,7 +75,7 @@ std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index) {
 			throw CGIMissconfigurationException();
 		else if (serverName[0] != ".py" || serverName[1] != "python3")
 			throw CGINotSupportedException();
-		log.debug("CGI setted from .conf file.");
+		Logger::debug("CGI setted from .conf file.");
 	}
 	return (serverName);
 }
@@ -87,12 +83,11 @@ std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index) {
 std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
-	Logger						log;
 
 	if (input[index].substr(0, 7) == "server_name ") {
 		name = input[index].substr(7);
 		serverName = ftstring::split(name, ' ');
-		log.debug("Server name setted from .conf file.");
+		Logger::debug("Server name setted from .conf file.");
 	}
 	return (serverName);
 }
@@ -100,7 +95,6 @@ std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 t_location	obtainLoc(std::vector<std::string> input, int index) {
 	//deal with location :')
 	t_location					location;
-	Logger						log;
 	std::vector<std::string>	locName;
 
 	location = initLocation();
@@ -119,14 +113,13 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.index = obtainIndex(input, i);
 		// faltam todas as infos referentes a response ->http methods, cgi, redirecionamento, permissões, ?
 	}
-	log.debug("Location saved", location.location);
+	Logger::debug("Location saved", location.location);
 	return (location);
 }
 
 std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 	std::set<std::string>		methods;
 	std::vector<std::string>	words;
-	Logger						log;
 
 	if (input[index].substr(0, 16) == "allowed_methods ") {
 		words = ftstring::split(input[index].substr(16), ' ');
@@ -138,7 +131,7 @@ std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 			else
 				throw InvalidMethodsException();
 		}
-		log.debug("Allowed Methods setted from .conf file.");
+		Logger::debug("Allowed Methods setted from .conf file.");
 	}
 	return (methods);
 }
@@ -147,7 +140,6 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 	std::pair<int, std::string>	paired;
 	std::vector<std::string>	words;
 	int							nbr;
-	Logger						log;
 
 	if (input[index].substr(0, 11) == "error_page ") {
 		words = ftstring::split(input[index].substr(11), ' ');
@@ -157,7 +149,7 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 		//verificar se o numero de erro é valido
 		//verificar arquivo -> existe e é valido ("/content/error_pages/" + words[1]);
 		paired = std::make_pair(nbr, "/content/error_pages/" + words[1]);
-		log.debug("Error page setted from .conf file.");
+		Logger::debug("Error page setted from .conf file.");
 	}
 	return (paired);
 }
@@ -165,7 +157,6 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	std::set<std::string>		value;
 	std::vector<std::string>	words;
-	Logger						log;
 
 	if (input[index].substr(0, 6) == "index ") {
 		words = ftstring::split(input[index].substr(16), ' ');
@@ -173,7 +164,7 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 			value.insert("/content/" + words[j]);
 			//verificar se arquivo existe e tem permissão
 		}
-		log.debug("Index setted from .conf file.");
+		Logger::debug("Index setted from .conf file.");
 	}
 	return (value);
 }

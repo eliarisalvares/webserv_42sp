@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 02:35:01 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:27:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,17 +42,17 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 bool RequestBuilder::read(void) {
 	int error;
 
-	log.debug("reading data and saving it...");
+	Logger::debug("reading data and saving it...");
 	_bytes_readed = recv(_fd, _buffer, _server->getBufferSize(), 0);
 	error = errno;
 
 	if (_bytes_readed <= 0) {
 		std::cout << ORANGE << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
 		if (_bytes_readed == 0) {
-			log.warning_no_lf("client connection closed: ");
+			Logger::warning_no_lf("client connection closed: ");
 			printf(GREY "socket %d hung up\n" RESET, this->_fd); // podemos usar a printf (por ser cpp)?
 		} else
-			log.strerror("recv", error);
+			Logger::strerror("recv", error);
 
 		close(this->_fd);
 		return false;
@@ -132,7 +132,7 @@ void RequestBuilder::parse(void) {
 
 Request* RequestBuilder::build(void) {
 	if (!_request->has_error())
-		log.info("Request parsed and created successfully.");
+		Logger::info("Request parsed and created successfully.");
 	this->_ready = false;
 	return _request;
 }
@@ -142,15 +142,15 @@ bool RequestBuilder::is_ready(void) const {
 }
 
 void RequestBuilder::_setRequestError(http::InvalidRequest& e) {
-	log.warning(e.what());
+	Logger::warning(e.what());
 	_request->setStatusCode(e.get_error_code());
 	_request->setError(true);
 	_parser.setStep(RequestParser::END);
 }
 
 void RequestBuilder::_setRequestError(std::exception& e) {
-	log.error("error on request parsing: ");
-	log.error(e.what());
+	Logger::error("error on request parsing: ");
+	Logger::error(e.what());
 	_request->setStatusCode(http::INTERNAL_SERVER_ERROR);
 	_request->setError(true);
 	_parser.setStep(RequestParser::END);
