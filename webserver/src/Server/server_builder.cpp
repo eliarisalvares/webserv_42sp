@@ -102,6 +102,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
 			location.location = locName[0];
+			if (locName[1] != "{")
+				throw LocationNotOpenedException();
 		}
 		if (input[i] == "}")
 			break ;
