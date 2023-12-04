@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 03:16:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 19:50:39 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@
 // error messages
 # define HTTP_VERSION "invalid HTTP version"
 
+# define HEADER_LIMIT_SIZE 10240 // ???????????????
+
 typedef std::map<std::string, std::string>	t_string_map;
 typedef std::pair<std::string, std::string>	t_string_pair;
 
@@ -58,6 +60,7 @@ public:
 		CR_FIRST_LINE,
 		HEADER,
 		HEADER_NAME,
+		HEADER_VALUE_INIT,
 		HEADER_VALUE,
 		CR_HEADER,
 		SECOND_CR_HEADER,
@@ -126,12 +129,15 @@ private:
 	static std::string const	_right_protocol;
 
 	// headers
+	int									_header_size;
 	std::string							_field_name;
 	std::string							_field_value;
 	std::string							_last_header;
 	std::map<std::string, std::vector<std::string> >	_headers;
 	void								_add_header(void);
 	void								_print_headers(void);
+	void								_check_host(void);
+	void								_check_content_length(void);
 	void								_parse_field_name(char c);
 	void								_parse_field_value(char c);
 
