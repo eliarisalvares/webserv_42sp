@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 01:24:05 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 02:45:36 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -430,6 +430,10 @@ void RequestParser::_check_content_length(void) {
 
 	std::stringstream ss(content_lenght);
 	ss >> _content_length;
+	// verificar porque não ficou setado no início...
+	_max_body_size = _request->server()->getBodySize();
+	// std::cout << GREY << "max_body_size: " << _max_body_size
+	// 			<< "content_length: " << _content_length << std::endl;
 	if (_content_length > _max_body_size)
 		_invalid_request(
 			"Content-Lenght bigger than max body size",
@@ -520,28 +524,47 @@ void RequestParser::_print_headers(void) {
 // Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
 
 void RequestParser::body(char c) {
-	if (_step == BODY_NEW_LINE) {
-		if (c == CR) {
-			_step = SECOND_CR_BODY;
-			if (DEBUG) {
-				std::cout << GREY << "Received body:\n";
-				_print_body();
-			}
-			return ;
+	if (_is_chunked)
+		return _body_chunked(c);
+	_body.push_back(c);  // em tese pode fazer isso pq se content-length == 0 dá erro antes
+	// ver como lidar com o parseamento
+	++_body_bytes_readed;
+	if (_body_bytes_readed == _content_length) {
+		_step = END;
+		if (DEBUG) {
+			std::cout << GREY << "Received body:\n";
+			_print_body();
 		}
-		else
-			_step = BODY;
 	}
-	if (_step == BODY) {
-		if (c == CR)
-			_step = CR_BODY;
-		else
-			_body.push_back(c);
-	}
-	// if (_step == HEADER_NAME)
-	// 	_parse_field_name(c);
-	// else if (_step == HEADER_VALUE)
-	// 	_parse_field_value(c);
+	// if (_step == BODY_NEW_LINE) {
+	// 	if (c == CR) {
+	// 		_step = SECOND_CR_BODY;
+	// 		if (DEBUG) {
+	// 			std::cout << GREY << "Received body:\n";
+	// 			_print_body();
+	// 		}
+	// 		return ;
+	// 	}
+	// 	else
+	// 		_step = BODY;
+	// }
+	// if (_step == BODY) {
+	// 	if (c == CR)
+	// 		_step = CR_BODY;
+	// 	else if (_is_chunked)
+	// 		_parse_chunk(c);
+	// 	else
+	// 		_body.push_back(c);
+	// }
+}
+
+void RequestParser::_body_chunked(char c) {
+	(void)c;
+	_step = END;
+	// if (DEBUG) {
+	// 	std::cout << GREY << "Received body:\n";
+	// 	_print_body();
+	// }
 }
 
 void RequestParser::_print_body(void) {
