@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:06:12 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 19:29:00 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,12 @@
 
 namespace http {
 
+// methods implemented in webserv
 std::set<std::string> _fill_methods(void) {
 	std::string methods_names[] = {
 		"GET",
 		"POST",
 		"DELETE",
-		// "PUT",
-		// "PATCH",
-		// "HEAD",
-		// "CONNECT",
-		// "OPTIONS",
-		// "TRACE",
 	};
 	std::set<std::string> methods (methods_names, methods_names + 3);
 	return methods;
@@ -67,14 +62,14 @@ std::string enum_to_str_method(RequestMethod method) {
 	return it->second;
 }
 
-// headers that needs a validation - não sei se isso vai ser útil
+// headers that needs a validation / singletons
 std::set<std::string> _fill_headers(void) {
 	std::string headers_names[] = {
-		"Host", // obrigatório, se não tiver retorna 400 - Bad Request
-		"Content-Length",  // número
-		"Content-Type",  // ?
+		"host",
+		"content-length",
+		// "content-type", // não é singleton, podemos ignorar o tipo
 	};
-	std::set<std::string> headers (headers_names, headers_names + 3);
+	std::set<std::string> headers (headers_names, headers_names + 2);
 	return headers;
 }
 

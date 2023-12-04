@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/02 12:06:18 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/03 16:17:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,9 @@ namespace http {
 	RequestMethod	str_to_enum_method(std::string method);
 	std::string		enum_to_str_method(RequestMethod method);
 
-	// headers that needs a validation - não sei se isso vai ser útil
+	// headers that needs a validation / singletons
 	std::set<std::string>				_fill_headers(void);
-	static std::set<std::string> const	headers = http::_fill_headers();
+	static std::set<std::string> const	special_headers = http::_fill_headers();
 
 	class InvalidRequest;
 	class InvalidErrorCode;

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 04:00:32 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 21:57:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,9 +161,26 @@ void RequestParser::protocol(char c) {
 // RFC 9110 - item 2.5. Protocol Version:
 // HTTP's version number consists of two decimal digits separated by a "."
 // (period or decimal point)
+// version format: <major-version>.<minor-version>
+
+// RFC 9110 - item 6.2. Control Data:
+// A server can send a 505 (HTTP Version Not Supported) response if it wishes,
+// for any reason, to refuse service of the client's major protocol version.
+// if major-version != 1: refuse -> 505
+
+// RFC 9110 - item 6.2. Control Data:
+// A recipient that receives a message with a major version number that it
+// implements and a minor version number higher than what it implements SHOULD
+// process the message as if it were in the highest minor version within that
+// major version to which the recipient is conformant
+// temos que aceitar 1.2, 1.3, 1.11
+// não precisamos aceitar 1.0?
+
 void RequestParser::version(char c) {
 	int size;
 
+	if (c == SP && !_version.empty())
+		return ;
 	if (std::isdigit(c) || (c == POINT && !_version.empty()))
 		_version.push_back(c);
 	else if (c == CR) {
@@ -236,28 +253,52 @@ void RequestParser::check_crlf(char c) {
 // servers should treat headers as an unordered set
 // one line per header, of the form "Header-Name: value", ending with CRLF
 // you should handle LF correctly
-// The header name is not case-sensitive (though the value may be) - Header
-// name can be either title-case or lowercase or mixed, all are valid
 // HTTP 1.1 defines 46 headers, and one (Host:) is required in requests.
+
+// A server MUST NOT apply a request to the target resource until it receives the
+// entire request header section, since later header field lines might include
+// conditionals, authentication credentials, or deliberately misleading duplicate
+// header fields that could impact request processing
 void RequestParser::header(char c) {
 	if (_step == HEADER) {
 		if (c == CR) {
 			_step = SECOND_CR_HEADER;
 			return ;
 		}
+		else if (c == SP || c == HTAB) {
+			_field_name = _last_header;
+			_step = HEADER_VALUE_INIT;
+		}
 		else
 			_step = HEADER_NAME;
+
 	}
-	if (_step == HEADER_NAME)
-		_parse_field_name(c);
-	else if (_step == HEADER_VALUE)
-		_parse_field_value(c);
+	switch (_step) {
+		case HEADER_NAME:
+			_parse_field_name(c);
+			break;
+		case HEADER_VALUE_INIT:
+			if (c == SP || c == HTAB)
+				return ;
+			_step = HEADER_VALUE;
+			_parse_field_value(c);
+			break;
+		case HEADER_VALUE:
+			_parse_field_value(c);
+			break;
+		default:
+			break;
+	}
 }
 
 // Field name:
 // The requested field name. It MUST conform to the field-name syntax defined
 // in Section 5.1, and it SHOULD be restricted to just letters, digits,
 // and hyphen ('-') characters, with the first character being a letter.
+// nginx não segue essas regras, aceita qualquer coisa, google tb...
+
+// The header name is not case-sensitive (though the value may be) - Header
+// name can be either title-case or lowercase or mixed, all are valid
 
 // nos headers parece considerar um espaço no começo do nome do header como parte dele
 // interpreta " Host" e não "Host" (dá erro porque considera que o header não está incluso)
@@ -268,41 +309,37 @@ void RequestParser::header(char c) {
 // HEADER1:    some-long-value-1a,
 //             some-long-value-1b
 
+static bool is_ctl(char c) {
+  return ((c >= 0 && c < 32) || c == 127);
+}
+
 void RequestParser::_parse_field_name(char c) {
-	if (std::isalpha(c))
+	if (c != COLON && !is_ctl(c) && c != SP)
 		_field_name.push_back(c);
-	else if (std::isdigit(c) || c == '-') {
-		if (_field_name.empty())  // nginx aceita...
-			_invalid_request("field name begins with '-'", http::BAD_REQUEST);
-		_field_name.push_back(c);
-	}
 	else if (c == COLON) {
 		log.debug("key", _field_name);
-		_step = HEADER_VALUE;
+		_step = HEADER_VALUE_INIT;
 	}
 	else if (c == CR) {
-		log.warning("field name without value: " + _field_name);
+		// log.warning("field name without value: " + _field_name);
 		_step = CR_HEADER;
 		_add_header();
 	}
 	else
 		_invalid_request("field name character", c, http::BAD_REQUEST);
-	// checkar espaços -> significa que é continuação do header anterior
-	// se for o primeiro, guarda com espaço
-
-	// if (c == CR)
-	// erro - não, ele ignora, a não ser que seja um header que tem validação
 }
 
 // Any number of spaces or tabs may be between the ":" and the value
 void RequestParser::_parse_field_value(char c) {
-	if (c == SP || c == HTAB)
-		return ;
+	// if (c == SP || c == HTAB) // só pode ser no começo
+	// 	return ;
 	if (c == CR) {
 		log.debug("value", _field_value);
 		_step = CR_HEADER;
 		_add_header();
 	}
+	else if (is_ctl(c) && c != HTAB)
+		_invalid_request("control character on field value", http::BAD_REQUEST);
 	else
 		_field_value.push_back(c);
 }
@@ -334,18 +371,9 @@ void RequestParser::_add_header(void) {
 }
 
 void RequestParser::check_headers(void) {
-	// 1 - verificar se tem o header obrigatório host
-	std::map<std::string, std::vector<std::string> >::iterator it;
-
-	it = _headers.find("host");
-	if (it == _headers.end())
-		_invalid_request("header 'host' not found", http::BAD_REQUEST);
-	else if (it->second[0].size() == 0)
-		_invalid_request("header 'host' without value", http::BAD_REQUEST);
-
-	// 2 - check de alguns headers: verificar se os valores dos headers estão compatíveis
-	std::cout << GREY << "host size: " << it->second.size() << std::endl;
 	_print_headers();
+
+	_check_host();
 
 	// ver onde a verificação da uri entra - encontrar o location
 	// uri
@@ -364,7 +392,27 @@ void RequestParser::check_headers(void) {
 
 	// check se tem body -> passa _step = BODY (ver onde entra)
 	// depende do loacation, método e headers
+	_headers.clear();
 }
+
+// header Host is mandatory and singleton
+void RequestParser::_check_host(void) {
+	std::map<std::string, std::vector<std::string> >::iterator it;
+
+	it = _headers.find("host");
+	if (it == _headers.end())
+		_invalid_request("header 'Host' not found", http::BAD_REQUEST);
+	if (it->second.size() > 1)
+		_invalid_request("header 'Host' with more than one value", http::BAD_REQUEST);
+	else if (it->second[0].size() == 0)
+		_invalid_request("header 'Host' without value", http::BAD_REQUEST);
+}
+
+// header Content-Length has only numbers, is singleton and has a maximum size
+void RequestParser::_check_content_length(void) {
+
+}
+
 
 void RequestParser::_print_headers(void) {
 	if (DEBUG) {
@@ -377,11 +425,16 @@ void RequestParser::_print_headers(void) {
 				<< "------------------------------------------------------\n"
 				<< BLUE << "Headers saved:\n" << GREY;
 		for (it = _headers.begin(); it != end; ++it) {
-			i = 1;
+			i = 0;
 			std::cout << it->first << ": ";
 			v_end = it->second.end();
-			for (v_it = it->second.begin(); v_it != v_end; ++v_it)
-				std::cout << i << ". " << *v_it << " | ";
+			for (v_it = it->second.begin(); v_it != v_end; ++v_it) {
+				++i;
+				if (i == 1)
+					std::cout << *v_it;
+				else
+					std::cout << "," << *v_it;
+			}
 			std::cout << std::endl;
 		}
 		std::cout << "------------------------------------------------------\n";
