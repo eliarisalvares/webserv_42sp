@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 13:54:47 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:27:33 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,13 @@ WebServ	webserv;
 
 void interrupt(int sig)
 {
-	Logger log;
 	std::cout << '\n';
-	log.warning("Received signal ", sig + 128);
+	Logger::warning("Received signal ", sig + 128);
 	webserv.stop();
 	exit(0);
 }
 
 int	main(int argc, char *argv[]) {
-	Logger log;
-
 	struct sigaction interruptHandler;
 	interruptHandler.sa_handler = interrupt;
 	sigemptyset(&interruptHandler.sa_mask);
@@ -40,10 +37,10 @@ int	main(int argc, char *argv[]) {
 		ServerParser	port;
 		port.setConf(argv[1]);
 		webserv.create_servers(port.getConf());
-		log.info("webserv configured.");
+		Logger::info("webserv configured.");
 	}
 	catch (std::exception & e) {
-		log.error(e.what());
+		Logger::error(e.what());
 		return 1;
 	}
 
@@ -65,7 +62,7 @@ int	main(int argc, char *argv[]) {
 			webserv.run();
 
 		} catch (std::exception & e) {
-			log.error(e.what());
+			Logger::error(e.what());
 			webserv.clean(); // para limparmos tudo que precisará ser limpo
 		}
 	}

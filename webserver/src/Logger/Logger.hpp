@@ -27,33 +27,24 @@ Class to log error, warning or debug messages
 # define WARNING_LOG "[ WARNING ] "
 # define ERROR_LOG "[ ERROR ] "
 
-class Logger {
-public:
-	Logger(void);
-	~Logger(void);
-
-	static void error(std::string const msg);
-	static void error(std::string const msg, std::string const value);
-	static void error_no_lf(std::string const msg);
-	static void strerror(std::string const msg, int error);
-	static void warning(std::string const msg);
-	static void warning(std::string const msg, std::string const value);
-	static void warning(std::string const msg, int const value);
-	static void warning_no_lf(std::string const msg);
-	static void info(std::string const msg);
-	static void info(std::string const msg, std::string const value);
-	static void info_no_lf(std::string const msg);
-	static void debug(std::string const msg);
-	static void debug(std::string const msg, std::string const value);
-	static void debug(std::string const msg, int const value);
-	static void debug_no_lf(std::string const msg);
-	static void success(std::string const msg);
-	static void title(std::string const msg);
-
-private:
-	Logger(Logger const& copy);
-	Logger const& operator=(Logger const& copy);
-
-};
+namespace Logger {
+void error(std::string const msg);
+void error(std::string const msg, std::string const value);
+void error_no_lf(std::string const msg);
+void strerror(std::string const msg, int error);
+void warning(std::string const msg);
+void warning(std::string const msg, std::string const value);
+void warning(std::string const msg, int const value);
+void warning_no_lf(std::string const msg);
+void info(std::string const msg);
+void info(std::string const msg, std::string const value);
+void info_no_lf(std::string const msg);
+void debug(std::string const msg);
+void debug(std::string const msg, std::string const value);
+void debug(std::string const msg, int const value);
+void debug_no_lf(std::string const msg);
+void success(std::string const msg);
+void title(std::string const msg);
+} /* Logger */
 
 #endif

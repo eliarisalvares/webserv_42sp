@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 02:45:36 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:27:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void RequestParser::method(char c) {
 				http::BAD_REQUEST
 			);
 		_step = URI;
-		log.debug("method", _method);
+		Logger::debug("method", _method);
 	}
 	else if (c == HTAB)
 		_invalid_request(
@@ -130,7 +130,7 @@ void RequestParser::uri(char c) {
 		_uri.push_back(c);
 	}
 	else if (c == SP) {
-		log.debug("uri", _uri);
+		Logger::debug("uri", _uri);
 		_step = PROTOCOL;
 		init_uri = true;
 	}
@@ -155,7 +155,7 @@ void RequestParser::protocol(char c) {
 			_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 			// throw http::InvalidRequest(http::NOT_FOUND); // nginx
 		_step = VERSION;
-		log.debug("protocol", _protocol);
+		Logger::debug("protocol", _protocol);
 		init_protocol = true;
 	}
 	else if (c == SP)
@@ -196,7 +196,7 @@ void RequestParser::version(char c) {
 		if (size == 3) {
 			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
 				_step = CR_FIRST_LINE;
-				log.debug("version", _version);
+				Logger::debug("version", _version);
 			}
 			else
 				_invalid_request(
@@ -229,26 +229,26 @@ void RequestParser::check_crlf(char c) {
 		switch (_step)
 		{
 		case CR_FIRST_LINE:
-			log.debug("CRLF first line");
+			Logger::debug("CRLF first line");
 			_step = HEADER;
 			break;
 		case CR_HEADER:
-			log.debug("CRLF header");
+			Logger::debug("CRLF header");
 			_step = HEADER;
 			break;
 		case SECOND_CR_HEADER:
-			log.debug("CRLF end header");
+			Logger::debug("CRLF end header");
 			_step = END; // mudar para BODY?
 			// por hora:
 			// BODY para testar body;
 			// END para retornar a resposta sem ficar travando
 			break;
 		case CR_BODY:
-			log.debug("CRLF body");
+			Logger::debug("CRLF body");
 			_step = BODY_NEW_LINE;
 			break;
 		case SECOND_CR_BODY:
-			log.debug("CRLF end body");
+			Logger::debug("CRLF end body");
 			_step = END;
 			break;
 		default:
@@ -325,11 +325,11 @@ void RequestParser::_parse_field_name(char c) {
 	if (c != COLON && !is_ctl(c) && c != SP)
 		_field_name.push_back(c);
 	else if (c == COLON) {
-		log.debug("key", _field_name);
+		Logger::debug("key", _field_name);
 		_step = HEADER_VALUE_INIT;
 	}
 	else if (c == CR) {
-		// log.warning("field name without value: " + _field_name);
+		// Logger::warning("field name without value: " + _field_name);
 		_step = CR_HEADER;
 		_add_header();
 	}
@@ -342,7 +342,7 @@ void RequestParser::_parse_field_value(char c) {
 	// if (c == SP || c == HTAB) // só pode ser no começo
 	// 	return ;
 	if (c == CR) {
-		log.debug("value", _field_value);
+		Logger::debug("value", _field_value);
 		_step = CR_HEADER;
 		_add_header();
 	}
@@ -588,7 +588,7 @@ void RequestParser::_invalid_request(
 	std::string const value,
 	http::HttpStatus error_code
 ) {
-	log.warning("request parser error: " + description, value);
+	Logger::warning("request parser error: " + description, value);
 	throw http::InvalidRequest(error_code);
 }
 
@@ -597,7 +597,7 @@ void RequestParser::_invalid_request(
 	char const c,
 	http::HttpStatus error_code
 ) {
-	log.warning_no_lf("request parser error: " + description);
+	Logger::warning_no_lf("request parser error: " + description);
 	std::cout << GREY << c << std::endl;
 	throw http::InvalidRequest(error_code);
 }
@@ -606,7 +606,7 @@ void RequestParser::_invalid_request(
 	std::string const description,
 	http::HttpStatus error_code
 ) {
-	log.warning("request parser error: " + description);
+	Logger::warning("request parser error: " + description);
 	throw http::InvalidRequest(error_code);
 }
 
