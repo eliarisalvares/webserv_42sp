@@ -20,6 +20,7 @@ static const std::map<int, std::string> initializeMessageMap() {
     m.insert(std::make_pair(http::URI_TOO_LONG, "URI Too Long"));
     m.insert(std::make_pair(http::UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type"));
     m.insert(std::make_pair(http::INTERNAL_SERVER_ERROR, "Internal Server Error"));
+    m.insert(std::make_pair(http::NOT_IMPLEMENTED, "Not Implemented"));
     m.insert(std::make_pair(http::HTTP_VERSION_NOT_SUPPORTED, "HTTP Version Not Supported"));
 
     return m;

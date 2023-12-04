@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 16:17:30 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 01:21:40 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ namespace http {
 		UNSUPPORTED_MEDIA_TYPE = 415,
 		// 422 Unprocessable Content - erro de código em python (cgi gera automático?)
 		INTERNAL_SERVER_ERROR = 500,
+		NOT_IMPLEMENTED = 501,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
 	};
 
