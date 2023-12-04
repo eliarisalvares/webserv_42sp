@@ -387,23 +387,11 @@ void RequestParser::check_request(void) {
 	_headers.clear();
 
 	// check if the path exists and set it; get location
-	// uri
-	// not found here
-	_request->setUri(_uri);
-
+	_check_uri();
 	// verify if method is allowed in specified location:
-	try {
-		// esse check vai ter que levar em conta também o location
-		_request->setMethod(http::str_to_enum_method(_method));
-	} catch(const utils::GeneralException& e) {
-		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
-	} catch(const std::exception& e) {
-		throw e;
-	}
-
-	// verificar se é POST, se tem o content-length ou outros headers relevantes
-	// check se tem body -> passa _step = BODY (ver onde entra)
-	// depende do loacation, método e headers
+	_check_method();
+	if (_request->method() == http::POST)
+		_check_post_headers();
 }
 
 // header Host is mandatory and singleton
@@ -462,6 +450,34 @@ void RequestParser::_check_transfer_encoding(void) {
 	_is_chunked = true;
 }
 
+void RequestParser::_check_uri(void) {
+	// check if the path exists and set it; get location
+	// uri
+	// not found here
+	_request->setUri(_uri);
+}
+
+void RequestParser::_check_method(void) {
+	// verify if method is allowed in specified location:
+	try {
+		// esse check vai ter que levar em conta o location
+		_request->setMethod(http::str_to_enum_method(_method));
+	} catch(const utils::GeneralException& e) {
+		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
+	} catch(const std::exception& e) {
+		throw e;
+	}
+}
+
+void RequestParser::_check_post_headers(void) {
+	if (!_is_chunked && (!_has_content_length || !_content_length))
+		_invalid_request("POST without body", http::BAD_REQUEST); // verificar se dá erro msm, e o tipo certo se for o caso
+	if (_is_chunked && _has_content_length && _content_length)
+		_invalid_request(
+			"chunked data and content-length both setted", http::BAD_REQUEST
+		);
+	_step = BODY;
+}
 
 void RequestParser::_print_headers(void) {
 	if (DEBUG) {
