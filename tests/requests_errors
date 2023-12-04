@@ -32,7 +32,7 @@ GET / HTTP/s - ok
 GET / HTTP/. - ok
 GET / HTTP/1 - ok
 GET / HTTP/1. - ok
-GET / HTTP/0 - deixei 505 Version Not Supported
+GET / HTTP/0 - ... deixei 505 Version Not Supported
 400 Bad Request
 GET / HTTP/12 - ok
 GET / HTTP/2 - ok
@@ -96,3 +96,9 @@ Content-Length: jheiu"
 400 Bad Request
 
 
+// content-length
+"GET / HTTP/1.1
+host: fdreg
+Content-Length: 1048577"
+(1MB = 1048576 bytes)
+413 Request Entity Too Large

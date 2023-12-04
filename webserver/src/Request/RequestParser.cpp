@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 23:45:53 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 00:45:11 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ RequestParser::RequestParser(void):
 	_field_value.clear();
 	_last_header.clear();
 	_headers.clear();
+	_has_content_length = false;
 	_content_length = 0;
 	_max_body_size = 0;
 	_body_bytes_readed = 0;
@@ -33,6 +34,7 @@ RequestParser::RequestParser(Request* request):
 	_field_value.clear();
 	_last_header.clear();
 	_headers.clear();
+	_has_content_length = false;
 	_content_length = 0;
 	_max_body_size = request->server()->getBodySize();
 	_body_bytes_readed = 0;
@@ -396,6 +398,7 @@ void RequestParser::check_request(void) {
 		throw e;
 	}
 
+	// verificar se é POST, se tem o content-length ou outros headers relevantes
 	// check se tem body -> passa _step = BODY (ver onde entra)
 	// depende do loacation, método e headers
 }
@@ -406,20 +409,42 @@ void RequestParser::_check_host(void) {
 
 	it = _headers.find("host");
 	if (it == _headers.end())
-		_invalid_request("header 'Host' not found", http::BAD_REQUEST);
-	if (it->second.size() > 1)
-		_invalid_request("header 'Host' with more than one value", http::BAD_REQUEST);
-	else if (it->second[0].size() == 0)
-		_invalid_request("header 'Host' without value", http::BAD_REQUEST);
+		_invalid_request("'Host' header not found", http::BAD_REQUEST);
+	if (it->second.size() > 1 || it->second[0].size() == 0)
+		_invalid_request("'Host' header", http::BAD_REQUEST);
+	_request->setHost(it->second[0]);
 }
 
 // header Content-Length has only numbers, is singleton and has a maximum size
 void RequestParser::_check_content_length(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it;
+	std::map<std::string, std::vector<std::string> >::iterator it_header;
 
-	it = _headers.find("content-length");
+	it_header = _headers.find("content-length");
+	if (it_header == _headers.end())
+		return ;
+	_has_content_length = true;
 
+	if (it_header->second.size() > 1)
+		_invalid_request("'Content-Length' header", http::BAD_REQUEST);
 
+	std::string content_lenght = it_header->second[0];
+	std::string::iterator it, end = content_lenght.end();
+	for (it = content_lenght.begin(); it != end; ++it) {
+		if (!std::isdigit(*it))
+			_invalid_request(
+				"'Content-Length' header invalid character",
+				*it,
+				http::BAD_REQUEST
+			);
+	}
+
+	std::stringstream ss(content_lenght);
+	ss >> _content_length;
+	if (_content_length > _max_body_size)
+		_invalid_request(
+			"Content-Lenght bigger than max body size",
+			http::CONTENT_TOO_LARGE
+		);
 }
 
 
@@ -509,7 +534,7 @@ void RequestParser::_invalid_request(
 	std::string const value,
 	http::HttpStatus error_code
 ) {
-	log.warning("request parser: " + description, value);
+	log.warning("request parser error: " + description, value);
 	throw http::InvalidRequest(error_code);
 }
 
@@ -518,7 +543,7 @@ void RequestParser::_invalid_request(
 	char const c,
 	http::HttpStatus error_code
 ) {
-	log.warning_no_lf("request parser: " + description);
+	log.warning_no_lf("request parser error: " + description);
 	std::cout << GREY << c << std::endl;
 	throw http::InvalidRequest(error_code);
 }
@@ -527,7 +552,7 @@ void RequestParser::_invalid_request(
 	std::string const description,
 	http::HttpStatus error_code
 ) {
-	log.warning("request parser: " + description);
+	log.warning("request parser error: " + description);
 	throw http::InvalidRequest(error_code);
 }
 
