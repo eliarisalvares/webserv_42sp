@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 23:38:16 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 00:30:11 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,7 @@ private:
 	void								_parse_field_value(char c);
 
 	// body
+	bool								_has_content_length;
 	size_t								_content_length;
 	size_t								_max_body_size;
 	size_t								_body_bytes_readed;
