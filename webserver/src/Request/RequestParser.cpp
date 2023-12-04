@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 21:57:17 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/03 23:45:53 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@ RequestParser::RequestParser(void):
 	_field_value.clear();
 	_last_header.clear();
 	_headers.clear();
+	_content_length = 0;
+	_max_body_size = 0;
+	_body_bytes_readed = 0;
 	_body.clear();
-	// _result.clear();
 }
 
 RequestParser::RequestParser(Request* request):
@@ -31,8 +33,10 @@ RequestParser::RequestParser(Request* request):
 	_field_value.clear();
 	_last_header.clear();
 	_headers.clear();
+	_content_length = 0;
+	_max_body_size = request->server()->getBodySize();
+	_body_bytes_readed = 0;
 	_body.clear();
-	// _result.clear();
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -370,17 +374,19 @@ void RequestParser::_add_header(void) {
 	_field_name.clear();
 }
 
-void RequestParser::check_headers(void) {
+void RequestParser::check_request(void) {
+	// first check headers and get necessary values
 	_print_headers();
-
 	_check_host();
+	_check_content_length();
+	_headers.clear();
 
-	// ver onde a verificação da uri entra - encontrar o location
+	// check if the path exists and set it; get location
 	// uri
 	// not found here
 	_request->setUri(_uri);
 
-	// 3 - verificar se o método é permitido para o location:
+	// verify if method is allowed in specified location:
 	try {
 		// esse check vai ter que levar em conta também o location
 		_request->setMethod(http::str_to_enum_method(_method));
@@ -392,7 +398,6 @@ void RequestParser::check_headers(void) {
 
 	// check se tem body -> passa _step = BODY (ver onde entra)
 	// depende do loacation, método e headers
-	_headers.clear();
 }
 
 // header Host is mandatory and singleton
@@ -410,6 +415,10 @@ void RequestParser::_check_host(void) {
 
 // header Content-Length has only numbers, is singleton and has a maximum size
 void RequestParser::_check_content_length(void) {
+	std::map<std::string, std::vector<std::string> >::iterator it;
+
+	it = _headers.find("content-length");
+
 
 }
 
