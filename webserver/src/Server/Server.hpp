@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 18:22:56 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 22:01:40 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ class Server {
 		int										_socket;
 		t_permissions							_permit; //autoindex && directory_listing
 		std::string								_root;
-		// std::string								_uploadPath; //duvida
+		std::string								_uploadPath; //duvida
 		std::set<std::string>					_allowed_methods;
 		std::set<std::string>					_index;
 		std::vector<t_location>					_locations;
