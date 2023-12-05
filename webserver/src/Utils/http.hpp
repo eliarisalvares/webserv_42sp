@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 01:21:40 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 22:07:51 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@
 # include <map>
 # include <set>
 # include <string>
+# include <iostream>
 # include <exception>
 
 # include "utils.hpp"
+# include "Logger.hpp"
 
 namespace http {
 	enum RequestMethod {
@@ -68,11 +70,14 @@ namespace http {
 	std::string		enum_to_str_method(RequestMethod method);
 
 	// headers that needs a validation / singletons
-	std::set<std::string>				_fill_headers(void);
-	static std::set<std::string> const	special_headers = http::_fill_headers();
+	std::set<std::string>				_fill_content_types(void);
+	static std::set<std::string> const	special_headers = http::_fill_content_types();
 
+	// http exceptions
 	class InvalidRequest;
 	class InvalidErrorCode;
+
+	void	bad_request(std::string const description);
 }
 
 class http::InvalidRequest: public std::exception {

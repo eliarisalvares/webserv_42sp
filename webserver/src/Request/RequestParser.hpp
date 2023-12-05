@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:28:00 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 22:28:33 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 # define SLASH '/'
 
 // error messages
+# define REQPARSER_ERROR "request parser error: "
 # define HTTP_VERSION "invalid HTTP version"
 
 # define HEADER_LIMIT_SIZE 10240 // ???????????????
@@ -153,6 +154,7 @@ private:
 	void								_body_chunked(char c);
 
 	// throw exceptions
+	void	_bad_request(std::string const description);
 	void	_invalid_request(
 		std::string const description,
 		std::string const value,
