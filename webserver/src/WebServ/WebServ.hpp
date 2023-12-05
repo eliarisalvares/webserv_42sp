@@ -22,6 +22,8 @@
 
 # define PORT 8080
 
+# define POLLNOEVENT 0x000
+
 // server types
 typedef std::map<std::string, std::string>	t_infoServer;
 typedef std::map<int, Server*> t_server_map;
@@ -49,10 +51,9 @@ public:
 	void	create_servers(std::vector<std::string> input);
 	void	init(void);
 	void	run(void);
+	void	stop(void);
 	void	clean(void);
 	void	restart_socket_servers(void);
-
-	Logger	log;
 
 private:
 	// we want only one instance of WebServ, without copy

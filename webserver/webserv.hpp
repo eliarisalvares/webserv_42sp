@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:08:43 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/10 15:57:06 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 13:29:48 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,12 @@
 
 # include <iostream> // std::cout
 # include <exception>
+#include <csignal> // Signal handling.
 
 # include "WebServ.hpp"
 # include "ServerParser.hpp"
 
 class	Server;
 class	ServerParser;
-
-bool	checkArgs(int argc, char *argv[]);
 
 #endif

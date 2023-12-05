@@ -6,15 +6,28 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/27 22:35:57 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 01:21:40 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTP_HPP
 # define HTTP_HPP
 
+# include <map>
+# include <set>
+# include <string>
+# include <exception>
+
+# include "utils.hpp"
+
 namespace http {
-	typedef enum e_status {
+	enum RequestMethod {
+		GET,
+		POST,
+		DELETE,
+	};
+
+	enum HttpStatus {
 		CONTINUE = 100,
 		OK = 200,
 		CREATED = 201,
@@ -35,13 +48,46 @@ namespace http {
 		UNSUPPORTED_MEDIA_TYPE = 415,
 		// 422 Unprocessable Content - erro de código em python (cgi gera automático?)
 		INTERNAL_SERVER_ERROR = 500,
+		NOT_IMPLEMENTED = 501,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
-	}			t_status;
+	};
 
-	typedef enum e_content_type {
+	enum ContentType {
 
-	}			t_content_type;
+	};
+
+	// http methods in webserv
+	std::set<std::string>				_fill_methods(void);
+	static std::set<std::string> const	methods = http::_fill_methods();
+	std::map<std::string, RequestMethod>				_fill_map_method_str_to_enum(void);
+	static std::map<std::string, RequestMethod> const	map_str_to_enum_method = http::_fill_map_method_str_to_enum();
+	std::map<RequestMethod, std::string>				_fill_map_method_enum_to_str(void);
+	static std::map<RequestMethod, std::string> const	map_enum_to_str_method = http::_fill_map_method_enum_to_str();
+	// makes transformation easier
+	RequestMethod	str_to_enum_method(std::string method);
+	std::string		enum_to_str_method(RequestMethod method);
+
+	// headers that needs a validation / singletons
+	std::set<std::string>				_fill_headers(void);
+	static std::set<std::string> const	special_headers = http::_fill_headers();
+
+	class InvalidRequest;
+	class InvalidErrorCode;
 }
+
+class http::InvalidRequest: public std::exception {
+	http::HttpStatus _error;
+
+	public:
+		InvalidRequest(http::HttpStatus error);
+		const char* what() const throw();
+		http::HttpStatus get_error_code(void) const;
+};
+
+class http::InvalidErrorCode: public std::exception {
+	public:
+		const char* what() const throw();
+};
 
 #endif
 

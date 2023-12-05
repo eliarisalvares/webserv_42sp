@@ -6,29 +6,43 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/11/28 15:56:09 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 14:27:33 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "src/WebServ/WebServ.hpp"
+
+WebServ	webserv;
+
+void interrupt(int sig)
+{
+	std::cout << '\n';
+	Logger::warning("Received signal ", sig + 128);
+	webserv.stop();
+	exit(0);
+}
 
 int	main(int argc, char *argv[]) {
-	Logger log;
+	struct sigaction interruptHandler;
+	interruptHandler.sa_handler = interrupt;
+	sigemptyset(&interruptHandler.sa_mask);
+	interruptHandler.sa_flags = 0;
+	sigaction(SIGINT, &interruptHandler, 0);
 
 	if (!checkArgs(argc, argv))
 		return 1;
 
-	WebServ	webserv;
-	ServerParser	port;
 	try {
+		ServerParser	port;
 		port.setConf(argv[1]);
 		webserv.create_servers(port.getConf());
+		Logger::info("webserv configured.");
 	}
 	catch (std::exception & e) {
-		log.error(e.what());
+		Logger::error(e.what());
 		return 1;
 	}
-	(void)port;
 
 	bool	first_init = true;
 
@@ -36,8 +50,7 @@ int	main(int argc, char *argv[]) {
 	while (true) {
 		try {
 			// create servers and sockets for each server
-			if (first_init)
-			{
+			if (first_init) {
 				// webserv.create_servers(port.getServersConf()); //send port.servers
 				first_init = false;
 			}
@@ -49,7 +62,7 @@ int	main(int argc, char *argv[]) {
 			webserv.run();
 
 		} catch (std::exception & e) {
-			log.error(e.what());
+			Logger::error(e.what());
 			webserv.clean(); // para limparmos tudo que precisará ser limpo
 		}
 	}

@@ -64,13 +64,14 @@ void	WebServ::create_servers(std::vector<std::string> input) {
 }
 
 void	WebServ::init(void) {
-	struct pollfd init;
+	pollfd init;
 	t_server_iterator it, end = this->_servers.end();
 
 	// Add each server socket ("listeners")
 	for (it = this->_servers.begin(); it != end; ++it) {
 		init.fd = it->first;
 		init.events = POLLIN; // Report ready to read on incoming connection
+		init.revents = POLLNOEVENT;
 		this->_pfds.push_back(init);
 		this->_serverSockets.push_back(init.fd);
 		this->_total_fds++;
@@ -79,9 +80,8 @@ void	WebServ::init(void) {
 
 void	WebServ::run(void) {
 	int poll_count, fd;
-	Logger log;
 
-	log.debug("run");
+	Logger::info("Running webserv...");
 	while(true) {
 		// &(*this->_pfds.begin()
 		poll_count = poll(this->_pfds.data(), this->_pfds.size(), -1);
@@ -97,9 +97,9 @@ void	WebServ::run(void) {
 
 			// Check if someone's ready to read
 			if (this->_pfds[i].revents & POLLIN) {
-				log.debug("POLLIN event");
+				Logger::debug("POLLIN event");
 				if (_is_server_socket(fd)) {
-					log.debug("creating connection...");
+					Logger::debug("creating connection...");
 					_create_connection(fd);
 				} else {
 					_receive(fd);
@@ -107,7 +107,7 @@ void	WebServ::run(void) {
 			}
 			if (this->_pfds[i].revents & POLLOUT) {  // can send
 				if (_is_ready_to_respond(fd)) {  // when request parsing ends*
-					log.debug("POLLOUT event and request parsing ended");
+					Logger::debug("POLLOUT event and request parsing ended");
 					// *pode ser que o parsing da request pegue um erro sem ter recebido
 					// todos os dados; pra ser mais eficaz e seguro a gente já
 					// vai retornar uma resposta com o erro adequado
@@ -115,8 +115,6 @@ void	WebServ::run(void) {
 					// create Request object
 					Request* request;
 					request = this->_requestBuilderMap[fd]->build();
-					log.debug("creating request...");
-					// std::cout << request << std::endl;
 
 					_respond(request);
 					delete request;
@@ -127,6 +125,17 @@ void	WebServ::run(void) {
 			}
 		}
 	}
+}
+
+
+void	WebServ::stop(void) {
+	if (_servers.size()) {
+		for (size_t i = 0; i < _servers.size(); i++) {
+			if (_servers[i])
+				delete _servers[i];
+		}
+	}
+	clear_fds();
 }
 
 bool	WebServ::_is_server_socket(int fd) {
@@ -160,15 +169,17 @@ void	WebServ::_create_connection(int server_fd) {
 	addrlen = sizeof remoteaddr;
 	newfd = accept(server_fd, (struct sockaddr *)&remoteaddr, &addrlen);
 	if (newfd == -1) {
-		log.strerror("accept", errno);
+		Logger::strerror("accept", errno);
 	} else {
 		a.fd = newfd;
 		a.events = POLLIN | POLLOUT; // Check ready-to-read + write
+		a.revents = POLLNOEVENT;
 		this->_pfds.push_back(a);
 		// ensures we keep the relation between the connection and it's server
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
 		this->_total_fds++;
 
+		Logger::info("New connection requested and created.");
 		// >>>>>>>>>>>>>>>>>>>>>>> remove this
 		printf("poll server: new connection from %s on socket %d\n",
 			inet_ntop(
@@ -190,7 +201,7 @@ void WebServ::_receive(int fd) {
 		// if (request_builder->is_ready())
 		// 	request_builder->build();
 	}
-	else
+	else // verificar se é a tratativa certa
 		_end_connection(fd);
 }
 
@@ -198,7 +209,7 @@ RequestBuilder* WebServ::_create_request_builder(int fd) {
 	int server_fd;
 	RequestBuilder *builder;
 
-	log.debug("creating RequestBuilder...");
+	Logger::debug("creating RequestBuilder...");
 	server_fd = this->_fds_map[fd];
 	builder = new RequestBuilder(this->_servers[server_fd], fd);
 	this->_requestBuilderMap.insert(std::make_pair(fd, builder));
@@ -227,15 +238,14 @@ bool WebServ::_is_ready_to_respond(int fd) {
 
 void WebServ::_respond(Request* request) {
 	Response response;
-	Logger log;
 	int response_fd = request->fd();
 
 	//std::string filePath = request->_requestData;
 	std::string filePath = "content/cgi/current_time.py";
 
-	log.debug("creating response...");
+	Logger::debug("creating response...");
 	std::string response_string = responseBuilder(filePath);
-	log.debug("sending response...");
+	Logger::debug("sending response...");
 	send(response_fd, response_string.c_str(), response_string.length(), 0);
 }
 
@@ -304,7 +314,7 @@ void WebServ::restart_socket_servers(void) {
 	t_server_iterator it, end = this->_servers.end();
 
 	for (it = this->_servers.begin(); it != end; ++it)
-		it->second->setSocket(it->second->getPort());
+		it->second->configSocket(it->second->getPort());
 }
 
 std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {

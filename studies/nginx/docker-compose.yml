@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: test
+    build:
+      context: ./
+    ports:
+      - 80:80
+    init: true
+
