@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:13:21 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/04 22:14:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,18 @@ const char* GeneralException::what() const throw() {
 	default:
 		return "GeneralException";
 	}
+}
+
+bool is_ctl(char c) {
+  return ((c >= 0 && c < 32) || c == 127);
+}
+
+bool is_ualpha(char c) {
+  return (c >= 'A' && c <= 'Z');
+}
+
+bool is_lalpha(char c) {
+  return (c >= 'a' && c <= 'z');
 }
 
 }
