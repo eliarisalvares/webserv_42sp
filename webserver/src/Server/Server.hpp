@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 16:23:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 18:50:10 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class Server {
 		int										_socket;
 		t_permissions							_permit;
 		std::string								_root;
+		std::string								_redirect;
 		std::string								_uploadPath;
 		std::set<std::string>					_allowed_methods;
 		std::set<std::string>					_index;

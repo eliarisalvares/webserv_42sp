@@ -9,6 +9,7 @@ t_location	initLocation(void) {
 	location.index.insert("content/index.html");
 	location.permit.autoindex = false;
 	location.permit.directory_listing = false;
+	location.permit.has_redir = false;
 	return (location);
 }
 
@@ -72,7 +73,7 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
 		root = "content" + words[0];
-		//check if root makes sense/exists
+		//check if root makes sense/exists -> use check directory
 		Logger::debug("Root setted", root);
 	}
 	return (root);
@@ -147,45 +148,6 @@ std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 	return (serverName);
 }
 
-t_location	obtainLoc(std::vector<std::string> input, int index) {
-	t_location					location;
-	std::vector<std::string>	locName;
-
-	location = initLocation();
-	Logger::debug("Init location parsing", location.location);
-	for (size_t i = index; i < input.size(); i++) {
-		if (input[i].substr(0, 9) == "location ") {
-			locName = ftstring::split(input[i].substr(9), ' ');
-			location.location = locName[0];
-			if (locName[1] != "{")
-				throw LocationNotOpenedException();
-		}
-		if (input[i] == "}")
-			break ;
-		if (input[i].substr(0, 5) == "root ")
-			location.root = obtainRoot(input, i);
-		if (input[i].substr(0, 16) == "allowed_methods ")
-			location.allowed_methods = obtainMethod(input, i);
-		if (input[i].substr(0, 6) == "index ")
-			location.index = obtainIndex(input, i);
-		if (input[i].substr(0, 10) == "autoindex ")
-			location.permit.autoindex = obtainAutoIndex(input, i);
-		if (input[i].substr(0, 18) == "directory_listing ")
-			location.permit.directory_listing = obtainDirList(input, i);
-		if (input[i].substr(0, 4) == "cgi ")
-			location.cgi = obtainCGI(input, i);
-		if (input[i].substr(0, 11) == "error_page ") {
-			std::pair<int, std::string> paired = obtainErrorPages(input, i);
-			if (location.error_pages.find(paired.first) != location.error_pages.end())
-				location.error_pages[paired.first] = paired.second;
-			else
-				location.error_pages.insert(paired);
-		}
-	}
-	Logger::debug("Location saved", location.location);
-	return (location);
-}
-
 std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 	std::set<std::string>		methods;
 	std::vector<std::string>	words;
@@ -250,6 +212,46 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 		Logger::debug("Index setted", input[index].substr(16));
 	}
 	return (value);
+}
+
+t_location	obtainLoc(std::vector<std::string> input, int index) {
+	t_location					location;
+	std::vector<std::string>	locName;
+
+	location = initLocation();
+	Logger::debug("Init location parsing", location.location);
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr(0, 9) == "location ") {
+			locName = ftstring::split(input[i].substr(9), ' ');
+			location.location = locName[0];
+			if (locName[1] != "{")
+				throw LocationNotOpenedException();
+		}
+		if (input[i] == "}")
+			break ;
+		if (input[i].substr(0, 5) == "root ")
+			location.root = obtainRoot(input, i);
+		if (input[i].substr(0, 16) == "allowed_methods ")
+			location.allowed_methods = obtainMethod(input, i);
+		if (input[i].substr(0, 6) == "index ")
+			location.index = obtainIndex(input, i);
+		if (input[i].substr(0, 10) == "autoindex ")
+			location.permit.autoindex = obtainAutoIndex(input, i);
+		if (input[i].substr(0, 18) == "directory_listing ")
+			location.permit.directory_listing = obtainDirList(input, i);
+		if (input[i].substr(0, 4) == "cgi ")
+			location.cgi = obtainCGI(input, i);
+		if (input[i].substr(0, 11) == "error_page ") {
+			std::pair<int, std::string> paired = obtainErrorPages(input, i);
+			if (location.error_pages.find(paired.first) != location.error_pages.end())
+				location.error_pages[paired.first] = paired.second;
+			else
+				location.error_pages.insert(paired);
+		}
+		//redirect
+	}
+	Logger::debug("Location saved", location.location);
+	return (location);
 }
 
 //-------------------------------EXCEPTIONS-------------------------//

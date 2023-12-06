@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 15:11:46 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 18:51:03 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			_permit.autoindex = obtainAutoIndex(input, i);
 		if (input[i].substr(0, 18) == "directory_listing ")
 			_permit.directory_listing = obtainDirList(input, i);
+		//redirect
 	}
 	configSocket(_port);
 	_location_root.clear();
@@ -86,6 +87,7 @@ void	Server::setBasics() {
 
 	permit.autoindex = false;
 	permit.directory_listing = false;
+	permit.has_redir = false;
 	serverName.push_back(SERVER_NAME);
 	index.insert("index.html");
 	location = initLocation();
@@ -96,7 +98,7 @@ void	Server::setBasics() {
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	_locations.push_back(location);
 	_permit = permit;
-	setUpPath("content/upload/"); // checar como que a pasta é criada??
+	setUpPath("content/upload/");
 	setMethods(http::methods);
 	setIndex(index);
 	setName(serverName);
