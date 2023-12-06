@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 16:08:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 18:34:49 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 # define COLON ':'
 # define POINT '.'
 # define SLASH '/'
+# define SEMICOLON ';'
+# define HEXADECIMAL "0123456789ABDEF"
 
 // error messages
 # define REQPARSER_ERROR "request parser error: "
@@ -67,10 +69,16 @@ public:
 		SECOND_CR_HEADER,
 		BODY,
 		BODY_LENGTH_END,
+		CR_BODY,
 		CHUNK_SIZE,
 		CHUNK_PARAMETERS,
+		CR_CHUNK_SIZE,
 		CHUNK_DATA,
-		CR_BODY,
+		CHUNK_DATA_END,
+		CHUNK_END,
+		CR_CHUNK_DATA,
+		CR_CHUNK_END,
+		SECOND_CR_CHUNK_END,
 		END,
 	};
 
@@ -149,11 +157,14 @@ private:
 	size_t								_content_length;
 	size_t								_max_body_size;
 	size_t								_body_bytes_readed;
-	// size_t								_chunk_bytes_readed;
+	size_t								_chunk_bytes_readed;
+	size_t								_chunk_size;
+	std::string							_chunk_size_str;
 	std::vector<char>					_body;
-	std::vector<char>::iterator			_body_it;
 	void								_print_body(void);
 	void								_body_chunked(char c);
+	void								_parse_chunk_size(char c);
+	void								_parse_chunk_data(char c);
 
 	// throw exceptions
 	void	_bad_request(std::string const description);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 21:02:43 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 22:43:38 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,12 +104,20 @@ void RequestBuilder::parse(void) {
 				case RequestParser::BODY_LENGTH_END:
 					_parser.end_body(c);
 					break;
+				case RequestParser::CR_BODY:
+					_parser.check_crlf(c);
+					break;
 				case RequestParser::CHUNK_SIZE:
 				case RequestParser::CHUNK_PARAMETERS:
 				case RequestParser::CHUNK_DATA:
+				case RequestParser::CHUNK_DATA_END:
+				case RequestParser::CHUNK_END:
 					_parser.body(c);
 					break;
-				case RequestParser::CR_BODY:
+				case RequestParser::CR_CHUNK_SIZE:
+				case RequestParser::CR_CHUNK_DATA:
+				case RequestParser::CR_CHUNK_END:
+				case RequestParser::SECOND_CR_CHUNK_END:
 					_parser.check_crlf(c);
 					break;
 				default:

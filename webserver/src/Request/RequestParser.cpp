@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 21:03:04 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 22:43:50 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ RequestParser::RequestParser(void):
 	_content_length = 0;
 	_max_body_size = 0;
 	_body_bytes_readed = 0;
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
 	_body.clear();
 }
 
@@ -40,6 +42,8 @@ RequestParser::RequestParser(Request* request):
 	_content_length = 0;
 	_max_body_size = request->server()->getBodySize();
 	_body_bytes_readed = 0;
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
 	_body.clear();
 }
 
@@ -242,6 +246,22 @@ void RequestParser::check_crlf(char c) {
 			break;
 		case CR_BODY:
 			Logger::debug("CRLF end body");
+			_step = END;
+			break;
+		case CR_CHUNK_SIZE:
+			Logger::debug("CRLF chunk size");
+			_step = CHUNK_DATA;
+			break;
+		case CR_CHUNK_DATA:
+			Logger::debug("CRLF chunk data");
+			_step = CHUNK_SIZE;
+			break;
+		case CR_CHUNK_END:
+			Logger::debug("first CRLF chunk end");
+			_step = CHUNK_END;
+			break;
+		case SECOND_CR_CHUNK_END:
+			Logger::debug("second CRLF chunk end");
 			_step = END;
 			break;
 		default:
@@ -452,6 +472,7 @@ void RequestParser::_check_transfer_encoding(void) {
 	if (it_header->second[0].compare("chunked") != 0)
 		_invalid_request("Transfer-Encoding type", http::NOT_IMPLEMENTED);
 	_is_chunked = true;
+	Logger::debug("found Transfer-Encoding: chunked");
 }
 
 void RequestParser::_check_uri(void) {
@@ -484,6 +505,8 @@ void RequestParser::_check_post_headers(void) {
 			"chunked data and content-length both setted"
 		);
 	_step = BODY;
+	if (_is_chunked)
+		_step = CHUNK_SIZE;
 }
 
 void RequestParser::_print_headers(void) {
@@ -573,14 +596,112 @@ void RequestParser::end_body(char c) {
 // depois de ler cada chunck, devolve uma resposta com status code = 202 pra
 // indicar pro cliente que foi aceito
 // quando finalizar, retorna 200 ou 201 (CREATED)
+
+// Example:
+// 4␍␊            (chunk size is four octets)
+// Wiki           (four octets of data)
+// ␍␊             (end of chunk)
+
+// 7␍␊            (chunk size is seven octets)
+// pedia i        (seven octets of data)
+// ␍␊             (end of chunk)
+
+// B␍␊            (chunk size is eleven octets)
+// n ␍␊chunks.    (eleven octets of data)
+// ␍␊             (end of chunk)
+
+// 0␍␊            (chunk size is zero octets, no more chunks)
+// ␍␊             (end of final chunk with zero data octets)
+
+// Result string: "Wikipedia in ␍␊chunks."
+// Result print:
+// "Wikipedia in
+// chunks."
+
 void RequestParser::_body_chunked(char c) {
-	(void)c;
-	_step = END;
-	// if (DEBUG) {
-	// 	std::cout << GREY << "Received body:\n";
-	// 	_print_body();
-	// }
+	switch (_step) {
+		case CHUNK_SIZE:
+			_parse_chunk_size(c);
+			break;
+		case CHUNK_PARAMETERS:
+			// por hora não vou fazer nada com os parametros
+			if (c == CR)
+				_step = CR_CHUNK_SIZE;
+			if (c == LF)
+				_step = CHUNK_DATA;
+			Logger::debug("chunk parameter: ", c);
+			break;
+		case CHUNK_DATA:
+			_parse_chunk_data(c);
+			break;
+		case CHUNK_DATA_END:
+			if (c == CR)
+				_step = CR_CHUNK_DATA;
+			else if (c == LF)
+				_step = CHUNK_SIZE;
+			else // verificar o tipo de erro
+				_invalid_request(
+					"chunk data larger than specified", http::CONTENT_TOO_LARGE
+				);
+			break;
+		case CHUNK_END:
+			if (c == CR)
+				_step = SECOND_CR_CHUNK_END;
+			else if (c == LF)
+				_step = END;
+			else // verificar o tipo de erro
+				_invalid_request(
+					"chunk data larger than specified", http::CONTENT_TOO_LARGE
+				);
+			break;
+
+		default:
+			break;
+	}
+	// _print_body();
 }
+
+void RequestParser::_parse_chunk_size(char c) {
+	if (c == CR || c == LF || c == SEMICOLON) {
+		if (c == CR)
+			_step = CR_CHUNK_SIZE;
+		else if (c == LF)
+			_step = CHUNK_DATA;
+		else if (c == SEMICOLON)
+			_step = CHUNK_PARAMETERS;
+		// TODO: transform to decimal number
+		std::stringstream ss(_chunk_size_str);
+		ss >> _chunk_size;
+		_chunk_bytes_readed = 0;
+		Logger::debug("chunk size hex:", _chunk_size_str);
+		Logger::debug("chunk size decimal:", _chunk_size);
+		if (_chunk_size == 0) {
+			if (c == CR)
+				_step = CR_CHUNK_END;
+			if (c == LF) {
+				Logger::debug("first LF chunk end");
+				_step = CHUNK_END;
+			}
+		}
+		_chunk_size_str.clear();
+	}
+	// else if (!utils::is_hexa(c))
+	// 	_bad_request("Invalid character on chunk size");
+	else
+		_chunk_size_str.push_back(c);
+}
+
+void RequestParser::_parse_chunk_data(char c) {
+	if (_chunk_bytes_readed < _chunk_size) {
+		_body.push_back(c);
+		++_chunk_bytes_readed;
+		if (_chunk_bytes_readed == _chunk_size) {
+			_step = CHUNK_DATA_END;
+			_print_body();
+		}
+	}
+}
+
 
 void RequestParser::_print_body(void) {
 	std::vector<char>::iterator it, end = _body.end();
