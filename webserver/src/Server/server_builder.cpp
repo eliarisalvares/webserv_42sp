@@ -104,14 +104,33 @@ bool	obtainAutoIndex(std::vector<std::string> input, int index) {
 	bool						valid = false;
 
 	if (input[index].substr(0, 10) == "autoindex ") {
-		autoindex = ftstring::split(input[index].substr(4), ' ');
-		if (autoindex.size() != 2)
+		autoindex = ftstring::split(input[index].substr(10), ' ');
+		if (autoindex.size() != 1)
 			throw WrongNbrException();
-		else if (autoindex[1] == "true")
+		if (autoindex[0] == "true")
 			valid = true;
-		else if (autoindex[1] == "false")
+		else if (autoindex[0] == "false")
 			valid = false;
-		Logger::debug("Autoindex setted as ", valid);
+		else
+			throw WrongArgumentException();
+		Logger::debug("Autoindex setted as ", autoindex[0]);
+	}
+	return (valid);
+}
+
+bool	obtainDirList(std::vector<std::string> input, int index) {
+	std::vector<std::string>	dirList;
+	bool						valid = false;
+
+	if (input[index].substr(0, 18) == "directory_listing ") {
+		dirList = ftstring::split(input[index].substr(18), ' ');
+		if (dirList.size() != 1)
+			throw WrongNbrException();
+		if (dirList[0] == "true")
+			valid = true;
+		else if (dirList[0] == "false")
+			valid = false;
+		Logger::debug("Directory Listing setted as ", dirList[0]);
 	}
 	return (valid);
 }
@@ -152,6 +171,10 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.index = obtainIndex(input, i);
 		if (input[i].substr(0, 10) == "autoindex ")
 			location.permit.autoindex = obtainAutoIndex(input, i);
+		if (input[i].substr(0, 18) == "directory_listing ")
+			location.permit.directory_listing = obtainDirList(input, i);
+		if (input[i].substr(0, 4) == "cgi ")
+			location.cgi = obtainCGI(input, i);
 		// faltam todas as infos referentes a response ->http methods, cgi, redirecionamento, permissões, ?
 	}
 	Logger::debug("Location saved", location.location);
@@ -275,4 +298,8 @@ const char* InvalidFileException::what() const throw() {
 
 const char* WrongNbrException::what() const throw() {
 	return ("Wrong number of arguments for autoindex.");
+}
+
+const char* WrongArgumentException::what() const throw() {
+	return ("Not a valid argument for autoindex.");
 }
