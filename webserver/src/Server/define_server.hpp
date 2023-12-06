@@ -12,5 +12,6 @@
 # define SERVER_NAME "WebWizards"
 # define SERVER_PORT "8080"
 # define TIMEOUT 5000
+# define DEFAULT_UPLOAD "content/upload"
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 15:40:36 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:55:45 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ namespace utils {
 	enum Errors {
 		GENERAL = 0,
 		INVALID_METHOD,
+		INVALID_DIRECTORY,
 	};
 
 	class GeneralException;

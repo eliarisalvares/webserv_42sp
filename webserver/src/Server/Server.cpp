@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 18:51:03 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:46:47 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	Server::setBasics() {
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	_locations.push_back(location);
 	_permit = permit;
-	setUpPath("content/upload/");
+	setUpPath(DEFAULT_UPLOAD);
 	setMethods(http::methods);
 	setIndex(index);
 	setName(serverName);

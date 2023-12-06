@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 15:36:53 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:58:21 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ const char* GeneralException::what() const throw() {
 	{
 	case INVALID_METHOD:
 		return "Method not present in allowed methods list";
+	case INVALID_DIRECTORY:
+		return "Directory does not exist";
 	default:
 		return "GeneralException";
 	}

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 18:50:10 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:47:03 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,7 @@ class Server {
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
-		std::map<std::string, std::string>		_location_root;  // temporário
-		// o que sabemos que falta: redirect -> for locations is ok
+		std::map<std::string, std::string>		_location_root;  // temporário -> EXCLUIR
 };
 
 #endif

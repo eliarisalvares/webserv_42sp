@@ -59,15 +59,15 @@ class PortNeedsSudoExeption : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class CGIMissconfigurationException : public std::exception {
+class CGIWrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class CGINotSupportedException : public std::exception {
+class CGIInvalidException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class InvalidNbrMethodsException : public std::exception {
+class MethodsWrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
@@ -79,7 +79,7 @@ class TooLargeException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class InvalidBufferSize : public std::exception {
+class BufferSizeInvalidException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
@@ -87,11 +87,11 @@ class LocationNotOpenedException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class WrongNbrErrorException : public std::exception {
+class ErrPagesWrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class InvalidErrorNbrException : public std::exception {
+class ErrPagesInvalidException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
@@ -99,11 +99,19 @@ class InvalidFileException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class WrongNbrException : public std::exception {
+class AutoIndexWrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
-class WrongArgumentException : public std::exception {
+class AutoIndexInvalidException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class DirListWrongArgumentException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class DirListInvalidException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
