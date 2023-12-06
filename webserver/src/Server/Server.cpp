@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 19:46:47 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 20:53:54 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			_permit.autoindex = obtainAutoIndex(input, i);
 		if (input[i].substr(0, 18) == "directory_listing ")
 			_permit.directory_listing = obtainDirList(input, i);
-		//redirect
+		if (input[i].substr(0, 9) == "redirect ")
+			setRedirect(obtainRedirect(input, i));
 	}
 	configSocket(_port);
 	_location_root.clear();

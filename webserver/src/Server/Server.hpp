@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 19:47:03 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 20:54:19 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Server {
 		void	setSocket(int port);
 		void	setBodySize(int size);
 		void	setRoot(std::string root);
+		void	setRedirect(std::string redirect);
 		void	setCGI(bool boolean);
 		void	addErrorPages(std::pair<int, std::string> paired);
 		void	setErrorPages(std::map<int, std::string> errorPages);

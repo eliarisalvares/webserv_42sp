@@ -27,6 +27,11 @@ void	Server::setRoot(std::string root) {
 	this->_root = root;
 }
 
+void	Server::setRedirect(std::string redirect) {
+	this->_permit.has_redir = true;
+	this->_redirect = redirect;
+}
+
 void	Server::setCGI(bool boolean) {
 	this->_cgi = boolean;
 }

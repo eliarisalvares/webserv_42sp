@@ -1,5 +1,4 @@
 #include "server_builder.hpp"
-#include <dirent.h>
 
 t_location	initLocation(void) {
 	t_location		location;
@@ -82,6 +81,18 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 		Logger::debug("Root setted", root);
 	}
 	return (root);
+}
+
+std::string	obtainRedirect(std::vector<std::string> input, int index) {
+	std::string					redir;
+	std::vector<std::string>	words;
+
+	if (input[index].substr(0, 9) == "redirect ") {
+		words = ftstring::split(input[index].substr(9), ' ');
+		redir = words[0];
+		Logger::debug("Redirect setted", redir);
+	}
+	return (redir);
 }
 
 bool	obtainCGI(std::vector<std::string> input, int index) {
@@ -255,7 +266,10 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			else
 				location.error_pages.insert(paired);
 		}
-		//redirect
+		if (input[i].substr(0, 9) == "redirect ") {
+			location.permit.has_redir = true;
+			location.redirection = obtainRedirect(input, i);
+		}
 	}
 	Logger::debug("Location saved", location.location);
 	return (location);

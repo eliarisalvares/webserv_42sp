@@ -8,6 +8,7 @@
 # include <map>
 # include <set>
 # include <algorithm>
+#include <dirent.h> //verifying or opening directories
 # include "define_server.hpp"
 # include "ftstring.hpp"
 # include "Logger.hpp"
@@ -41,6 +42,7 @@ int							obtainPort(std::vector<std::string> input, int index);
 int							obtainBodySize(std::vector<std::string> input, int index);
 int							obtainBufferSize(std::vector<std::string> input, int index);
 std::string					obtainRoot(std::vector<std::string> input, int index);
+std::string					obtainRedirect(std::vector<std::string> input, int index);
 std::vector<std::string>	obtainName(std::vector<std::string> input, int index);
 t_location					obtainLoc(std::vector<std::string> input, int index);
 std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
