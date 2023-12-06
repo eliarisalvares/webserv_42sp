@@ -16,7 +16,7 @@ int	Server::getBodySize(void) const {
 	return this->_client_max_body_size;
 }
 
-std::vector<std::string>	Server::getCGI(void) const {
+bool	Server::getCGI(void) const {
 	return this->_cgi;
 }
 

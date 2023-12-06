@@ -27,8 +27,8 @@ void	Server::setRoot(std::string root) {
 	this->_root = root;
 }
 
-void	Server::setCGI(std::vector<std::string> cgi) {
-	this->_cgi = cgi;
+void	Server::setCGI(bool boolean) {
+	this->_cgi = boolean;
 }
 
 void	Server::addErrorPages(std::pair<int, std::string> paired) {

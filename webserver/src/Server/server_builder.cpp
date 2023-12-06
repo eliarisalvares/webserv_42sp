@@ -51,6 +51,17 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 	return (bodySize);
 }
 
+int	obtainBufferSize(std::vector<std::string> input, int index) {
+	int							bufferSize;
+
+	if (input[index].substr(0, 12) == "buffer_size ") {
+		bufferSize = ftstring::strtoi(input[index].substr(12));
+		//check min or max?
+		Logger::debug("Buffer Size setted", bufferSize);
+	}
+	return (bufferSize);
+}
+
 std::string	obtainRoot(std::vector<std::string> input, int index) {
 	std::string					root;
 	std::vector<std::string>	words;
@@ -64,20 +75,25 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 	return (root);
 }
 
-std::vector<std::string>	obtainCGI(std::vector<std::string> input, int index) {
+bool	obtainCGI(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
+	bool						valid = true;
 
 	if (input[index].substr(0, 4) == "cgi ") {
 		name = input[index].substr(4);
 		serverName = ftstring::split(name, ' ');
-		if (serverName.size() != 2)
+		if (serverName.size() != 2) {
+			valid = false;
 			throw CGIMissconfigurationException();
-		else if (serverName[0] != ".py" || serverName[1] != "python3")
+		}
+		else if (serverName[0] != ".py" || serverName[1] != "python3") {
+			valid = false;
 			throw CGINotSupportedException();
+		}
 		Logger::debug("CGI setted from .conf file");
 	}
-	return (serverName);
+	return (valid);
 }
 
 std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {

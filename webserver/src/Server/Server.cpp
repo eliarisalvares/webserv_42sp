@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 14:28:48 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 11:36:29 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,8 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			addErrorPages(obtainErrorPages(input, i));
 		if (input[i].substr(0, 6) == "index ")
 			setIndex(obtainIndex(input, i));
-
-		//_bufferSize;
-		// _uploadPath;
+		if (input[i].substr(0, 12) == "buffer_size ")
+			setBufferSize(obtainBufferSize(input, i));
 	}
 	configSocket(_port);
 	_location_root.clear();
@@ -86,10 +85,10 @@ void	Server::setBasics() {
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
-	setCGI(ftstring::split(".py python3", ' '));
+	setCGI(true);
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	_locations.push_back(location);
-	setUpPath("/content/upload/"); //idk
+	setUpPath("/content/upload/"); // checar como que a pasta é criada??
 	setMethods(http::methods);
 	setIndex(index);
 	setName(serverName);
