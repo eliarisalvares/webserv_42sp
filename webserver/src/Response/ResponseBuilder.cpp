@@ -63,8 +63,19 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 }
 
 
-std::string responseBuilder(const std::string& filePath) {
+std::string responseBuilder(std::string& filePath) {
     Response response;
+
+    // isso aqui é um teste:
+    if (filePath == "/") {
+        if (access("content/index.html", F_OK) == 0) {
+            filePath = "content/index.html";
+        } else {
+            filePath = "content/cgi/autoindex.py";
+        }
+    }
+
+    std::cout << "filePath: " << filePath << std::endl;
 
     std::string contentType = getContentType(filePath);
 

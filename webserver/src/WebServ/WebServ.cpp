@@ -240,8 +240,9 @@ void WebServ::_respond(Request* request) {
 	Response response;
 	int response_fd = request->fd();
 
-	//std::string filePath = request->_requestData;
-	std::string filePath = "content/cgi/current_time.py";
+	// get uri from request
+	std::string filePath = request->uri();
+	std::cout << "filePath: " << filePath << std::endl;
 
 	Logger::debug("creating response...");
 	std::string response_string = responseBuilder(filePath);
