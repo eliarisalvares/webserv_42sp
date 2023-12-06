@@ -20,7 +20,9 @@ server {
 	cgi .py python 3				# Define o uso do cgi - apenas python (opcional)
 	allowed_methods GET POST DELETE # Define quais métodos são permitidos(opcional)
 	index index.html				# Páginas de índice padrão da rota (opcional)
-	buffer_size						# Buffersize para leitura
+	buffer_size 256					# Buffersize para leitura - maior que 1 e menor que 1024 (opcional)
+	autoindex true					# habilita listagem de diretórios (opcional)
+
 
 	# Configurações para rotas  (opcional)
 	location / {

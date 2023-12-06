@@ -21,7 +21,7 @@ typedef struct	s_permissions
 
 typedef struct	s_location
 {
-	bool									cgi; // .py python3
+	bool									cgi;
 	std::string								location; // "/"
 	std::string								root; // "/content"
 	std::set<std::string>					allowed_methods; //std::set<std::string> _fill_methods(void)
@@ -31,6 +31,7 @@ typedef struct	s_location
 	// std::pair<unsigned int, std::string>	http_redirection;
 }				t_location;
 
+bool						obtainAutoIndex(std::vector<std::string> input, int index);
 bool						obtainCGI(std::vector<std::string> input, int index);
 int							obtainPort(std::vector<std::string> input, int index);
 int							obtainBodySize(std::vector<std::string> input, int index);
@@ -93,5 +94,10 @@ class InvalidErrorNbrException : public std::exception {
 class InvalidFileException : public std::exception {
 	virtual const char* what(void) const throw();
 };
+
+class WrongNbrException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
 
 #endif

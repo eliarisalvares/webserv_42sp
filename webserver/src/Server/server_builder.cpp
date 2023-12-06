@@ -1,12 +1,14 @@
 #include "server_builder.hpp"
 
 t_location	initLocation(void) {
-	t_location	location;
+	t_location		location;
 
 	location.allowed_methods = http::methods;
 	location.location = LOCATION;
 	location.root = "/content";
 	location.index.insert("/content/index.html");
+	location.permit.autoindex = false;
+	location.permit.directory_listing = false;
 	return (location);
 }
 
@@ -78,21 +80,38 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 
 bool	obtainCGI(std::vector<std::string> input, int index) {
 	std::string					name;
-	std::vector<std::string>	serverName;
+	std::vector<std::string>	cgiName;
 	bool						valid = true;
 
 	if (input[index].substr(0, 4) == "cgi ") {
 		name = input[index].substr(4);
-		serverName = ftstring::split(name, ' ');
-		if (serverName.size() != 2) {
+		cgiName = ftstring::split(name, ' ');
+		if (cgiName.size() != 2) {
 			valid = false;
 			throw CGIMissconfigurationException();
 		}
-		else if (serverName[0] != ".py" || serverName[1] != "python3") {
+		else if (cgiName[0] != ".py" || cgiName[1] != "python3") {
 			valid = false;
 			throw CGINotSupportedException();
 		}
 		Logger::debug("CGI setted from .conf file");
+	}
+	return (valid);
+}
+
+bool	obtainAutoIndex(std::vector<std::string> input, int index) {
+	std::vector<std::string>	autoindex;
+	bool						valid = false;
+
+	if (input[index].substr(0, 10) == "autoindex ") {
+		autoindex = ftstring::split(input[index].substr(4), ' ');
+		if (autoindex.size() != 2)
+			throw WrongNbrException();
+		else if (autoindex[1] == "true")
+			valid = true;
+		else if (autoindex[1] == "false")
+			valid = false;
+		Logger::debug("Autoindex setted as ", valid);
 	}
 	return (valid);
 }
@@ -131,6 +150,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.allowed_methods = obtainMethod(input, i);
 		if (input[i].substr(0, 6) == "index ")
 			location.index = obtainIndex(input, i);
+		if (input[i].substr(0, 10) == "autoindex ")
+			location.permit.autoindex = obtainAutoIndex(input, i);
 		// faltam todas as infos referentes a response ->http methods, cgi, redirecionamento, permissões, ?
 	}
 	Logger::debug("Location saved", location.location);
@@ -250,4 +271,8 @@ const char* InvalidErrorNbrException::what() const throw() {
 
 const char* InvalidFileException::what() const throw() {
 	return ("Invalid File");
+}
+
+const char* WrongNbrException::what() const throw() {
+	return ("Wrong number of arguments for autoindex.");
 }
