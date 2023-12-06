@@ -56,6 +56,10 @@ std::map<int, std::string>	Server::getErrorPages(void) const {
 	return this->_error_pages;
 }
 
+std::string	Server::getErrorPages(int value) const {
+	return this->_error_pages[value];
+}
+
 //---------------------------------------------------/
 std::string	Server::getServerName(void) {
 	return (SERVER_NAME);
