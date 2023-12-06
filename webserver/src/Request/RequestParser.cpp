@@ -141,7 +141,7 @@ void RequestParser::protocol(char c) {
 
 	if (c == SP && init_protocol)
 		return ;
-	if (c != SLASH && c != CR && c != SP) {
+	if (c != SLASH && c != CR && c != LF && c != SP) {
 		if (init_protocol)
 			init_protocol = false;
 		_protocol.push_back(c);
@@ -187,12 +187,17 @@ void RequestParser::version(char c) {
 		return ;
 	if (std::isdigit(c) || (c == POINT && !_version.empty()))
 		_version.push_back(c);
-	else if (c == CR) {
+	else if (c == CR || c == LF) {
 		size = _version.size();
 		if (size == 3) {
 			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
-				_step = CR_FIRST_LINE;
 				Logger::debug("version", _version);
+				if (c == CR)
+					_step = CR_FIRST_LINE;
+				if (c == LF) {
+					Logger::debug("LF first line");
+					_step = HEADER;
+				}
 			}
 			else
 				_invalid_request(
@@ -219,7 +224,7 @@ void RequestParser::version(char c) {
 // lidando apenas com CRLF por hora, verificar no RFC
 void RequestParser::check_crlf(char c) {
 	if (c != LF)
-		_bad_request("CR without L");
+		_bad_request("CR without LF");
 	else {
 		switch (_step)
 		{
@@ -265,13 +270,17 @@ void RequestParser::header(char c) {
 			_step = SECOND_CR_HEADER;
 			return ;
 		}
+		else if (c == LF) {
+			Logger::debug("LF end header");
+			_step = END;
+			return ;
+		}
 		else if (c == SP || c == HTAB) {
 			_field_name = _last_header;
 			_step = HEADER_VALUE_INIT;
 		}
 		else
 			_step = HEADER_NAME;
-
 	}
 	switch (_step) {
 		case HEADER_NAME:
@@ -329,9 +338,14 @@ void RequestParser::_parse_field_name(char c) {
 void RequestParser::_parse_field_value(char c) {
 	// if (c == SP || c == HTAB) // só pode ser no começo
 	// 	return ;
-	if (c == CR) {
+	if (c == CR || c == LF) {
 		Logger::debug("value", _field_value);
-		_step = CR_HEADER;
+		if (c == CR)
+			_step = CR_HEADER;
+		else if (c == LF) {
+			Logger::debug("LF header");
+			_step = HEADER;
+		}
 		_add_header();
 	}
 	else if (utils::is_ctl(c) && c != HTAB)
@@ -470,7 +484,7 @@ void RequestParser::_check_post_headers(void) {
 		);
 	if (_is_chunked && _has_content_length && _content_length)
 		_bad_request(
-			"can't receive both 'Transfer-Enconding' and 'Content-Length' headers"
+			"chunked data and content-length both setted"
 		);
 	_step = BODY;
 }
