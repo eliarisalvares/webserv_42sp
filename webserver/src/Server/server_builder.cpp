@@ -69,7 +69,7 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
-		root = "/content" + words[0];
+		root = "content" + words[0];
 		//check if root makes sense/exists
 		Logger::debug("Root setted", root);
 	}
@@ -188,12 +188,15 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	std::set<std::string>		value;
 	std::vector<std::string>	words;
+	std::string					page;
 
 	if (input[index].substr(0, 6) == "index ") {
 		words = ftstring::split(input[index].substr(16), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
-			value.insert("/content/" + words[j]);
-			//verificar se arquivo existe e tem permissão
+			page = "content/" + words[j];
+			if (!checkFileWorks(page))
+				throw InvalidFileException();
+			value.insert(page);
 		}
 		Logger::debug("Index setted", input[index].substr(16));
 	}
