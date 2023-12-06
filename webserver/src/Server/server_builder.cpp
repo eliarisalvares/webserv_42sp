@@ -174,6 +174,13 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.permit.directory_listing = obtainDirList(input, i);
 		if (input[i].substr(0, 4) == "cgi ")
 			location.cgi = obtainCGI(input, i);
+		if (input[i].substr(0, 11) == "error_page ") {
+			std::pair<int, std::string> paired = obtainErrorPages(input, i);
+			if (location.error_pages.find(paired.first) != location.error_pages.end())
+				location.error_pages[paired.first] = paired.second;
+			else
+				location.error_pages.insert(paired);
+		}
 	}
 	Logger::debug("Location saved", location.location);
 	return (location);
@@ -191,7 +198,7 @@ std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 			if (words[j] == "GET" || words[j] == "POST" || words[j] == "DELETE")
 				methods.insert(words[j]);
 			else
-				throw InvalidMethodsException();
+				throw utils::GeneralException(utils::INVALID_METHOD);
 		}
 		Logger::debug("Allowed Methods setted from .conf file");
 	}
@@ -264,10 +271,6 @@ const char* CGINotSupportedException::what() const throw() {
 
 const char* InvalidNbrMethodsException::what() const throw() {
 	return ("Wrong values for Allowed Methods.");
-}
-
-const char* InvalidMethodsException::what() const throw() {
-	return ("Invalid Allowed Method.");
 }
 
 const char* TooLargeException::what() const throw() {
