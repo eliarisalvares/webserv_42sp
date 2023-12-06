@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 16:10:14 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 16:23:54 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class Server {
 		std::vector<std::string>	getName(void);
 		std::string					getName(int index);
 		std::map<int, std::string>	getErrorPages(void) const;
-		std::string					getErrorPages(void) const;
+		std::string					getErrorPages(int value) const;
 
 		static std::string	getServerName(void);
 		static std::string	getCurrentPort(void);
