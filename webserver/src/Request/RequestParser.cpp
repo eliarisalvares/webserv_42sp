@@ -340,7 +340,7 @@ void RequestParser::_parse_field_value(char c) {
 		_field_value.push_back(c);
 }
 
-static unsigned char c_tolower(unsigned char c) { return std::tolower(c); }
+
 void RequestParser::_add_header(void) {
 	std::map<std::string, std::vector<std::string> >::iterator it;
 
@@ -348,7 +348,7 @@ void RequestParser::_add_header(void) {
 		_field_name.begin(),
 		_field_name.end(),
 		_field_name.begin(),
-		&c_tolower
+		&utils::c_tolower
 	);
 	_last_header = _field_name; // verificar se faz deep copy...
 	it = _headers.find(_field_name);
@@ -367,6 +367,7 @@ void RequestParser::_add_header(void) {
 }
 
 void RequestParser::check_request(void) {
+	Logger::debug("Checking request");
 	// first check headers and get necessary values
 	_print_headers();
 	_check_host();
@@ -380,6 +381,7 @@ void RequestParser::check_request(void) {
 	_check_method();
 	if (_request->method() == http::POST)
 		_check_post_headers();
+	Logger::debug("End checking request");
 }
 
 // header Host is mandatory and singleton
@@ -463,10 +465,12 @@ void RequestParser::_check_method(void) {
 
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
-		_bad_request("POST without body"); // verificar se dá erro msm, e o tipo certo se for o caso
+		_bad_request(
+			"POST without 'Transfer-Enconding' or 'Content-Length' headers"
+		);
 	if (_is_chunked && _has_content_length && _content_length)
 		_bad_request(
-			"chunked data and content-length both setted"
+			"can't receive both 'Transfer-Enconding' and 'Content-Length' headers"
 		);
 	_step = BODY;
 }
@@ -504,12 +508,26 @@ void RequestParser::_print_headers(void) {
 // }
 
 // Body
+
+//  Request messages are never close-delimited because they are always explicitly
+//  framed by length or transfer coding, with the absence of both implying the
+//   request ends immediately after the header section
+
+// A server MAY reject a request that contains a message body but not a
+// Content-Length by responding with 411 (Length Required).
+
 // If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
 // Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
 // Content-Length: header gives the number of bytes in the body.
 
 // A HTTP request is terminated by two newlines
 // Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
+
+// If a valid Content-Length header field is present without Transfer-Encoding,
+// its decimal value defines the expected message body length in octets. If the
+// sender closes the connection or the recipient times out before the indicated
+// number of octets are received, the recipient MUST consider the message to be
+// incomplete and close the connection.
 
 void RequestParser::body(char c) {
 	if (_is_chunked)
@@ -546,6 +564,15 @@ void RequestParser::body(char c) {
 	// }
 }
 
+// RFC 9112 - 6.3.4
+// If a Transfer-Encoding header field is present in a request and the chunked
+// transfer coding is not the final encoding (0), the message body length cannot
+// be determined reliably; the server MUST respond with the 400 (Bad Request)
+//  status code and then close the connection.
+
+// depois de ler cada chunck, devolve uma resposta com status code = 202 pra
+// indicar pro cliente que foi aceito
+// quando finalizar, retorna 200 ou 201 (CREATED)
 void RequestParser::_body_chunked(char c) {
 	(void)c;
 	_step = END;

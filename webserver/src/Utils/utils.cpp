@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 22:14:43 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 23:04:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ const char* GeneralException::what() const throw() {
 	default:
 		return "GeneralException";
 	}
+}
+
+unsigned char c_tolower(unsigned char c) {
+	return std::tolower(c);
 }
 
 bool is_ctl(char c) {
