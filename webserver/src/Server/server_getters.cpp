@@ -57,7 +57,7 @@ std::map<int, std::string>	Server::getErrorPages(void) const {
 }
 
 std::string	Server::getErrorPages(int value) const {
-	return this->_error_pages[value];
+	return this->_error_pages.at(value);
 }
 
 //---------------------------------------------------/
