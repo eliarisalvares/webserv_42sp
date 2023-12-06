@@ -32,6 +32,7 @@ typedef struct	s_location
 }				t_location;
 
 bool						obtainAutoIndex(std::vector<std::string> input, int index);
+bool						obtainDirList(std::vector<std::string> input, int index);
 bool						obtainCGI(std::vector<std::string> input, int index);
 int							obtainPort(std::vector<std::string> input, int index);
 int							obtainBodySize(std::vector<std::string> input, int index);
@@ -96,6 +97,10 @@ class InvalidFileException : public std::exception {
 };
 
 class WrongNbrException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class WrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
