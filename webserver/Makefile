@@ -43,6 +43,11 @@ VPATH =			src src/Logger src/Request src/Response src/Server src/Parser \
 # Default target
 all: $(NAME)
 
+#needed to run the project if python not installed
+update-env:
+	sudo apt-get update
+	sudo apt-get python3
+
 # Folder for temporary objects
 $(OBJPATH)/%.o:	%.cpp
 	@$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDES)
@@ -52,15 +57,12 @@ $(OBJPATH)/%.o:	%.cpp
 $(OBJPATH):
 	@printf "$(GRAY)[ INFO ] Compiling objects with $(RESET)$(CXX) $(CXXFLAGS) \n" $@
 	@mkdir -p $(OBJPATH)
+	@mkdir -p content/upload
 
 # Linking the final program
 $(NAME): $(OBJPATH) $(OBJ)
 	@$(CXX) $(OBJ) -o $(NAME)
 	@echo "$(CYAN)$(NAME)$(GRAY): $(GREEN)Done$(GRAY)!$(RESET)"
-
-# Compiling the source files
-# %.o: %.cpp
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Removing all object files
 clean:
