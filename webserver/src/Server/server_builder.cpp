@@ -1,4 +1,5 @@
 #include "server_builder.hpp"
+#include <dirent.h>
 
 t_location	initLocation(void) {
 	t_location		location;
@@ -60,7 +61,7 @@ int	obtainBufferSize(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 12) == "buffer_size ") {
 		bufferSize = ftstring::strtoi(input[index].substr(12));
 		if (bufferSize < 1 || bufferSize > 1024)
-			throw InvalidBufferSize();
+			throw BufferSizeInvalidException();
 		Logger::debug("Buffer Size setted", bufferSize);
 	}
 	return (bufferSize);
@@ -69,11 +70,15 @@ int	obtainBufferSize(std::vector<std::string> input, int index) {
 std::string	obtainRoot(std::vector<std::string> input, int index) {
 	std::string					root;
 	std::vector<std::string>	words;
+	DIR *dr;
 
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
 		root = "content" + words[0];
-		//check if root makes sense/exists -> use check directory
+		dr = opendir(root.data());
+		if (dr == NULL) {
+			throw utils::GeneralException(utils::INVALID_DIRECTORY);
+		}
 		Logger::debug("Root setted", root);
 	}
 	return (root);
@@ -89,11 +94,11 @@ bool	obtainCGI(std::vector<std::string> input, int index) {
 		cgiName = ftstring::split(name, ' ');
 		if (cgiName.size() != 2) {
 			valid = false;
-			throw CGIMissconfigurationException();
+			throw CGIWrongArgumentException();
 		}
 		else if (cgiName[0] != ".py" || cgiName[1] != "python3") {
 			valid = false;
-			throw CGINotSupportedException();
+			throw CGIInvalidException();
 		}
 		Logger::debug("CGI setted from .conf file");
 	}
@@ -107,13 +112,13 @@ bool	obtainAutoIndex(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 10) == "autoindex ") {
 		autoindex = ftstring::split(input[index].substr(10), ' ');
 		if (autoindex.size() != 1)
-			throw WrongNbrException();
+			throw AutoIndexWrongArgumentException();
 		if (autoindex[0] == "true")
 			valid = true;
 		else if (autoindex[0] == "false")
 			valid = false;
 		else
-			throw WrongArgumentException();
+			throw AutoIndexInvalidException();
 		Logger::debug("Autoindex setted as ", autoindex[0]);
 	}
 	return (valid);
@@ -126,11 +131,13 @@ bool	obtainDirList(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 18) == "directory_listing ") {
 		dirList = ftstring::split(input[index].substr(18), ' ');
 		if (dirList.size() != 1)
-			throw WrongNbrException();
+			throw DirListWrongArgumentException();
 		if (dirList[0] == "true")
 			valid = true;
 		else if (dirList[0] == "false")
 			valid = false;
+		else
+			throw DirListInvalidException();
 		Logger::debug("Directory Listing setted as ", dirList[0]);
 	}
 	return (valid);
@@ -155,7 +162,7 @@ std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 16) == "allowed_methods ") {
 		words = ftstring::split(input[index].substr(16), ' ');
 		if (words.size() <= 0 || words.size() >= 4)
-			throw InvalidNbrMethodsException();
+			throw MethodsWrongArgumentException();
 		for (size_t j = 0; j < words.size(); j++) {
 			if (words[j] == "GET" || words[j] == "POST" || words[j] == "DELETE")
 				methods.insert(words[j]);
@@ -182,10 +189,10 @@ std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int
 	if (input[index].substr(0, 11) == "error_page ") {
 		words = ftstring::split(input[index].substr(11), ' ');
 		if (words.size() != 2)
-			throw WrongNbrErrorException();
+			throw ErrPagesWrongArgumentException();
 		it = words.begin();
 		if (!(std::find(codes.begin(), codes.end(), *it) != codes.end()))
-			throw InvalidErrorNbrException();
+			throw ErrPagesInvalidException();
 		nbr = ftstring::strtoi(words[0]);
 		page = "content/error_pages/" + words[1];
 		if (!checkFileWorks(page))
@@ -263,46 +270,54 @@ const char* PortNeedsSudoExeption::what() const throw() {
 	return ("Sudo required to run.");
 }
 
-const char* CGIMissconfigurationException::what() const throw() {
-	return ("Wrong number of arguments in CGI.");
+const char* CGIWrongArgumentException::what() const throw() {
+	return ("Wrong number of arguments for CGI.");
 }
 
-const char* CGINotSupportedException::what() const throw() {
+const char* CGIInvalidException::what() const throw() {
 	return ("CGI mode not supported by webserv.");
 }
 
-const char* InvalidNbrMethodsException::what() const throw() {
-	return ("Wrong values for Allowed Methods.");
+const char* MethodsWrongArgumentException::what() const throw() {
+	return ("Wrong number of arguments for Allowed Methods.");
 }
 
 const char* TooLargeException::what() const throw() {
 	return ("Size of client body too large.");
 }
 
-const char* InvalidBufferSize::what() const throw() {
-	return ("Value for Buffer invalid.");
+const char* BufferSizeInvalidException::what() const throw() {
+	return ("Not a valid argument for Buffer size.");
 }
 
 const char* LocationNotOpenedException::what() const throw() {
 	return ("Location open bracket '{' not found.");
 }
 
-const char* WrongNbrErrorException::what() const throw() {
+const char* ErrPagesWrongArgumentException::what() const throw() {
 	return ("Wrong number of arguments to set Error Pages.");
 }
 
-const char* InvalidErrorNbrException::what() const throw() {
-	return ("Value of Error Page does not exist.");
+const char* ErrPagesInvalidException::what() const throw() {
+	return ("Not a valid argument for Error Pages.");
 }
 
 const char* InvalidFileException::what() const throw() {
 	return ("Invalid File");
 }
 
-const char* WrongNbrException::what() const throw() {
+const char* AutoIndexWrongArgumentException::what() const throw() {
 	return ("Wrong number of arguments for autoindex.");
 }
 
-const char* WrongArgumentException::what() const throw() {
+const char* AutoIndexInvalidException::what() const throw() {
 	return ("Not a valid argument for autoindex.");
+}
+
+const char* DirListWrongArgumentException::what() const throw() {
+	return ("Wrong number of arguments for directory_listing.");
+}
+
+const char* DirListInvalidException::what() const throw() {
+	return ("Not a valid argument for directory_listing.");
 }
