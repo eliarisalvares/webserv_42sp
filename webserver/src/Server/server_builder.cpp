@@ -5,8 +5,8 @@ t_location	initLocation(void) {
 
 	location.allowed_methods = http::methods;
 	location.location = LOCATION;
-	location.root = "/content";
-	location.index.insert("/content/index.html");
+	location.root = "content";
+	location.index.insert("content/index.html");
 	location.permit.autoindex = false;
 	location.permit.directory_listing = false;
 	return (location);
@@ -148,7 +148,6 @@ std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 }
 
 t_location	obtainLoc(std::vector<std::string> input, int index) {
-	//deal with location :')
 	t_location					location;
 	std::vector<std::string>	locName;
 
@@ -175,7 +174,6 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.permit.directory_listing = obtainDirList(input, i);
 		if (input[i].substr(0, 4) == "cgi ")
 			location.cgi = obtainCGI(input, i);
-		// faltam todas as infos referentes a response ->http methods, cgi, redirecionamento, permissões, ?
 	}
 	Logger::debug("Location saved", location.location);
 	return (location);
