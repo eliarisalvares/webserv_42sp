@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 22:27:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 15:12:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,10 +241,6 @@ void RequestParser::check_crlf(char c) {
 			_step = END;
 			break;
 		case CR_BODY:
-			Logger::debug("CRLF body");
-			_step = BODY_NEW_LINE;
-			break;
-		case SECOND_CR_BODY:  // check if it have two CRLFs also
 			Logger::debug("CRLF end body");
 			_step = END;
 			break;
@@ -479,8 +475,9 @@ void RequestParser::_check_method(void) {
 
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
-		_bad_request(
-			"POST without 'Transfer-Enconding' or 'Content-Length' headers"
+		_invalid_request(
+			"POST without 'Transfer-Enconding' or 'Content-Length' headers",
+			http::LENGTH_REQUIRED
 		);
 	if (_is_chunked && _has_content_length && _content_length)
 		_bad_request(
@@ -512,8 +509,8 @@ void RequestParser::_print_headers(void) {
 			}
 			std::cout << std::endl;
 		}
-		std::cout << "------------------------------------------------------\n";
-		std::cout << RESET << std::endl;
+		std::cout << "------------------------------------------------------\n"
+				<< RESET;
 	}
 }
 
@@ -546,36 +543,25 @@ void RequestParser::_print_headers(void) {
 void RequestParser::body(char c) {
 	if (_is_chunked)
 		return _body_chunked(c);
-	_body.push_back(c);  // em tese pode fazer isso pq se content-length == 0 dá erro antes
-	// ver como lidar com o parseamento
-	++_body_bytes_readed;
-	if (_body_bytes_readed == _content_length) {
-		_step = END;
-		if (DEBUG) {
-			std::cout << GREY << "Received body:\n";
+	if (_body_bytes_readed < _content_length) {
+		_body.push_back(c);
+		++_body_bytes_readed;
+		if (_body_bytes_readed == _content_length) {
+			_step = BODY_LENGTH_END;
 			_print_body();
 		}
 	}
-	// if (_step == BODY_NEW_LINE) {
-	// 	if (c == CR) {
-	// 		_step = SECOND_CR_BODY;
-	// 		if (DEBUG) {
-	// 			std::cout << GREY << "Received body:\n";
-	// 			_print_body();
-	// 		}
-	// 		return ;
-	// 	}
-	// 	else
-	// 		_step = BODY;
-	// }
-	// if (_step == BODY) {
-	// 	if (c == CR)
-	// 		_step = CR_BODY;
-	// 	else if (_is_chunked)
-	// 		_parse_chunk(c);
-	// 	else
-	// 		_body.push_back(c);
-	// }
+}
+
+void RequestParser::end_body(char c) {
+	if (c == CR)
+		_step = CR_BODY;
+	else if (c == LF) {
+		Logger::debug("LF end Body");
+		_step = END;
+	}
+	else
+		_invalid_request("Body larger than specified", http::CONTENT_TOO_LARGE);
 }
 
 // RFC 9112 - 6.3.4
@@ -600,6 +586,10 @@ void RequestParser::_print_body(void) {
 	std::vector<char>::iterator it, end = _body.end();
 
 	if (DEBUG) {
+		std::cout << GREY
+				<< "------------------------------------------------------\n"
+				<< BLUE << "Received body of size " << _body_bytes_readed
+				<< ":\n" << GREY;
 		for(it = _body.begin(); it != end; ++it) {
 			if (*it == CR)
 				std::cout << " CR";
@@ -608,7 +598,9 @@ void RequestParser::_print_body(void) {
 			else
 				std::cout << *it;
 		}
-		std::cout << RESET << std::endl;
+		std::cout
+				<< "\n------------------------------------------------------\n"
+				<< RESET << std::endl;
 	}
 }
 

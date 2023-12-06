@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 22:28:33 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 16:08:06 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,12 @@ public:
 		CR_HEADER,
 		SECOND_CR_HEADER,
 		BODY,
-		BODY_NEW_LINE,
+		BODY_LENGTH_END,
+		CHUNK_SIZE,
+		CHUNK_PARAMETERS,
+		CHUNK_DATA,
 		CR_BODY,
-		SECOND_CR_BODY,
 		END,
-		ERROR, // necessary?
 	};
 
 	enum Error {
@@ -106,6 +107,7 @@ public:
 	void			version(char c);
 	void			header(char c);
 	void			body(char c);
+	void			end_body(char c);
 
 	void			check_crlf(char c);
 	void			check_request(void);
