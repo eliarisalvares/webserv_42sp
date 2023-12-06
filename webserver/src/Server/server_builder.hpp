@@ -17,6 +17,7 @@ typedef struct	s_permissions
 {
 	bool	autoindex;
 	bool	directory_listing;
+	bool	has_redir; // a fazer
 }				t_permissions;
 
 typedef struct	s_location
@@ -24,8 +25,10 @@ typedef struct	s_location
 	bool									cgi;
 	std::string								location;
 	std::string								root;
+	std::string								redirection; // a fazer
 	std::set<std::string>					allowed_methods;
 	std::set<std::string>					index;
+	std::map<int, std::string>				error_pages;
 	t_permissions							permit;
 	// std::vector<std::string>				http_methods;
 	// std::pair<unsigned int, std::string>	http_redirection;
@@ -103,6 +106,5 @@ class WrongNbrException : public std::exception {
 class WrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
-
 
 #endif

@@ -26,12 +26,12 @@ server {
 
 	# Configurações para rotas  (opcional)
 	location / {
-		root /var/www/html				# Diretório raiz da rota
+		root /				# Diretório raiz da rota
 		index index.html				# Páginas de índice padrão da rota
 	}
 
 	location /about {
-		root /var/www/html
+		root /html
 		index about.html
 	}
 }```
