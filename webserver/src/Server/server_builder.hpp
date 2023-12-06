@@ -22,9 +22,9 @@ typedef struct	s_permissions
 typedef struct	s_location
 {
 	bool									cgi;
-	std::string								location; // "/"
-	std::string								root; // "/content"
-	std::set<std::string>					allowed_methods; //std::set<std::string> _fill_methods(void)
+	std::string								location;
+	std::string								root;
+	std::set<std::string>					allowed_methods;
 	std::set<std::string>					index;
 	t_permissions							permit;
 	// std::vector<std::string>				http_methods;

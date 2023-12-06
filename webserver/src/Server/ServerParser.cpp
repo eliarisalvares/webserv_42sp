@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:44:59 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 14:10:50 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 15:23:28 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ void	ServerParser::setConf(std::string fileName) {
 	}
 	inputFile.close();
 	if (!_beginingOfFile())
-		throw ServerErrorException(); //error of not server in the begining
+		throw ServerErrorException();
 	if (!_bracketsClosed())
-		throw SyntaxErrorException(); //error of syntax
+		throw SyntaxErrorException();
 	for (size_t i = 0; i < _lines.size(); i++)
 	{
 		if (_lines[i].substr() == "server {")

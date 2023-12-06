@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 11:33:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 15:23:06 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ class Server {
 		bool									_cgi;
 		int										_bufferSize;
 		int										_client_max_body_size;
-		int										_port;  // único item obrigatório no arquivo
+		int										_port;
 		int										_socket;
-		t_permissions							_permit; //autoindex && directory_listing
+		t_permissions							_permit;
 		std::string								_root;
 		std::string								_uploadPath;
 		std::set<std::string>					_allowed_methods;
@@ -83,26 +83,8 @@ class Server {
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
-		std::map<std::string, std::string>		_location_root;  // inclui o par pro cgi -> colocar dentro de locations
+		std::map<std::string, std::string>		_location_root;  // temporário
 		// o que sabemos que falta: redirect -> for locations is ok
 };
 
 #endif
-
-/* {
-	root content
-
-	location /cgi {
-		root bla
-		limit_except GET
-	}
-
-} */
-
-/* Rota: métodos permitidos, redirecionamento http, root dr/file,
-arquivo padrão(/) se usuário requisitar um diretório,
-cgi .py python3;
-cgi .php php-cgi;
- */
-
-
