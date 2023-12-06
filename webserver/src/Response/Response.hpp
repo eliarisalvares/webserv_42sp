@@ -57,7 +57,7 @@ private:
 };
 
 std::string handleCGI(void);
-std::string responseBuilder(const std::string& filePath);
+std::string responseBuilder(std::string& filePath);
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);

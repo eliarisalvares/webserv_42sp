@@ -72,6 +72,7 @@ http::HttpStatus Request::status_code(void) const {
 }
 
 std::string Request::uri(void) const {
+	std::cout << "uri: " << this->_uri << std::endl;
 	return this->_uri;
 }
 
