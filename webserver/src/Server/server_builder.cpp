@@ -56,7 +56,8 @@ int	obtainBufferSize(std::vector<std::string> input, int index) {
 
 	if (input[index].substr(0, 12) == "buffer_size ") {
 		bufferSize = ftstring::strtoi(input[index].substr(12));
-		//check min or max?
+		if (bufferSize < 1 || bufferSize > 1024)
+			throw InvalidBufferSize();
 		Logger::debug("Buffer Size setted", bufferSize);
 	}
 	return (bufferSize);
@@ -114,12 +115,13 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	std::vector<std::string>	locName;
 
 	location = initLocation();
+	Logger::debug("Init location parsing", location.location);
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
 			location.location = locName[0];
-			// if (locName[1] != "{")
-			// 	throw LocationNotOpenedException();
+			if (locName[1] != "{")
+				throw LocationNotOpenedException();
 		}
 		if (input[i] == "}")
 			break ;
@@ -157,17 +159,28 @@ std::set<std::string>	obtainMethod(std::vector<std::string> input, int index) {
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index) {
 	std::pair<int, std::string>	paired;
 	std::vector<std::string>	words;
+	std::string					page;
 	int							nbr;
+	char const		*values[] = {"400", "401", "402", "403", "404", "405", "406", "407", "408", "409", "410",
+								"411", "412", "413", "414", "415", "416", "417", "418", "421", "422", "423",
+								"424", "425", "426", "428", "429", "431", "451", "500", "501", "502", "503",
+								"504", "505", "506", "507", "508", "510", "511"};
+	std::vector<std::string> const codes(values, (values + sizeof(values) / sizeof(values[0])));
+	std::vector<std::string>::const_iterator it;
 
 	if (input[index].substr(0, 11) == "error_page ") {
 		words = ftstring::split(input[index].substr(11), ' ');
 		if (words.size() != 2)
-			throw PortNeedsSudoExeption();
+			throw WrongNbrErrorException();
+		it = words.begin();
+		if (!(std::find(codes.begin(), codes.end(), *it) != codes.end()))
+			throw InvalidErrorNbrException();
 		nbr = ftstring::strtoi(words[0]);
-		//verificar se o numero de erro é valido
-		//verificar arquivo -> existe e é valido ("/content/error_pages/" + words[1]);
-		paired = std::make_pair(nbr, "/content/error_pages/" + words[1]);
-		Logger::debug("Error page setted, nbr", nbr);
+		page = "content/error_pages/" + words[1];
+		if (!checkFileWorks(page))
+			throw InvalidFileException();
+		paired = std::make_pair(nbr, page);
+		Logger::debug("Error page setted, value", nbr);
 	}
 	return (paired);
 }
@@ -214,4 +227,24 @@ const char* InvalidMethodsException::what() const throw() {
 
 const char* TooLargeException::what() const throw() {
 	return ("Size of client body too large.");
+}
+
+const char* InvalidBufferSize::what() const throw() {
+	return ("Value for Buffer invalid.");
+}
+
+const char* LocationNotOpenedException::what() const throw() {
+	return ("Location open bracket '{' not found.");
+}
+
+const char* WrongNbrErrorException::what() const throw() {
+	return ("Wrong number of arguments to set Error Pages.");
+}
+
+const char* InvalidErrorNbrException::what() const throw() {
+	return ("Value of Error Page does not exist.");
+}
+
+const char* InvalidFileException::what() const throw() {
+	return ("Invalid File");
 }
