@@ -7,6 +7,7 @@
 # include <vector>
 # include <map>
 # include <set>
+# include <algorithm>
 # include "define_server.hpp"
 # include "ftstring.hpp"
 # include "Logger.hpp"
@@ -70,6 +71,26 @@ class InvalidMethodsException : public std::exception {
 };
 
 class TooLargeException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class InvalidBufferSize : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class LocationNotOpenedException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class WrongNbrErrorException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class InvalidErrorNbrException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class InvalidFileException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
