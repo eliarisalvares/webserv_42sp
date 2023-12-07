@@ -54,6 +54,7 @@ public:
 	void	stop(void);
 	void	clean(void);
 	void	restart_socket_servers(void);
+	bool	checkPort(int port);
 	class ServerPortAlreadySetted : public std::exception {
 			virtual const char* what(void) const throw();
 		};
