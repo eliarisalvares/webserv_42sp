@@ -244,7 +244,7 @@ bool WebServ::_is_ready_to_respond(int fd) {
 }
 
 void WebServ::_respond(Request* request) {
-	Response response(request);
+	Response response = responseBuilder(request);
 
 	response.sendResponse();
 }

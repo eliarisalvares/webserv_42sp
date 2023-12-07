@@ -3,36 +3,34 @@
 /* Canonical Form
 */
 
-Response::Response(void) { 
+Response::Response(void) {
 	this->_status_code = http::OK;
 	this->_message = "OK";
 }
 
-Response::Response(Request* request) {
-	this->_fd = request->fd();
-	this->_status_code = request->status_code();
-	if (request->has_error()) {
-		//resposta vai ser uma página de erro
-	}
-	
-	
-
-	Logger::debug("creating response...");
-	this->_message = responseBuilder(request, response);
+Response::Response(int fd, int status_code) {
+	this->_fd = fd;
+	this->_status_code = status_code;
 }
 
 Response::~Response(void) { }
 
-Response::Response(Response const& copy) { 
-	(void)copy;
+Response::Response(Response const& copy) {
+	*this = copy;
 }
 
 Response const& Response::operator=(Response const & copy) {
-	(void)copy;
+	if (this != &copy) {
+		this->_fd = copy.getFd();
+		this->_status_code = copy.getStatusCode();
+		this->_message = copy.getMessage();
+		this->body = copy.getBody();
+		this->headers = copy.getHeaders();
+	}
 	return *this;
 }
 
-/* Setters 
+/* Setters
 */
 
 void Response::setStatusCode(int status_code) {
@@ -53,6 +51,10 @@ void Response::addHeader(const std::string& key, const std::string& value) {
 
 /* Getters
 */
+
+int Response::getFd(void) const {
+	return _status_code;
+}
 
 int Response::getStatusCode(void) const {
 	return _status_code;
@@ -91,5 +93,7 @@ std::string Response::toString() const {
 
 void Response::sendResponse(void) {
 	Logger::debug("sending response...");
-	send(this->_fd, this->_message.c_str(), this->_message.length(), 0);
+
+	std::string response_string = this->toString();
+	send(this->_fd, response_string.c_str(), response_string.length(), 0);
 }
