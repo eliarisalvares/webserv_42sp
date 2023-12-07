@@ -39,27 +39,28 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 }
 
 void	WebServ::create_servers(std::vector<std::string> input) {
-	// for now working with one server only
-	// int	extraBrackets = 0;
+	//verify if the same port is being used
+	int	brackets = 0;
+	size_t i;
 
-	// for (size_t index = 0; index < input.size(); index++) {
-		Server *oneServer = new Server(input, 0);
+	for (size_t index = 0; index < input.size(); index++) {
+		Server *oneServer = new Server(input, index);
 
-		// if (input[index] == input.back())
-			// break ;
-		// oneServer->setServer(input, 0);
-		// if (input[index].substr(0, 8) == "server {") {
-			// while (input[index].substr() != "}" && extraBrackets == 0) {
-				// if (input[index].substr(0, 9) == "location ")
-					// extraBrackets++;
-				// else if (input[index].substr() == "}")
-					// extraBrackets--;
-				// index++;
-			// }
-		// }
+		if (input[index] == input.back())
+			break ;
+		if (input[index].substr(0, 8) == "server {") {
+			for (i = index; i < input.size(); i++) {
+				if (input[i].substr(0, 9) == "location ")
+					brackets++;
+				if (input[i].substr() == "}" && brackets == 0)
+					break ;
+				else if (input[i].substr() == "}")
+					brackets--;
+			}
+			index = i;
+		}
 		this->_servers.insert(std::pair<int, Server*>(oneServer->getSocket(), oneServer));
-	// }
-
+	}
 	//will get the socket for the server, initialize the server
 }
 
