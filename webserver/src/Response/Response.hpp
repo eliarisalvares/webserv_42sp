@@ -25,16 +25,18 @@ Response Class
 # include "Request.hpp"
 # include "Logger.hpp"
 # include "http.hpp"
+# include "ftstring.hpp"
 
 class Response {
 
 public:
 	Response(void);
-	Response(Request* request);
+	Response(int fd, int status_code);
 	~Response(void);
 	Response(Response const& copy);
 	Response const& operator=(Response const& copy);
 
+	int getFd(void) const;
 	int getStatusCode(void) const;
 	std::string getMessage(void) const;
 	std::string getBody(void) const;
@@ -61,7 +63,7 @@ private:
 };
 
 std::string handleCGI(void);
-std::string responseBuilder(std::string& filePath);
+Response	responseBuilder(Request* request);
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);
