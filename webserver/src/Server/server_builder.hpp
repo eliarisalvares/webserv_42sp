@@ -48,6 +48,7 @@ t_location					obtainLoc(std::vector<std::string> input, int index);
 std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index);
 std::set<std::string>		obtainIndex(std::vector<std::string> input, int index);
+std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std::string root);
 
 t_location					initLocation(void);
 

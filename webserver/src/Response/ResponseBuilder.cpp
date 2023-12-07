@@ -69,6 +69,15 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 	response.addHeader("Cache-Control", "no-cache");
 }
 
+std::string	setFlagsContent(std::string contentType) {
+	std::string	result;
+
+	result = contentType;
+	if (contentType == "text/html") {
+		result += HTML_CHAR;
+	}
+	return result;
+}
 
 Response responseBuilder(Request* request) {
 	Response response(request->fd(), request->status_code());
@@ -109,7 +118,7 @@ Response responseBuilder(Request* request) {
 	} else if (contentType == "text/html") {
 		body = getHtmlContent(filePath);
 	}
-
+	contentType = setFlagsContent(contentType);
 	if (!request->has_error())
 		statusCode = body.empty() ? 404 : 200;
 	std::string message = getStatusMessage(statusCode);

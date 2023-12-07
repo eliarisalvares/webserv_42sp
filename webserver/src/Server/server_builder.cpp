@@ -5,7 +5,7 @@ t_location	initLocation(void) {
 
 	location.allowed_methods = http::methods;
 	location.location = LOCATION;
-	location.root = "content";
+	location.root = ROOT;
 	location.index.insert("content/index.html");
 	location.permit.autoindex = false;
 	location.permit.directory_listing = false;
@@ -232,6 +232,24 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	return (value);
 }
 
+std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std::string root) {
+	std::set<std::string>		value;
+	std::vector<std::string>	words;
+	std::string					page;
+
+	if (input[index].substr(0, 6) == "index ") {
+		words = ftstring::split(input[index].substr(6), ' ');
+		for (size_t j = 0; j < words.size(); j++) {
+			page = root + "/" + words[j];
+			if (!checkFileWorks(page))
+				throw InvalidFileException();
+			value.insert(page);
+		}
+		Logger::debug("Index setted", input[index].substr(6));
+	}
+	return (value);
+}
+
 t_location	obtainLoc(std::vector<std::string> input, int index) {
 	t_location					location;
 	std::vector<std::string>	locName;
@@ -240,8 +258,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
-			location.location = locName[0];
 			Logger::debug("Init location parsing", location.location);
+			location.location = locName[0];
 			if (locName[1] != "{")
 				throw LocationNotOpenedException();
 		}
@@ -251,8 +269,12 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 			location.root = obtainRoot(input, i);
 		if (input[i].substr(0, 16) == "allowed_methods ")
 			location.allowed_methods = obtainMethod(input, i);
-		if (input[i].substr(0, 6) == "index ")
-			location.index = obtainIndex(input, i);
+		if (input[i].substr(0, 6) == "index ") {
+			if (location.root != "/")
+				location.index = obtainIndex(input, i, location.root);
+			else
+				location.index = obtainIndex(input, i);
+		}
 		if (input[i].substr(0, 10) == "autoindex ")
 			location.permit.autoindex = obtainAutoIndex(input, i);
 		if (input[i].substr(0, 18) == "directory_listing ")

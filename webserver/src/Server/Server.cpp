@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/07 10:45:14 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/07 18:49:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,12 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		}
 		if (input[i].substr(0, 11) == "error_page ")
 			addErrorPages(obtainErrorPages(input, i));
-		if (input[i].substr(0, 6) == "index ")
-			setIndex(obtainIndex(input, i));
+		if (input[i].substr(0, 6) == "index ") {
+			if (getRoot() != "/")
+				setIndex(obtainIndex(input, i, getRoot()));
+			else
+				setIndex(obtainIndex(input, i));
+		}
 		if (input[i].substr(0, 12) == "buffer_size ")
 			setBufferSize(obtainBufferSize(input, i));
 		if (input[i].substr(0, 10) == "autoindex ")
