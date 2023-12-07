@@ -20,15 +20,18 @@ server {
 	cgi .py python 3				# Define o uso do cgi - apenas python (opcional)
 	allowed_methods GET POST DELETE # Define quais métodos são permitidos(opcional)
 	index index.html				# Páginas de índice padrão da rota (opcional)
+	buffer_size 256					# Buffersize para leitura - maior que 1 e menor que 1024 (opcional)
+	autoindex true					# habilita listagem de diretórios (opcional)
+
 
 	# Configurações para rotas  (opcional)
 	location / {
-		root /var/www/html				# Diretório raiz da rota
+		root /				# Diretório raiz da rota
 		index index.html				# Páginas de índice padrão da rota
 	}
 
 	location /about {
-		root /var/www/html
+		root /html
 		index about.html
 	}
 }```
@@ -47,7 +50,6 @@ Definições ainda em processo de parseamento
 		root /var/www/html
 		index upload.html
 		allowed_methods GET POST		# informa quais métodos são permitidos nessa rota (opcional)
-		upload_dir /var/www/uploads	# Diretório onde os arquivos enviados serão salvos (opcional)
 		max_body_size 300000			# Tamanho permitido do arquivo em bytes (opcional)
 	}
 

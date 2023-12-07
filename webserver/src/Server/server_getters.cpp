@@ -16,7 +16,7 @@ int	Server::getBodySize(void) const {
 	return this->_client_max_body_size;
 }
 
-std::vector<std::string>	Server::getCGI(void) const {
+bool	Server::getCGI(void) const {
 	return this->_cgi;
 }
 
@@ -54,6 +54,10 @@ std::string	Server::getName(int index) {
 
 std::map<int, std::string>	Server::getErrorPages(void) const {
 	return this->_error_pages;
+}
+
+std::string	Server::getErrorPages(int value) const {
+	return this->_error_pages.at(value);
 }
 
 //---------------------------------------------------/

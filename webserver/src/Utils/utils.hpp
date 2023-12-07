@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:15:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:55:45 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,15 @@ namespace utils {
 	enum Errors {
 		GENERAL = 0,
 		INVALID_METHOD,
+		INVALID_DIRECTORY,
 	};
 
 	class GeneralException;
+
+	unsigned char c_tolower(unsigned char c);
+	bool is_ctl(char c);
+	bool is_ualpha(char c);
+	bool is_lalpha(char c);
 
 }
 

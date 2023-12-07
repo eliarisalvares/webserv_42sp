@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:27:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 21:02:43 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,20 +101,17 @@ void RequestBuilder::parse(void) {
 				case RequestParser::BODY:
 					_parser.body(c);
 					break;
-				case RequestParser::BODY_NEW_LINE:
+				case RequestParser::BODY_LENGTH_END:
+					_parser.end_body(c);
+					break;
+				case RequestParser::CHUNK_SIZE:
+				case RequestParser::CHUNK_PARAMETERS:
+				case RequestParser::CHUNK_DATA:
 					_parser.body(c);
 					break;
 				case RequestParser::CR_BODY:
 					_parser.check_crlf(c);
 					break;
-				case RequestParser::SECOND_CR_BODY:
-					_parser.check_crlf(c);
-					// validação extra do body aqui
-					break;
-				// case RequestParser::ERROR:
-				// 	_request->setError(true);
-				// 	_ready = true;
-				// 	break;
 				default:
 					break;
 			}
@@ -127,6 +124,8 @@ void RequestBuilder::parse(void) {
 			_ready = true;
 		i++;
 	}
+	if (_parser.step() == RequestParser::BODY_LENGTH_END) // this is not the best solution...
+		_ready = true;
 	memset(_buffer, 0, _bytes_readed);
 }
 

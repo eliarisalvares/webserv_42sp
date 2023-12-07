@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 14:21:55 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 14:29:05 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 12:58:57 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@ bool	checkFileWorks(const std::string& fileName) {
 
 	file.open(fileName.c_str());
 	if (file.fail()){
-		Logger::error("Could not open file.");
+		Logger::error("Could not open file", fileName);
 		file.close();
 		return (false);
 	}
 	if (file.peek() == EOF){
-		Logger::error("Empty file.");
+		Logger::error("Empty file", fileName);
 		file.close();
 		return (false);
 	}
@@ -41,17 +41,17 @@ bool	checkFile(const std::string& fileName) {
 	std::ifstream file;
 
 	if (!checkFileName(fileName)){
-		Logger::error("Wrong file extension.");
+		Logger::error("Wrong file extension", fileName);
 		return (false);
 	}
 	file.open(fileName.c_str());
 	if (file.fail()){
-		Logger::error("Could not open file.");
+		Logger::error("Could not open file", fileName);
 		file.close();
 		return (false);
 	}
 	if (file.peek() == EOF){
-		Logger::error("Empty file.");
+		Logger::error("Empty file", fileName);
 		file.close();
 		return (false);
 	}

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:13:21 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:58:21 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,27 @@ const char* GeneralException::what() const throw() {
 	{
 	case INVALID_METHOD:
 		return "Method not present in allowed methods list";
+	case INVALID_DIRECTORY:
+		return "Directory does not exist";
 	default:
 		return "GeneralException";
 	}
+}
+
+unsigned char c_tolower(unsigned char c) {
+	return std::tolower(c);
+}
+
+bool is_ctl(char c) {
+  return ((c >= 0 && c < 32) || c == 127);
+}
+
+bool is_ualpha(char c) {
+  return (c >= 'A' && c <= 'Z');
+}
+
+bool is_lalpha(char c) {
+  return (c >= 'a' && c <= 'z');
 }
 
 }

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/04 14:28:48 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 21:42:28 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@ Server::Server(int port): _port(port) {
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
+	int	extraBrackets = 0;
+
 	setBasics();
 	setPort(input, index);
-	int x = 0;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -36,7 +37,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
 		if (input[i].substr(0, 9) == "location ") {
-			x++;
+			extraBrackets++;
 			addLocation(obtainLoc(input, i));
 			while (input[i].substr() != "}")
 				i++;
@@ -51,9 +52,18 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			addErrorPages(obtainErrorPages(input, i));
 		if (input[i].substr(0, 6) == "index ")
 			setIndex(obtainIndex(input, i));
-
-		//_bufferSize;
-		// _uploadPath;
+		if (input[i].substr(0, 12) == "buffer_size ")
+			setBufferSize(obtainBufferSize(input, i));
+		if (input[i].substr(0, 10) == "autoindex ")
+			_permit.autoindex = obtainAutoIndex(input, i);
+		if (input[i].substr(0, 18) == "directory_listing ")
+			_permit.directory_listing = obtainDirList(input, i);
+		if (input[i].substr(0, 9) == "redirect ")
+			setRedirect(obtainRedirect(input, i));
+		if (input[i].substr() == "}" && extraBrackets == 0)
+			break ;
+		else if (input[i].substr() == "}")
+			extraBrackets--;
 	}
 	configSocket(_port);
 	_location_root.clear();
@@ -79,17 +89,22 @@ void	Server::setBasics() {
 	std::vector<std::string>	serverName;
 	std::set<std::string>		index;
 	t_location					location;
+	t_permissions				permit;
 
+	permit.autoindex = false;
+	permit.directory_listing = false;
+	permit.has_redir = false;
 	serverName.push_back(SERVER_NAME);
 	index.insert("index.html");
 	location = initLocation();
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
-	setCGI(ftstring::split(".py python3", ' '));
+	setCGI(true);
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
 	_locations.push_back(location);
-	setUpPath("/content/upload/"); //idk
+	_permit = permit;
+	setUpPath(DEFAULT_UPLOAD);
 	setMethods(http::methods);
 	setIndex(index);
 	setName(serverName);

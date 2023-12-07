@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 19:29:00 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/04 22:09:09 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,47 +63,53 @@ std::string enum_to_str_method(RequestMethod method) {
 }
 
 // headers that needs a validation / singletons
-std::set<std::string> _fill_headers(void) {
-	std::string headers_names[] = {
-		"host",
-		"content-length",
-		// "content-type", // não é singleton, podemos ignorar o tipo
+std::set<std::string> _fill_content_types(void) {
+	std::string _content_types[] = {
+		"text/html",
+		"application/x-www-form-urlencoded",
+		"application/json",
 	};
-	std::set<std::string> headers (headers_names, headers_names + 2);
-	return headers;
+	std::set<std::string> content_types (_content_types, _content_types + 2);
+	return content_types;
 }
 
-}
-
-const char* http::InvalidErrorCode::what() const throw() {
+const char* InvalidErrorCode::what() const throw() {
 	return "InvalidRequest: invalid error status code";
 }
 
-http::InvalidRequest::InvalidRequest(http::HttpStatus error) {
-	if (error < http::BAD_REQUEST)
-		throw http::InvalidErrorCode();
+InvalidRequest::InvalidRequest(HttpStatus error) {
+	if (error < BAD_REQUEST)
+		throw InvalidErrorCode();
 	_error = error;
 }
 
-const char* http::InvalidRequest::what() const throw() {
+const char* InvalidRequest::what() const throw() {
 	switch (_error) {
-    case http::BAD_REQUEST:
+    case BAD_REQUEST:
       return "400 Bad request";
-    case http::METHOD_NOT_ALLOWED:
+    case METHOD_NOT_ALLOWED:
       return "405 Method not allowed";
-    case http::LENGTH_REQUIRED:
+    case LENGTH_REQUIRED:
       return "411 Length required";
-    case http::URI_TOO_LONG:
+    case URI_TOO_LONG:
       return "414 Request URI too long";
-    case http::CONTENT_TOO_LARGE:
+    case CONTENT_TOO_LARGE:
       return "501 Content Too Large";
-    case http::HTTP_VERSION_NOT_SUPPORTED:
+    case HTTP_VERSION_NOT_SUPPORTED:
       return "505 HTTP version not supported";
     default:
       return "Unknown error";
   }
 }
 
-http::HttpStatus http::InvalidRequest::get_error_code(void) const {
+HttpStatus InvalidRequest::get_error_code(void) const {
 	return _error;
 }
+
+void bad_request(std::string const description) {
+	Logger::warning(description);
+	throw InvalidRequest(BAD_REQUEST);
+}
+
+} // end namespace http
+

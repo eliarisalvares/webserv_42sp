@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/11 16:43:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 14:27:16 by feralves         ###   ########.fr       */
+/*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
+/*   Updated: 2023/12/06 21:03:04 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,25 +85,22 @@ void RequestParser::setStep(Step s) {
 // SHOULD respond with the 405 (Method Not Allowed) status code.
 void RequestParser::method(char c) {
 	_step = METHOD;
-	if (c >= 'A' && c <= 'Z')
+	if (utils::is_ualpha(c))
 		_method.push_back(c);
 	else if (c == SP) {
 		if (_method.size() == 0)
-			_invalid_request(
-				"invalid method: method token begins with space",
-				http::BAD_REQUEST
-			);
+			_bad_request("invalid method: method token begins with space");
 		_step = URI;
 		Logger::debug("method", _method);
 	}
 	else if (c == HTAB)
-		_invalid_request(
-			"invalid method/uri separator: horizontal tab", http::BAD_REQUEST
-		);
+		_bad_request("invalid method/uri separator: horizontal tab");
+	else if (c == CR || c == LF)
+		_bad_request("missing data on request first line");
+	else if (utils::is_lalpha(c))
+		_bad_request("method characters must be upper case");
 	else
-		_invalid_request(
-			"invalid method: character is not upper case", http::BAD_REQUEST
-		);
+		_bad_request("invalid character at request first line");
 }
 
 // URI enconding (tb serve pra POST) - não entendi se posso receber https
@@ -118,13 +115,12 @@ void RequestParser::uri(char c) {
 
 	if (c == SP && init_uri)
 		return ;
+	else if (c == CR || c == LF)
+		_bad_request("missing data on request first line");
 	if (c != SP) { // make first validation
 		if (init_uri) {
 			if (c == HTAB)
-				_invalid_request(
-					"invalid method/uri separator: horizontal tab",
-					http::BAD_REQUEST
-				);
+				_bad_request("invalid method/uri separator: horizontal tab");
 			init_uri = false;
 		}
 		_uri.push_back(c);
@@ -145,7 +141,7 @@ void RequestParser::protocol(char c) {
 
 	if (c == SP && init_protocol)
 		return ;
-	if (c != SLASH && c != CR && c != SP) {
+	if (c != SLASH && c != CR && c != LF && c != SP) {
 		if (init_protocol)
 			init_protocol = false;
 		_protocol.push_back(c);
@@ -159,9 +155,9 @@ void RequestParser::protocol(char c) {
 		init_protocol = true;
 	}
 	else if (c == SP)
-		_invalid_request("invalid space in HTTP protocol", http::BAD_REQUEST);
+		_bad_request("invalid space in HTTP protocol");
 	else if (_protocol.compare(_right_protocol) == 0)
-		_invalid_request("missing HTTP version", http::BAD_REQUEST);
+		_bad_request("missing HTTP version");
 	else
 		_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 }
@@ -191,12 +187,17 @@ void RequestParser::version(char c) {
 		return ;
 	if (std::isdigit(c) || (c == POINT && !_version.empty()))
 		_version.push_back(c);
-	else if (c == CR) {
+	else if (c == CR || c == LF) {
 		size = _version.size();
 		if (size == 3) {
 			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
-				_step = CR_FIRST_LINE;
 				Logger::debug("version", _version);
+				if (c == CR)
+					_step = CR_FIRST_LINE;
+				if (c == LF) {
+					Logger::debug("LF first line");
+					_step = HEADER;
+				}
 			}
 			else
 				_invalid_request(
@@ -222,9 +223,8 @@ void RequestParser::version(char c) {
 // Even though header lines should end with CRLF, someone might use a single LF instead. Accept either CRLF or LF.
 // lidando apenas com CRLF por hora, verificar no RFC
 void RequestParser::check_crlf(char c) {
-	if (c != LF) {
-		throw http::InvalidRequest(http::BAD_REQUEST);
-	}
+	if (c != LF)
+		_bad_request("CR without LF");
 	else {
 		switch (_step)
 		{
@@ -238,16 +238,9 @@ void RequestParser::check_crlf(char c) {
 			break;
 		case SECOND_CR_HEADER:
 			Logger::debug("CRLF end header");
-			_step = END; // mudar para BODY?
-			// por hora:
-			// BODY para testar body;
-			// END para retornar a resposta sem ficar travando
+			_step = END;
 			break;
 		case CR_BODY:
-			Logger::debug("CRLF body");
-			_step = BODY_NEW_LINE;
-			break;
-		case SECOND_CR_BODY:
 			Logger::debug("CRLF end body");
 			_step = END;
 			break;
@@ -273,13 +266,17 @@ void RequestParser::header(char c) {
 			_step = SECOND_CR_HEADER;
 			return ;
 		}
+		else if (c == LF) {
+			Logger::debug("LF end header");
+			_step = END;
+			return ;
+		}
 		else if (c == SP || c == HTAB) {
 			_field_name = _last_header;
 			_step = HEADER_VALUE_INIT;
 		}
 		else
 			_step = HEADER_NAME;
-
 	}
 	switch (_step) {
 		case HEADER_NAME:
@@ -317,12 +314,8 @@ void RequestParser::header(char c) {
 // HEADER1:    some-long-value-1a,
 //             some-long-value-1b
 
-static bool is_ctl(char c) {
-  return ((c >= 0 && c < 32) || c == 127);
-}
-
 void RequestParser::_parse_field_name(char c) {
-	if (c != COLON && !is_ctl(c) && c != SP)
+	if (c != COLON && !utils::is_ctl(c) && c != SP)
 		_field_name.push_back(c);
 	else if (c == COLON) {
 		Logger::debug("key", _field_name);
@@ -341,18 +334,23 @@ void RequestParser::_parse_field_name(char c) {
 void RequestParser::_parse_field_value(char c) {
 	// if (c == SP || c == HTAB) // só pode ser no começo
 	// 	return ;
-	if (c == CR) {
+	if (c == CR || c == LF) {
 		Logger::debug("value", _field_value);
-		_step = CR_HEADER;
+		if (c == CR)
+			_step = CR_HEADER;
+		else if (c == LF) {
+			Logger::debug("LF header");
+			_step = HEADER;
+		}
 		_add_header();
 	}
-	else if (is_ctl(c) && c != HTAB)
-		_invalid_request("control character on field value", http::BAD_REQUEST);
+	else if (utils::is_ctl(c) && c != HTAB)
+		_bad_request("request parser: control character on field value");
 	else
 		_field_value.push_back(c);
 }
 
-static unsigned char c_tolower(unsigned char c) { return std::tolower(c); }
+
 void RequestParser::_add_header(void) {
 	std::map<std::string, std::vector<std::string> >::iterator it;
 
@@ -360,7 +358,7 @@ void RequestParser::_add_header(void) {
 		_field_name.begin(),
 		_field_name.end(),
 		_field_name.begin(),
-		&c_tolower
+		&utils::c_tolower
 	);
 	_last_header = _field_name; // verificar se faz deep copy...
 	it = _headers.find(_field_name);
@@ -379,6 +377,7 @@ void RequestParser::_add_header(void) {
 }
 
 void RequestParser::check_request(void) {
+	Logger::debug("Checking request");
 	// first check headers and get necessary values
 	_print_headers();
 	_check_host();
@@ -392,6 +391,7 @@ void RequestParser::check_request(void) {
 	_check_method();
 	if (_request->method() == http::POST)
 		_check_post_headers();
+	Logger::debug("End checking request");
 }
 
 // header Host is mandatory and singleton
@@ -400,9 +400,9 @@ void RequestParser::_check_host(void) {
 
 	it = _headers.find("host");
 	if (it == _headers.end())
-		_invalid_request("'Host' header not found", http::BAD_REQUEST);
+		_bad_request("'Host' header not found");
 	if (it->second.size() > 1 || it->second[0].size() == 0)
-		_invalid_request("'Host' header", http::BAD_REQUEST);
+		_bad_request("'Host' header");
 	_request->setHost(it->second[0]);
 }
 
@@ -414,7 +414,7 @@ void RequestParser::_check_content_length(void) {
 	if (it_header == _headers.end())
 		return ;
 	if (it_header->second.size() > 1)
-		_invalid_request("'Content-Length' header", http::BAD_REQUEST);
+		_bad_request("'Content-Length' header");
 	_has_content_length = true;
 
 	std::string content_lenght = it_header->second[0];
@@ -448,7 +448,7 @@ void RequestParser::_check_transfer_encoding(void) {
 	if (it_header == _headers.end())
 		return ;
 	if (it_header->second.size() > 1)
-		_invalid_request("'Transfer-Encoding' header", http::BAD_REQUEST);
+		_bad_request("'Transfer-Encoding' header");
 	if (it_header->second[0].compare("chunked") != 0)
 		_invalid_request("Transfer-Encoding type", http::NOT_IMPLEMENTED);
 	_is_chunked = true;
@@ -475,10 +475,13 @@ void RequestParser::_check_method(void) {
 
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
-		_invalid_request("POST without body", http::BAD_REQUEST); // verificar se dá erro msm, e o tipo certo se for o caso
-	if (_is_chunked && _has_content_length && _content_length)
 		_invalid_request(
-			"chunked data and content-length both setted", http::BAD_REQUEST
+			"POST without 'Transfer-Enconding' or 'Content-Length' headers",
+			http::LENGTH_REQUIRED
+		);
+	if (_is_chunked && _has_content_length && _content_length)
+		_bad_request(
+			"chunked data and content-length both setted"
 		);
 	_step = BODY;
 }
@@ -506,8 +509,8 @@ void RequestParser::_print_headers(void) {
 			}
 			std::cout << std::endl;
 		}
-		std::cout << "------------------------------------------------------\n";
-		std::cout << RESET << std::endl;
+		std::cout << "------------------------------------------------------\n"
+				<< RESET;
 	}
 }
 
@@ -516,6 +519,14 @@ void RequestParser::_print_headers(void) {
 // }
 
 // Body
+
+//  Request messages are never close-delimited because they are always explicitly
+//  framed by length or transfer coding, with the absence of both implying the
+//   request ends immediately after the header section
+
+// A server MAY reject a request that contains a message body but not a
+// Content-Length by responding with 411 (Length Required).
+
 // If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
 // Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
 // Content-Length: header gives the number of bytes in the body.
@@ -523,41 +534,45 @@ void RequestParser::_print_headers(void) {
 // A HTTP request is terminated by two newlines
 // Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
 
+// If a valid Content-Length header field is present without Transfer-Encoding,
+// its decimal value defines the expected message body length in octets. If the
+// sender closes the connection or the recipient times out before the indicated
+// number of octets are received, the recipient MUST consider the message to be
+// incomplete and close the connection.
+
 void RequestParser::body(char c) {
 	if (_is_chunked)
 		return _body_chunked(c);
-	_body.push_back(c);  // em tese pode fazer isso pq se content-length == 0 dá erro antes
-	// ver como lidar com o parseamento
-	++_body_bytes_readed;
-	if (_body_bytes_readed == _content_length) {
-		_step = END;
-		if (DEBUG) {
-			std::cout << GREY << "Received body:\n";
+	if (_body_bytes_readed < _content_length) {
+		_body.push_back(c);
+		++_body_bytes_readed;
+		if (_body_bytes_readed == _content_length) {
+			_step = BODY_LENGTH_END;
 			_print_body();
 		}
 	}
-	// if (_step == BODY_NEW_LINE) {
-	// 	if (c == CR) {
-	// 		_step = SECOND_CR_BODY;
-	// 		if (DEBUG) {
-	// 			std::cout << GREY << "Received body:\n";
-	// 			_print_body();
-	// 		}
-	// 		return ;
-	// 	}
-	// 	else
-	// 		_step = BODY;
-	// }
-	// if (_step == BODY) {
-	// 	if (c == CR)
-	// 		_step = CR_BODY;
-	// 	else if (_is_chunked)
-	// 		_parse_chunk(c);
-	// 	else
-	// 		_body.push_back(c);
-	// }
 }
 
+void RequestParser::end_body(char c) {
+	if (c == CR)
+		_step = CR_BODY;
+	else if (c == LF) {
+		Logger::debug("LF end Body");
+		_step = END;
+	}
+	else
+		_invalid_request("Body larger than specified", http::CONTENT_TOO_LARGE);
+}
+
+// RFC 9112 - 6.3.4
+// If a Transfer-Encoding header field is present in a request and the chunked
+// transfer coding is not the final encoding (0), the message body length cannot
+// be determined reliably; the server MUST respond with the 400 (Bad Request)
+//  status code and then close the connection.
+
+// depois de ler cada chunck, devolve uma resposta com status code = 202 pra
+// indicar pro cliente que foi aceito
+// quando finalizar, retorna 200 ou 201 (CREATED)
 void RequestParser::_body_chunked(char c) {
 	(void)c;
 	_step = END;
@@ -571,6 +586,10 @@ void RequestParser::_print_body(void) {
 	std::vector<char>::iterator it, end = _body.end();
 
 	if (DEBUG) {
+		std::cout << GREY
+				<< "------------------------------------------------------\n"
+				<< BLUE << "Received body of size " << _body_bytes_readed
+				<< ":\n" << GREY;
 		for(it = _body.begin(); it != end; ++it) {
 			if (*it == CR)
 				std::cout << " CR";
@@ -579,34 +598,40 @@ void RequestParser::_print_body(void) {
 			else
 				std::cout << *it;
 		}
-		std::cout << RESET << std::endl;
+		std::cout
+				<< "\n------------------------------------------------------\n"
+				<< RESET << std::endl;
 	}
 }
 
-void RequestParser::_invalid_request(
+void RequestParser::_bad_request(std::string const description) {
+	http::bad_request(REQPARSER_ERROR + description);
+}
+
+void  RequestParser::_invalid_request(
 	std::string const description,
 	std::string const value,
 	http::HttpStatus error_code
 ) {
-	Logger::warning("request parser error: " + description, value);
+	Logger::warning(REQPARSER_ERROR + description, value);
 	throw http::InvalidRequest(error_code);
 }
 
-void RequestParser::_invalid_request(
+void  RequestParser::_invalid_request(
 	std::string const description,
 	char const c,
 	http::HttpStatus error_code
 ) {
-	Logger::warning_no_lf("request parser error: " + description);
+	Logger::warning_no_lf(REQPARSER_ERROR + description);
 	std::cout << GREY << c << std::endl;
 	throw http::InvalidRequest(error_code);
 }
 
-void RequestParser::_invalid_request(
+void  RequestParser::_invalid_request(
 	std::string const description,
 	http::HttpStatus error_code
 ) {
-	Logger::warning("request parser error: " + description);
+	Logger::warning(REQPARSER_ERROR + description);
 	throw http::InvalidRequest(error_code);
 }
 
