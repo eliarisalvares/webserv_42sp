@@ -38,10 +38,17 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 	return *this;
 }
 
+bool	WebServ::checkPort(int port) {
+	for (t_server_iterator it = _servers.begin(); it!= _servers.end(); ++it) {
+		if (it->second->getPort() == port)
+			return (false);
+	}
+	return (true);
+}
+
 void	WebServ::create_servers(std::vector<std::string> input) {
-	//verify if the same port is being used
 	int	brackets = 0;
-	size_t i;
+	size_t	i;
 
 	for (size_t index = 0; index < input.size(); index++) {
 		Server *oneServer = new Server(input, index);
@@ -59,16 +66,11 @@ void	WebServ::create_servers(std::vector<std::string> input) {
 			}
 			index = i;
 		}
-		for (size_t j = 0; j < _servers.size(); j++) {
-			if (_servers[j]) {
-				if (oneServer->getPort() == _servers[j]->getPort())
-					throw ServerPortAlreadySetted();
-			}
-		}
+		if (!checkPort(oneServer->getPort()))
+			throw ServerPortAlreadySetted();
 		Logger::info("Server initialized on port", oneServer->getPort());
 		this->_servers.insert(std::pair<int, Server*>(oneServer->getSocket(), oneServer));
 	}
-	//will get the socket for the server, initialize the server
 }
 
 void	WebServ::init(void) {
