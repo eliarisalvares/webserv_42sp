@@ -121,6 +121,8 @@ void	WebServ::run(void) {
 					_respond(this->_requestBuilderMap[fd]->build());
 					delete this->_requestBuilderMap[fd]; // deletes the Request also
 					this->_requestBuilderMap.erase(fd);
+					// if (!_keep_connection)
+					_end_connection(fd); // vai dar problema se a response for mandada quebrada...
 				}
 			}
 		}
@@ -309,6 +311,7 @@ void WebServ::_end_connection(int fd) {
 
 	--this->_total_fds;
 	close(fd);
+	Logger::debug("Close connection on socket", fd);
 }
 
 void WebServ::restart_socket_servers(void) {
