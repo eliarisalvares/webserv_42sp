@@ -129,15 +129,20 @@ void	WebServ::run(void) {
 	}
 }
 
-
 void	WebServ::stop(void) {
+	t_req_builder_iterator it, end = this->_requestBuilderMap.end();
+
+	for (it = _requestBuilderMap.begin(); it != end; ++it) {
+		delete it->second;
+	}
+	for(int i = 0; i < _total_fds; i++)
+		close(_pfds[i].fd);
 	if (_servers.size()) {
 		for (size_t i = 0; i < _servers.size(); i++) {
 			if (_servers[i])
 				delete _servers[i];
 		}
 	}
-	clear_fds();
 }
 
 bool	WebServ::_is_server_socket(int fd) {
@@ -253,20 +258,20 @@ void WebServ::_respond(Request* request) {
 }
 
 void WebServ::clean(void) {
-	t_pollfd_vector::iterator it, end = this->_pfds.end();
+	t_req_builder_iterator it, end = this->_requestBuilderMap.end();
 
-	// close all connections, including server ports?
-	// não sei se pode fechar tudo, incluindo as portas dos servidores...
-	for (it = this->_pfds.begin(); it != end; ++it)
-		close((*it).fd);
+	for (it = _requestBuilderMap.begin(); it != end; ++it) {
+		delete it->second;
+	}
+	for(int i = 0; i < _total_fds; i++)
+		close(_pfds[i].fd);
 
 	// precisa verificar se isso gera leak
-	this->_servers.clear();
 	this->_pfds.clear();
 	this->_fds_map.clear();
 	this->_serverSockets.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 
 	this->_total_fds = 0;
