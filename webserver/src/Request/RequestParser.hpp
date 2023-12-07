@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 22:03:28 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 10:08:37 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@
 
 typedef std::map<std::string, std::string>	t_string_map;
 typedef std::pair<std::string, std::string>	t_string_pair;
+typedef std::map<std::string, std::vector<std::string> > t_header_map;
+typedef std::map<std::string, std::vector<std::string> >::iterator t_header_iterator;
 
 class RequestParser {
 public:
@@ -89,6 +91,7 @@ public:
 		INVALID_HTTP_VERSION,
 	};
 
+	// tirar esse enum; deixando por hora só por referência
 	typedef enum e_abnf_rules {
 		ALPHA, // (letters)
 		// CR, // (carriage return)
@@ -104,64 +107,86 @@ public:
 		VCHAR, //(any visible US-ASCII character)
 	}           t_abnf_rules;
 
-	Step			step(void) const;
-	void			setStep(Step s);
-	void			method(char c);
-	void			uri(char c);
-	void			protocol(char c);
-	void			version(char c);
-	void			header(char c);
-	void			body(char c);
-	void			end_body(char c);
+	void						init(char c);
+	void						method(char c);
+	void						uri(char c);
+	void						protocol(char c);
+	void						version(char c);
+	void						header(char c);
+	void						body(char c);
+	void						end_body(char c);
 
-	void			check_crlf(char c);
-	void			check_request(void);
+	void						check_crlf(char c);
+	void						check_request(void);
 
-	// void			break_data(char* buffer, size_t bytes_read);
+	// getters
+	Step						step(void) const;
+	bool						has_content_length(void) const;
+	bool						is_chunked(void) const;
+	size_t						content_length(void) const;
+	size_t						max_body_size(void) const;
+	size_t						body_bytes_readed(void) const;
+	size_t						chunk_bytes_readed(void) const;
+	size_t						chunk_size(void) const;
+	Request*					getRequest(void) const;
+	std::string					getMethod(void) const;
+	std::string					getUri(void) const;
+	std::string					getProtocol(void) const;
+	std::string					getVersion(void) const;
+	std::string					getFieldName(void) const;
+	std::string					getFieldValue(void) const;
+	std::string					getLastHeader(void) const;
+	std::string					getChunkSizeStr(void) const;
+	t_header_map				getHeaders(void) const;
+	std::vector<char>			getBody(void) const;
+
+	// setters
+	void						setStep(Step s);
 
 private:
-	size_t								_idx;
-	Step								_step;
-	Request*							_request;
+	Step						_step;
+	Request*					_request;
 
 	// request first line
-	std::string		_method;
-	std::string		_uri;
-	std::string		_protocol;
-	std::string		_version;
+	std::string					_method;
+	std::string					_uri;
+	std::string					_protocol;
+	std::string					_version;
 	static std::string const	_right_protocol;
 	void						_check_uri(void);
 	void						_check_method(void);
 
 	// headers
-	int									_header_size;
-	std::string							_field_name;
-	std::string							_field_value;
-	std::string							_last_header;
-	std::map<std::string, std::vector<std::string> >	_headers;
-	void								_add_header(void);
-	void								_print_headers(void);
-	void								_check_host(void);
-	void								_check_content_length(void);
-	void								_check_transfer_encoding(void);
-	void								_check_post_headers(void);
-	void								_parse_field_name(char c);
-	void								_parse_field_value(char c);
+	// static int const			_header_size;
+	std::string					_field_name;
+	std::string					_field_value;
+	std::string					_last_header;
+	t_header_map				_headers;
+
+	void						_add_header(void);
+	void						_print_headers(void);
+	void						_check_host(void);
+	void						_check_content_length(void);
+	void						_check_transfer_encoding(void);
+	void						_check_post_headers(void);
+	void						_parse_field_name(char c);
+	void						_parse_field_value(char c);
 
 	// body
-	bool								_has_content_length;
-	bool								_is_chunked;
-	size_t								_content_length;
-	size_t								_max_body_size;
-	size_t								_body_bytes_readed;
-	size_t								_chunk_bytes_readed;
-	size_t								_chunk_size;
-	std::string							_chunk_size_str;
-	std::vector<char>					_body;
-	void								_print_body(void);
-	void								_body_chunked(char c);
-	void								_parse_chunk_size(char c);
-	void								_parse_chunk_data(char c);
+	bool						_has_content_length;
+	bool						_is_chunked;
+	size_t						_content_length;
+	size_t						_max_body_size;
+	size_t						_body_bytes_readed;
+	size_t						_chunk_size;
+	size_t						_chunk_bytes_readed;
+	std::string					_chunk_size_str;
+	std::vector<char>			_body;
+
+	void						_print_body(void);
+	void						_body_chunked(char c);
+	void						_parse_chunk_size(char c);
+	void						_parse_chunk_data(char c);
 
 	// throw exceptions
 	void	_bad_request(std::string const description);

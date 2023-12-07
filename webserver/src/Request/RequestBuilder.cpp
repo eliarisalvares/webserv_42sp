@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 22:43:38 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 10:09:52 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ void RequestBuilder::parse(void) {
 			switch (_parser.step())
 			{
 				case RequestParser::INIT:
+					_parser.init(c);
+					break;
 				case RequestParser::METHOD:
 					_parser.method(c);
 					break;
@@ -132,8 +134,10 @@ void RequestBuilder::parse(void) {
 			_ready = true;
 		i++;
 	}
-	if (_parser.step() == RequestParser::BODY_LENGTH_END) // this is not the best solution...
+	if (_parser.step() == RequestParser::BODY_LENGTH_END) {
+		_parser.setStep(RequestParser::END);
 		_ready = true;
+	} // this is not the best solution...
 	memset(_buffer, 0, _bytes_readed);
 }
 
