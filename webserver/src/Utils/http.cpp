@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 22:09:09 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 12:28:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ std::set<std::string> _fill_content_types(void) {
 		"text/html",
 		"application/x-www-form-urlencoded",
 		"application/json",
+		"multipart/form-data"
 	};
 	std::set<std::string> content_types (_content_types, _content_types + 2);
 	return content_types;

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 23:57:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:16:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ public:
 	t_location*				location(void) const;
 	bool					has_error(void) const;
 	bool					is_chuncked(void) const;
-	http::ContentType		content_type(void) const;
+	// http::ContentType		content_type(void) const;
 	size_t					content_length(void) const;
 
 	// setters
@@ -66,7 +66,7 @@ private:
 
 	// headers data
 	std::string				_host;
-	http::ContentType		_content_type;
+	// http::ContentType		_content_type;
 	size_t					_content_length;
 	bool					_is_chuncked;
 

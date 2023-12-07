@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 12:14:57 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:18:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -479,6 +479,7 @@ void RequestParser::_check_content_length(void) {
 			"Content-Lenght bigger than max body size",
 			http::CONTENT_TOO_LARGE
 		);
+	_request->setContentLength(_content_length);
 }
 
 void RequestParser::_check_transfer_encoding(void) {
@@ -492,6 +493,7 @@ void RequestParser::_check_transfer_encoding(void) {
 	if (it_header->second[0].compare("chunked") != 0)
 		_invalid_request("Transfer-Encoding type", http::NOT_IMPLEMENTED);
 	_is_chunked = true;
+	_request->setChuncked(true);
 	Logger::debug("found Transfer-Encoding: chunked");
 }
 
