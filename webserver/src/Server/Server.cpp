@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 20:53:54 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 21:42:28 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@ Server::Server(int port): _port(port) {
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
+	int	extraBrackets = 0;
+
 	setBasics();
 	setPort(input, index);
-	int x = 0;
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -36,7 +37,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
 		if (input[i].substr(0, 9) == "location ") {
-			x++;
+			extraBrackets++;
 			addLocation(obtainLoc(input, i));
 			while (input[i].substr() != "}")
 				i++;
@@ -59,6 +60,10 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			_permit.directory_listing = obtainDirList(input, i);
 		if (input[i].substr(0, 9) == "redirect ")
 			setRedirect(obtainRedirect(input, i));
+		if (input[i].substr() == "}" && extraBrackets == 0)
+			break ;
+		else if (input[i].substr() == "}")
+			extraBrackets--;
 	}
 	configSocket(_port);
 	_location_root.clear();

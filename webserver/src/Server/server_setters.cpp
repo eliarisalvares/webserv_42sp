@@ -1,6 +1,8 @@
 #include "Server.hpp"
 
 void	Server::setPort(std::vector<std::string> input, int index) {
+	int	extraBrackets = 0;
+
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")
 			i++ ;
@@ -8,6 +10,12 @@ void	Server::setPort(std::vector<std::string> input, int index) {
 			_port = obtainPort(input, i);
 			setSocket(_port);
 		}
+		if (input[i].substr(0, 9) == "location ")
+			extraBrackets++;
+		if (input[i].substr() == "}" && extraBrackets == 0)
+			break ;
+		else if (input[i].substr() == "}")
+			extraBrackets--;
 	}
 }
 

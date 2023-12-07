@@ -220,14 +220,14 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	std::string					page;
 
 	if (input[index].substr(0, 6) == "index ") {
-		words = ftstring::split(input[index].substr(16), ' ');
+		words = ftstring::split(input[index].substr(6), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
 			page = "content/" + words[j];
 			if (!checkFileWorks(page))
 				throw InvalidFileException();
 			value.insert(page);
 		}
-		Logger::debug("Index setted", input[index].substr(16));
+		Logger::debug("Index setted", input[index].substr(6));
 	}
 	return (value);
 }
@@ -237,10 +237,10 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	std::vector<std::string>	locName;
 
 	location = initLocation();
-	Logger::debug("Init location parsing", location.location);
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
+			Logger::debug("Init location parsing", location.location);
 			location.location = locName[0];
 			if (locName[1] != "{")
 				throw LocationNotOpenedException();
