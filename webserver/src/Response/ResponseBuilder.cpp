@@ -61,19 +61,35 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 }
 
 
-std::string responseBuilder(std::string& filePath, Request* request) {
-    Response response;
+Response responseBuilder(Request* request) {
+	Response response(request->fd(), request->status_code());
+	std::string filePath;
+	int		statusCode = request->status_code();
 
-    // isso aqui é um teste:
-    if (filePath == "/") {
-        if (access("content/index.html", F_OK) == 0) {
-            filePath = "content/index.html";
-        } else {
-            filePath = "content/cgi/autoindex.py";
-        }
-    }
+	Logger::debug("creating response...");
+	if (request->has_error()) {
+		// adicionar lógica pra pegar o arquivo certo se tiver setado no server
+		filePath = (
+			std::string("content/error_pages/")
+			+ ftstring::itostr(statusCode)
+			+ std::string(".html") // pode dar erro se o arquivo do erro não existir
+		);
+	}
+	else {
+		// get uri from request
+		filePath = request->uri();
+		std::cout << "filePath: " << filePath << std::endl;
 
-    std::cout << "filePath: " << filePath << std::endl;
+		// isso aqui é um teste:
+		if (filePath == "/") {
+			if (access("content/index.html", F_OK) == 0) {
+				filePath = "content/index.html";
+			} else {
+				filePath = "content/cgi/autoindex.py";
+			}
+		}
+	}
+	std::cout << "filePath: " << filePath << std::endl;
 
     std::string contentType = getContentType(filePath);
 
@@ -85,7 +101,8 @@ std::string responseBuilder(std::string& filePath, Request* request) {
         body = getHtmlContent(filePath);
     }
 
-    int statusCode = body.empty() ? 404 : 200;
+	if (!request->has_error())
+    	statusCode = body.empty() ? 404 : 200;
     std::string message = getStatusMessage(statusCode);
 
     response.setStatusCode(statusCode);
@@ -97,6 +114,5 @@ std::string responseBuilder(std::string& filePath, Request* request) {
 
     setResponseHeaders(response, contentType, ss.str(), request);
 
-    return response.toString();
+    return response;
 }
-

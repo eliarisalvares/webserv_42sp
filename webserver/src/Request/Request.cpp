@@ -6,13 +6,14 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/03 23:57:18 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:17:02 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
 Request::Request(void):
+	_server(NULL),
 	_fd(0),
 	_error(false),
 	_method(http::GET),
@@ -20,7 +21,7 @@ Request::Request(void):
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	_content_type(),
+	// _content_type(),
 	_content_length(0),
 	_is_chuncked(false) { }
 
@@ -33,7 +34,7 @@ Request::Request(int fd, Server* server):
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	_content_type(),
+	// _content_type(),
 	_content_length(0),
 	_is_chuncked(false) { }
 
@@ -45,8 +46,17 @@ Request::Request(Request const& copy) {
 
 Request const& Request::operator=(Request const & copy) {
 	if (this != &copy) {
+		this->_server = copy.server();
 		this->_method = copy.method();
-		// this->server = copy.getServer();
+		this->_fd = copy.fd();
+		this->_status_code = copy.status_code();
+		this->_uri = copy.uri();
+		this->_host = copy.host();
+		this->_location = copy.location();
+		this->_error = copy.has_error();
+		this->_is_chuncked = copy.is_chuncked();
+		this->_content_length = copy.content_length();
+		// this->_content_type = copy.content_type();
 	}
 	return *this;
 }
@@ -92,9 +102,9 @@ bool Request::is_chuncked(void) const {
 	return this->_is_chuncked;
 }
 
-http::ContentType Request::content_type(void) const {
-	return this->_content_type;
-}
+// http::ContentType Request::content_type(void) const {
+// 	return this->_content_type;
+// }
 
 size_t Request::content_length(void) const {
 	return this->_content_length;
@@ -132,9 +142,9 @@ void Request::setChuncked(bool is_chuncked) {
 	this->_is_chuncked = is_chuncked;
 }
 
-void Request::setContentType(http::ContentType type) {
-	this->_content_type = type;
-}
+// void Request::setContentType(http::ContentType type) {
+// 	this->_content_type = type;
+// }
 
 void Request::setContentLength(size_t length) {
 	this->_content_length = length;

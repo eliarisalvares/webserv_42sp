@@ -8,7 +8,7 @@ void	Server::setPort(std::vector<std::string> input, int index) {
 			i++ ;
 		if (input[i].substr(0, 7) == "listen ") {
 			_port = obtainPort(input, i);
-			setSocket(_port);
+			configSocket(_port);
 		}
 		if (input[i].substr(0, 9) == "location ")
 			extraBrackets++;

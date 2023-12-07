@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 21:03:04 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:18:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,25 @@
 
 std::string const RequestParser::_right_protocol = "HTTP";
 
-RequestParser::RequestParser(void):
-	_idx(0), _step(INIT) {
-	_request = new Request();
-	_field_name.clear();
-	_field_value.clear();
-	_last_header.clear();
-	_headers.clear();
+RequestParser::RequestParser(void): _step(INIT) {
+	_request = NULL;
 	_has_content_length = false;
 	_is_chunked = false;
 	_content_length = 0;
 	_max_body_size = 0;
 	_body_bytes_readed = 0;
-	_body.clear();
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
 }
 
-RequestParser::RequestParser(Request* request):
-	_idx(0), _step(INIT), _request(request) {
-	_field_name.clear();
-	_field_value.clear();
-	_last_header.clear();
-	_headers.clear();
+RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_has_content_length = false;
 	_is_chunked = false;
 	_content_length = 0;
-	_max_body_size = request->server()->getBodySize();
+	_max_body_size = size_t(request->server()->getBodySize());
 	_body_bytes_readed = 0;
-	_body.clear();
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -49,7 +41,27 @@ RequestParser::RequestParser(RequestParser const& copy) {
 
 RequestParser& RequestParser::operator=(RequestParser const& copy) {
 	if (this != &copy) {
-		(void)copy;
+		_step = copy.step();
+		if (_request && _request != copy.getRequest())
+			delete _request;
+		_request = copy.getRequest();
+		_method = copy.getMethod();
+		_uri = copy.getUri();
+		_protocol = copy.getProtocol();
+		_version = copy.getVersion();
+		_field_name = copy.getFieldName();
+		_field_value = copy.getFieldValue();
+		_last_header = copy.getLastHeader();
+		_headers = copy.getHeaders();
+		_has_content_length = copy.has_content_length();
+		_is_chunked = copy.is_chunked();
+		_content_length = copy.content_length();
+		_max_body_size = copy.max_body_size();
+		_body_bytes_readed = copy.body_bytes_readed();
+		_chunk_size = copy.chunk_size();
+		_chunk_bytes_readed = copy.chunk_bytes_readed();
+		_chunk_size_str = copy.getChunkSizeStr();
+		_body = getBody();
 	}
 	return *this;
 }
@@ -59,12 +71,30 @@ RequestParser::~RequestParser(void) {
 	// _result.clear();
 }
 
-RequestParser::Step RequestParser::step(void) const {
-	return this->_step;
-}
-
 void RequestParser::setStep(Step s) {
 	this->_step = s;
+}
+
+void RequestParser::init(char c) {
+	_method.clear();
+	_uri.clear();
+	_protocol.clear();
+	_version.clear();
+	_field_name.clear();
+	_field_value.clear();
+	_last_header.clear();
+	_headers.clear();
+	_chunk_size_str.clear();
+	_body.clear();
+	_has_content_length = false;
+	_is_chunked = false;
+	_content_length = 0;
+	_body_bytes_readed = 0;
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
+
+	_step = METHOD;
+	method(c);
 }
 
 // general:
@@ -84,7 +114,6 @@ void RequestParser::setStep(Step s) {
 // server but not allowed for the target resource, the origin server
 // SHOULD respond with the 405 (Method Not Allowed) status code.
 void RequestParser::method(char c) {
-	_step = METHOD;
 	if (utils::is_ualpha(c))
 		_method.push_back(c);
 	else if (c == SP) {
@@ -244,6 +273,22 @@ void RequestParser::check_crlf(char c) {
 			Logger::debug("CRLF end body");
 			_step = END;
 			break;
+		case CR_CHUNK_SIZE:
+			Logger::debug("CRLF chunk size");
+			_step = CHUNK_DATA;
+			break;
+		case CR_CHUNK_DATA:
+			Logger::debug("CRLF chunk data");
+			_step = CHUNK_SIZE;
+			break;
+		case CR_CHUNK_END:
+			Logger::debug("first CRLF chunk end");
+			_step = CHUNK_END;
+			break;
+		case SECOND_CR_CHUNK_END:
+			Logger::debug("second CRLF chunk end");
+			_step = END;
+			break;
 		default:
 			break;
 		}
@@ -350,9 +395,8 @@ void RequestParser::_parse_field_value(char c) {
 		_field_value.push_back(c);
 }
 
-
 void RequestParser::_add_header(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it;
+	t_header_iterator it;
 
 	std::transform(
 		_field_name.begin(),
@@ -396,7 +440,7 @@ void RequestParser::check_request(void) {
 
 // header Host is mandatory and singleton
 void RequestParser::_check_host(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it;
+	t_header_iterator it;
 
 	it = _headers.find("host");
 	if (it == _headers.end())
@@ -408,7 +452,7 @@ void RequestParser::_check_host(void) {
 
 // header Content-Length has only numbers, is singleton and has a maximum size
 void RequestParser::_check_content_length(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it_header;
+	t_header_iterator it_header;
 
 	it_header = _headers.find("content-length");
 	if (it_header == _headers.end())
@@ -430,19 +474,16 @@ void RequestParser::_check_content_length(void) {
 
 	std::stringstream ss(content_lenght);
 	ss >> _content_length;
-	// verificar porque não ficou setado no início...
-	_max_body_size = _request->server()->getBodySize();
-	// std::cout << GREY << "max_body_size: " << _max_body_size
-	// 			<< "content_length: " << _content_length << std::endl;
 	if (_content_length > _max_body_size)
 		_invalid_request(
 			"Content-Lenght bigger than max body size",
 			http::CONTENT_TOO_LARGE
 		);
+	_request->setContentLength(_content_length);
 }
 
 void RequestParser::_check_transfer_encoding(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it_header;
+	t_header_iterator it_header;
 
 	it_header = _headers.find("transfer-encoding");
 	if (it_header == _headers.end())
@@ -452,6 +493,8 @@ void RequestParser::_check_transfer_encoding(void) {
 	if (it_header->second[0].compare("chunked") != 0)
 		_invalid_request("Transfer-Encoding type", http::NOT_IMPLEMENTED);
 	_is_chunked = true;
+	_request->setChuncked(true);
+	Logger::debug("found Transfer-Encoding: chunked");
 }
 
 void RequestParser::_check_uri(void) {
@@ -476,7 +519,7 @@ void RequestParser::_check_method(void) {
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
 		_invalid_request(
-			"POST without 'Transfer-Enconding' or 'Content-Length' headers",
+			"POST without 'Transfer-Encoding' or 'Content-Length' headers",
 			http::LENGTH_REQUIRED
 		);
 	if (_is_chunked && _has_content_length && _content_length)
@@ -484,11 +527,13 @@ void RequestParser::_check_post_headers(void) {
 			"chunked data and content-length both setted"
 		);
 	_step = BODY;
+	if (_is_chunked)
+		_step = CHUNK_SIZE;
 }
 
 void RequestParser::_print_headers(void) {
 	if (DEBUG) {
-		std::map<std::string, std::vector<std::string> >::iterator it, end;
+		t_header_iterator it, end;
 		std::vector<std::string>::iterator v_it, v_end;
 		int i;
 
@@ -573,14 +618,110 @@ void RequestParser::end_body(char c) {
 // depois de ler cada chunck, devolve uma resposta com status code = 202 pra
 // indicar pro cliente que foi aceito
 // quando finalizar, retorna 200 ou 201 (CREATED)
+
+// Example:
+// 4␍␊            (chunk size is four octets)
+// Wiki           (four octets of data)
+// ␍␊             (end of chunk)
+
+// 7␍␊            (chunk size is seven octets)
+// pedia i        (seven octets of data)
+// ␍␊             (end of chunk)
+
+// B␍␊            (chunk size is eleven octets)
+// n ␍␊chunks.    (eleven octets of data)
+// ␍␊             (end of chunk)
+
+// 0␍␊            (chunk size is zero octets, no more chunks)
+// ␍␊             (end of final chunk with zero data octets)
+
+// Result string: "Wikipedia in ␍␊chunks."
+// Result print:
+// "Wikipedia in
+// chunks."
+
 void RequestParser::_body_chunked(char c) {
-	(void)c;
-	_step = END;
-	// if (DEBUG) {
-	// 	std::cout << GREY << "Received body:\n";
-	// 	_print_body();
-	// }
+	switch (_step) {
+		case CHUNK_SIZE:
+			_parse_chunk_size(c);
+			break;
+		case CHUNK_PARAMETERS:
+			// por hora não vou fazer nada com os parametros
+			if (c == CR)
+				_step = CR_CHUNK_SIZE;
+			if (c == LF)
+				_step = CHUNK_DATA;
+			Logger::debug("chunk parameter: ", c);
+			break;
+		case CHUNK_DATA:
+			_parse_chunk_data(c);
+			break;
+		case CHUNK_DATA_END:
+			if (c == CR)
+				_step = CR_CHUNK_DATA;
+			else if (c == LF)
+				_step = CHUNK_SIZE;
+			else // verificar o tipo de erro
+				_invalid_request(
+					"chunk data larger than specified", http::CONTENT_TOO_LARGE
+				);
+			break;
+		case CHUNK_END:
+			if (c == CR)
+				_step = SECOND_CR_CHUNK_END;
+			else if (c == LF)
+				_step = END;
+			else // verificar o tipo de erro
+				_invalid_request(
+					"chunk data larger than specified", http::CONTENT_TOO_LARGE
+				);
+			break;
+
+		default:
+			break;
+	}
+	// _print_body();
 }
+
+void RequestParser::_parse_chunk_size(char c) {
+	if (c == CR || c == LF || c == SEMICOLON) {
+		if (c == CR)
+			_step = CR_CHUNK_SIZE;
+		else if (c == LF)
+			_step = CHUNK_DATA;
+		else if (c == SEMICOLON)
+			_step = CHUNK_PARAMETERS;
+		_chunk_size = utils::xtod(_chunk_size_str);
+		_chunk_bytes_readed = 0;
+		Logger::debug("chunk size hex:", _chunk_size_str);
+		Logger::debug("chunk size decimal:", _chunk_size);
+		if (_chunk_size == 0) {
+			if (c == CR)
+				_step = CR_CHUNK_END;
+			if (c == LF) {
+				Logger::debug("first LF chunk end");
+				_step = CHUNK_END;
+			}
+		}
+		_chunk_size_str.clear();
+	}
+	else if (!std::isxdigit(c))
+		_bad_request("Invalid character on chunk size");
+	else
+		_chunk_size_str.push_back(c);
+}
+
+void RequestParser::_parse_chunk_data(char c) {
+	if (_chunk_bytes_readed < _chunk_size) {
+		_body.push_back(c);
+		++_chunk_bytes_readed;
+		if (_chunk_bytes_readed == _chunk_size) {
+			_step = CHUNK_DATA_END;
+			_print_body();
+		}
+	}
+}
+
 
 void RequestParser::_print_body(void) {
 	std::vector<char>::iterator it, end = _body.end();
@@ -591,12 +732,12 @@ void RequestParser::_print_body(void) {
 				<< BLUE << "Received body of size " << _body_bytes_readed
 				<< ":\n" << GREY;
 		for(it = _body.begin(); it != end; ++it) {
-			if (*it == CR)
-				std::cout << " CR";
-			else if (*it == LF)
-				std::cout << "LF" << *it;
-			else
-				std::cout << *it;
+			// if (*it == CR)
+			// 	std::cout << " CR";
+			// else if (*it == LF)
+			// 	std::cout << "LF" << *it;
+			// else
+			std::cout << *it;
 		}
 		std::cout
 				<< "\n------------------------------------------------------\n"

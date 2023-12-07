@@ -6,8 +6,8 @@ WebServ::WebServ(void): _total_fds(0) {
 	this->_pfds.clear();
 	this->_fds_map.clear();
 	this->_serverSockets.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 }
 
@@ -21,8 +21,8 @@ WebServ::~WebServ(void) {
 
 	// is this necessary?
 	this->_servers.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 }
 
@@ -38,10 +38,17 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 	return *this;
 }
 
+bool	WebServ::checkPort(int port) {
+	for (t_server_iterator it = _servers.begin(); it!= _servers.end(); ++it) {
+		if (it->second->getPort() == port)
+			return (false);
+	}
+	return (true);
+}
+
 void	WebServ::create_servers(std::vector<std::string> input) {
-	//verify if the same port is being used
 	int	brackets = 0;
-	size_t i;
+	size_t	i;
 
 	for (size_t index = 0; index < input.size(); index++) {
 		Server *oneServer = new Server(input, index);
@@ -59,9 +66,11 @@ void	WebServ::create_servers(std::vector<std::string> input) {
 			}
 			index = i;
 		}
+		if (!checkPort(oneServer->getPort()))
+			throw ServerPortAlreadySetted();
+		Logger::info("Server initialized on port", oneServer->getPort());
 		this->_servers.insert(std::pair<int, Server*>(oneServer->getSocket(), oneServer));
 	}
-	//will get the socket for the server, initialize the server
 }
 
 void	WebServ::init(void) {
@@ -107,36 +116,33 @@ void	WebServ::run(void) {
 				}
 			}
 			if (this->_pfds[i].revents & POLLOUT) {  // can send
-				if (_is_ready_to_respond(fd)) {  // when request parsing ends*
+				if (_is_ready_to_respond(fd)) {  // when request parsing ends
 					Logger::debug("POLLOUT event and request parsing ended");
-					// *pode ser que o parsing da request pegue um erro sem ter recebido
-					// todos os dados; pra ser mais eficaz e seguro a gente já
-					// vai retornar uma resposta com o erro adequado
-
-					// create Request object
-					Request* request;
-					request = this->_requestBuilderMap[fd]->build();
-
-					_respond(request);
-					delete request;
-					delete this->_requestBuilderMap[fd];  // ou dá um clean nele
+					_respond(this->_requestBuilderMap[fd]->build());
+					delete this->_requestBuilderMap[fd]; // deletes the Request also
 					this->_requestBuilderMap.erase(fd);
-					// clean requestBuilder or delete it?
+					// if (!_keep_connection)
+					_end_connection(fd); // vai dar problema se a response for mandada quebrada...
 				}
 			}
 		}
 	}
 }
 
-
 void	WebServ::stop(void) {
+	t_req_builder_iterator it, end = this->_requestBuilderMap.end();
+
+	for (it = _requestBuilderMap.begin(); it != end; ++it) {
+		delete it->second;
+	}
+	for(int i = 0; i < _total_fds; i++)
+		close(_pfds[i].fd);
 	if (_servers.size()) {
 		for (size_t i = 0; i < _servers.size(); i++) {
 			if (_servers[i])
 				delete _servers[i];
 		}
 	}
-	clear_fds();
 }
 
 bool	WebServ::_is_server_socket(int fd) {
@@ -238,33 +244,26 @@ bool WebServ::_is_ready_to_respond(int fd) {
 }
 
 void WebServ::_respond(Request* request) {
-	int response_fd = request->fd();
+	Response response = responseBuilder(request);
 
-	// get uri from request
-	std::string filePath = request->uri();
-	std::cout << "filePath: " << filePath << std::endl;
-
-	Logger::debug("creating response...");
-	std::string response_string = responseBuilder(filePath, request);
-	Logger::debug("sending response...");
-	send(response_fd, response_string.c_str(), response_string.length(), 0);
+	response.sendResponse();
 }
 
 void WebServ::clean(void) {
-	t_pollfd_vector::iterator it, end = this->_pfds.end();
+	t_req_builder_iterator it, end = this->_requestBuilderMap.end();
 
-	// close all connections, including server ports?
-	// não sei se pode fechar tudo, incluindo as portas dos servidores...
-	for (it = this->_pfds.begin(); it != end; ++it)
-		close((*it).fd);
+	for (it = _requestBuilderMap.begin(); it != end; ++it) {
+		delete it->second;
+	}
+	for(int i = 0; i < _total_fds; i++)
+		close(_pfds[i].fd);
 
 	// precisa verificar se isso gera leak
-	this->_servers.clear();
 	this->_pfds.clear();
 	this->_fds_map.clear();
 	this->_serverSockets.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 
 	this->_total_fds = 0;
@@ -273,8 +272,8 @@ void WebServ::clean(void) {
 // for server we need to create other function
 void WebServ::_end_connection(int fd) {
 	t_pollfd_iterator it, end = this->_pfds.end();
-	t_request_iterator request;
-	t_response_iterator response;
+	// t_request_iterator request;
+	// t_response_iterator response;
 	t_req_builder_iterator builder;
 	std::map<int, int>::iterator fds_map;
 
@@ -285,16 +284,16 @@ void WebServ::_end_connection(int fd) {
 		delete builder->second;
 		this->_requestBuilderMap.erase(fd);
 	}
-	request = this->_requests.find(fd);
-	if (request != this->_requests.end()) {
-		delete request->second;
-		this->_requests.erase(fd);
-	}
-	response = this->_responses.find(fd);
-	if (response != this->_responses.end()) {
-		delete response->second;
-		this->_responses.erase(fd);
-	}
+	// request = this->_requests.find(fd);
+	// if (request != this->_requests.end()) {
+	// 	delete request->second;
+	// 	this->_requests.erase(fd);
+	// }
+	// response = this->_responses.find(fd);
+	// if (response != this->_responses.end()) {
+	// 	delete response->second;
+	// 	this->_responses.erase(fd);
+	// }
 
 	// clean fds structures
 	for (it = this->_pfds.begin(); it != end; ++it) {
@@ -309,6 +308,7 @@ void WebServ::_end_connection(int fd) {
 
 	--this->_total_fds;
 	close(fd);
+	Logger::debug("Close connection on socket", fd);
 }
 
 void WebServ::restart_socket_servers(void) {
@@ -326,4 +326,8 @@ std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {
 		o << (*it).fd << " | ";
 	o << RESET;
 	return o;
+}
+
+const char* WebServ::ServerPortAlreadySetted::what() const throw() {
+	return ("Port already setted to other server.");
 }

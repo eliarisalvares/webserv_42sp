@@ -38,6 +38,7 @@ void warning(std::string const msg, int const value);
 void warning_no_lf(std::string const msg);
 void info(std::string const msg);
 void info(std::string const msg, std::string const value);
+void info(std::string const msg, int const value);
 void info_no_lf(std::string const msg);
 void debug(std::string const msg);
 void debug(std::string const msg, std::string const value);

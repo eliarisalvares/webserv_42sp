@@ -46,6 +46,11 @@ void	info(std::string const msg, std::string const value) {
 			<< RESET << std::endl;
 }
 
+void	info(std::string const msg, int const value) {
+	std::cout << BLUE << INFO_LOG << msg << ": |" << value << "|"
+			<< RESET << std::endl;
+}
+
 void	info_no_lf(std::string const msg) {
 	std::cout << BLUE << INFO_LOG << msg << RESET;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 19:55:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:38:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ namespace utils {
 		GENERAL = 0,
 		INVALID_METHOD,
 		INVALID_DIRECTORY,
+		MISSING_REQUEST_ON_PARSER,
 	};
 
 	class GeneralException;
@@ -30,7 +31,8 @@ namespace utils {
 	bool is_ctl(char c);
 	bool is_ualpha(char c);
 	bool is_lalpha(char c);
-
+	int xtod(char c);
+	size_t xtod(std::string hex);
 }
 
 class utils::GeneralException: public std::exception {
@@ -43,6 +45,5 @@ class utils::GeneralException: public std::exception {
 
 bool	checkFileWorks(const std::string& fileName);
 bool	checkArgs(int argc, char *argv[]);
-void	clear_fds(void);
 
 #endif

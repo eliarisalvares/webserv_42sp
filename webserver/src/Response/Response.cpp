@@ -3,38 +3,42 @@
 /* Canonical Form
 */
 
-Response::Response(void) { 
-	status_code = 200;
-	message = "OK";
+Response::Response(void) {
+	this->_status_code = http::OK;
+	this->_message = "OK";
 }
 
-Response::Response(int status_code, std::string message, std::string body, std::map<std::string, std::string> headers) {
-	this->status_code = status_code;
-	this->message = message;
-	this->body = body;
-	this->headers = headers;
+Response::Response(int fd, int status_code) {
+	this->_fd = fd;
+	this->_status_code = status_code;
 }
 
 Response::~Response(void) { }
 
-Response::Response(Response const& copy) { 
-	(void)copy;
+Response::Response(Response const& copy) {
+	*this = copy;
 }
 
 Response const& Response::operator=(Response const & copy) {
-	(void)copy;
+	if (this != &copy) {
+		this->_fd = copy.getFd();
+		this->_status_code = copy.getStatusCode();
+		this->_message = copy.getMessage();
+		this->body = copy.getBody();
+		this->headers = copy.getHeaders();
+	}
 	return *this;
 }
 
-/* Setters 
+/* Setters
 */
 
 void Response::setStatusCode(int status_code) {
-	this->status_code = status_code;
+	this->_status_code = status_code;
 }
 
 void Response::setMessage(std::string message) {
-	this->message = message;
+	this->_message = message;
 }
 
 void Response::setBody(std::string body) {
@@ -48,12 +52,16 @@ void Response::addHeader(const std::string& key, const std::string& value) {
 /* Getters
 */
 
+int Response::getFd(void) const {
+	return _status_code;
+}
+
 int Response::getStatusCode(void) const {
-	return status_code;
+	return _status_code;
 }
 
 std::string Response::getMessage(void) const {
-	return message;
+	return _message;
 }
 
 std::string Response::getBody(void) const {
@@ -73,7 +81,7 @@ const std::map<std::string, std::string>& Response::getHeaders(void) const {
 std::string Response::toString() const {
     std::ostringstream response_stream;
 
-    response_stream << "HTTP/1.1 " << status_code << " " << message << "\r\n";
+    response_stream << "HTTP/1.1 " << _status_code << " " << _message << "\r\n";
     for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
         response_stream << it->first << ": " << it->second << "\r\n";
     }
@@ -81,4 +89,11 @@ std::string Response::toString() const {
     response_stream << body;
 
     return response_stream.str();
+}
+
+void Response::sendResponse(void) {
+	Logger::debug("sending response...");
+
+	std::string response_string = this->toString();
+	send(this->_fd, response_string.c_str(), response_string.length(), 0);
 }

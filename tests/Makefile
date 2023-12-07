@@ -9,33 +9,22 @@ RESET			= \033[0m
 ##                                 COMPILATION                                ##
 ################################################################################
 # Variables
-NAME = webserv
+NAME = tests
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -g3
 CXXDEBUG = -D DEBUG=true
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all \
 --trace-children=yes --track-origins=yes --track-fds=yes
 
-SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
-				$(UTILS)
-WEBSERV =		WebServ.cpp
-SERVER =		Server.cpp ServerParser.cpp server_builder.cpp server_getters.cpp \
-				server_setters.cpp
-REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp \
-				request_parser_getters.cpp
-RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
-LOGGER =		Logger.cpp
-UTILS =			openFile.cpp ftstring.cpp http.cpp utils.cpp
+SRCS =			xtod_test.cpp Logger.cpp utils.cpp
 
-INCLUDES =		-I ./ -I src/Logger -I src/Request -I src/Response \
-				-I src/Server -I src/Parser -I src/WebServ -I src/Utils
+INCLUDES =		-I ./ -I ../webserver/src/Logger -I ../webserver/src/Utils
 
 OBJ	=			$(SRCS:%.cpp=$(OBJPATH)/%.o)
 DEPS =			$(SRCS:%.cpp=$(OBJPATH)/%.d)
 
 OBJPATH =		temp
-VPATH =			src src/Logger src/Request src/Response src/Server src/Parser \
-				src/WebServ src/Utils
+VPATH =			../webserver/src/Logger ../webserver/src/Utils
 
 ################################################################################
 ##                                    RULES                                   ##
@@ -43,11 +32,6 @@ VPATH =			src src/Logger src/Request src/Response src/Server src/Parser \
 
 # Default target
 all: $(NAME)
-
-#needed to run the project if python not installed
-update-env:
-	sudo apt-get update
-	sudo apt-get python3
 
 # Folder for temporary objects
 $(OBJPATH)/%.o:	%.cpp
@@ -58,12 +42,15 @@ $(OBJPATH)/%.o:	%.cpp
 $(OBJPATH):
 	@printf "$(GRAY)[ INFO ] Compiling objects with $(RESET)$(CXX) $(CXXFLAGS) \n" $@
 	@mkdir -p $(OBJPATH)
-	@mkdir -p content/upload
 
 # Linking the final program
 $(NAME): $(OBJPATH) $(OBJ)
 	@$(CXX) $(OBJ) -o $(NAME)
 	@echo "$(CYAN)$(NAME)$(GRAY): $(GREEN)Done$(GRAY)!$(RESET)"
+
+# Compiling the source files
+# %.o: %.cpp
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Removing all object files
 clean:
@@ -82,11 +69,7 @@ re: fclean all
 # Checking headers for each file
 -include $(DEPS)
 
-#run the program with args
-run:
-	./$(NAME) config/testconfig.conf
-
 val:
-	$(VALGRIND) ./$(NAME) config/testconfig.conf
+	$(VALGRIND) ./$(NAME)
 
 .PHONY: all clean fclean re
