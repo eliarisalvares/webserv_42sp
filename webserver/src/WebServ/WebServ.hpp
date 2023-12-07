@@ -54,6 +54,9 @@ public:
 	void	stop(void);
 	void	clean(void);
 	void	restart_socket_servers(void);
+	class ServerPortAlreadySetted : public std::exception {
+			virtual const char* what(void) const throw();
+		};
 
 private:
 	// we want only one instance of WebServ, without copy

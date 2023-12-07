@@ -59,6 +59,13 @@ void	WebServ::create_servers(std::vector<std::string> input) {
 			}
 			index = i;
 		}
+		for (size_t j = 0; j < _servers.size(); j++) {
+			if (_servers[j]) {
+				if (oneServer->getPort() == _servers[j]->getPort())
+					throw ServerPortAlreadySetted();
+			}
+		}
+		Logger::info("Server initialized on port", oneServer->getPort());
 		this->_servers.insert(std::pair<int, Server*>(oneServer->getSocket(), oneServer));
 	}
 	//will get the socket for the server, initialize the server
@@ -327,4 +334,10 @@ std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {
 		o << (*it).fd << " | ";
 	o << RESET;
 	return o;
+}
+
+
+
+const char* WebServ::ServerPortAlreadySetted::what() const throw() {
+	return ("Port already setted to other server.");
 }
