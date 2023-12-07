@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 18:34:49 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 22:03:28 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,10 @@
 # define POINT '.'
 # define SLASH '/'
 # define SEMICOLON ';'
-# define HEXADECIMAL "0123456789ABDEF"
 
 // error messages
 # define REQPARSER_ERROR "request parser error: "
 # define HTTP_VERSION "invalid HTTP version"
-
-# define HEADER_LIMIT_SIZE 10240 // ???????????????
 
 typedef std::map<std::string, std::string>	t_string_map;
 typedef std::pair<std::string, std::string>	t_string_pair;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 19:55:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/06 22:45:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ namespace utils {
 	bool is_ctl(char c);
 	bool is_ualpha(char c);
 	bool is_lalpha(char c);
-
+	int xtod(char c);
+	size_t xtod(std::string hex);
 }
 
 class utils::GeneralException: public std::exception {
