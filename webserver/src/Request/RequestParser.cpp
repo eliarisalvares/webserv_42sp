@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 22:44:29 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 10:23:36 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,8 @@
 
 std::string const RequestParser::_right_protocol = "HTTP";
 
-RequestParser::RequestParser(void):
-	_idx(0), _step(INIT) {
+RequestParser::RequestParser(void): _step(INIT) {
 	_request = new Request();
-	_field_name.clear();
-	_field_value.clear();
-	_last_header.clear();
-	_headers.clear();
 	_has_content_length = false;
 	_is_chunked = false;
 	_content_length = 0;
@@ -28,23 +23,16 @@ RequestParser::RequestParser(void):
 	_body_bytes_readed = 0;
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
-	_body.clear();
 }
 
-RequestParser::RequestParser(Request* request):
-	_idx(0), _step(INIT), _request(request) {
-	_field_name.clear();
-	_field_value.clear();
-	_last_header.clear();
-	_headers.clear();
+RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_has_content_length = false;
 	_is_chunked = false;
 	_content_length = 0;
-	_max_body_size = request->server()->getBodySize();
+	_max_body_size = size_t(request->server()->getBodySize());
 	_body_bytes_readed = 0;
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
-	_body.clear();
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -53,7 +41,27 @@ RequestParser::RequestParser(RequestParser const& copy) {
 
 RequestParser& RequestParser::operator=(RequestParser const& copy) {
 	if (this != &copy) {
-		(void)copy;
+		_step = copy.step();
+		if (_request)
+			delete _request;
+		_request = copy.getRequest();
+		_method = copy.getMethod();
+		_uri = copy.getUri();
+		_protocol = copy.getProtocol();
+		_version = copy.getVersion();
+		_field_name = copy.getFieldName();
+		_field_value = copy.getFieldValue();
+		_last_header = copy.getLastHeader();
+		_headers = copy.getHeaders();
+		_has_content_length = copy.has_content_length();
+		_is_chunked = copy.is_chunked();
+		_content_length = copy.content_length();
+		_max_body_size = copy.max_body_size();
+		_body_bytes_readed = copy.body_bytes_readed();
+		_chunk_size = copy.chunk_size();
+		_chunk_bytes_readed = copy.chunk_bytes_readed();
+		_chunk_size_str = copy.getChunkSizeStr();
+		_body = getBody();
 	}
 	return *this;
 }
@@ -63,12 +71,30 @@ RequestParser::~RequestParser(void) {
 	// _result.clear();
 }
 
-RequestParser::Step RequestParser::step(void) const {
-	return this->_step;
-}
-
 void RequestParser::setStep(Step s) {
 	this->_step = s;
+}
+
+void RequestParser::init(char c) {
+	_method.clear();
+	_uri.clear();
+	_protocol.clear();
+	_version.clear();
+	_field_name.clear();
+	_field_value.clear();
+	_last_header.clear();
+	_headers.clear();
+	_chunk_size_str.clear();
+	_body.clear();
+	_has_content_length = false;
+	_is_chunked = false;
+	_content_length = 0;
+	_body_bytes_readed = 0;
+	_chunk_size = 0;
+	_chunk_bytes_readed = 0;
+
+	_step = METHOD;
+	method(c);
 }
 
 // general:
@@ -88,7 +114,6 @@ void RequestParser::setStep(Step s) {
 // server but not allowed for the target resource, the origin server
 // SHOULD respond with the 405 (Method Not Allowed) status code.
 void RequestParser::method(char c) {
-	_step = METHOD;
 	if (utils::is_ualpha(c))
 		_method.push_back(c);
 	else if (c == SP) {
@@ -370,9 +395,8 @@ void RequestParser::_parse_field_value(char c) {
 		_field_value.push_back(c);
 }
 
-
 void RequestParser::_add_header(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it;
+	t_header_iterator it;
 
 	std::transform(
 		_field_name.begin(),
@@ -416,7 +440,7 @@ void RequestParser::check_request(void) {
 
 // header Host is mandatory and singleton
 void RequestParser::_check_host(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it;
+	t_header_iterator it;
 
 	it = _headers.find("host");
 	if (it == _headers.end())
@@ -428,7 +452,7 @@ void RequestParser::_check_host(void) {
 
 // header Content-Length has only numbers, is singleton and has a maximum size
 void RequestParser::_check_content_length(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it_header;
+	t_header_iterator it_header;
 
 	it_header = _headers.find("content-length");
 	if (it_header == _headers.end())
@@ -450,10 +474,6 @@ void RequestParser::_check_content_length(void) {
 
 	std::stringstream ss(content_lenght);
 	ss >> _content_length;
-	// verificar porque não ficou setado no início...
-	_max_body_size = _request->server()->getBodySize();
-	// std::cout << GREY << "max_body_size: " << _max_body_size
-	// 			<< "content_length: " << _content_length << std::endl;
 	if (_content_length > _max_body_size)
 		_invalid_request(
 			"Content-Lenght bigger than max body size",
@@ -462,7 +482,7 @@ void RequestParser::_check_content_length(void) {
 }
 
 void RequestParser::_check_transfer_encoding(void) {
-	std::map<std::string, std::vector<std::string> >::iterator it_header;
+	t_header_iterator it_header;
 
 	it_header = _headers.find("transfer-encoding");
 	if (it_header == _headers.end())
@@ -511,7 +531,7 @@ void RequestParser::_check_post_headers(void) {
 
 void RequestParser::_print_headers(void) {
 	if (DEBUG) {
-		std::map<std::string, std::vector<std::string> >::iterator it, end;
+		t_header_iterator it, end;
 		std::vector<std::string>::iterator v_it, v_end;
 		int i;
 

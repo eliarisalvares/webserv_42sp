@@ -21,7 +21,8 @@ SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 WEBSERV =		WebServ.cpp
 SERVER =		Server.cpp ServerParser.cpp server_builder.cpp server_getters.cpp \
 				server_setters.cpp
-REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp
+REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp \
+				request_parser_getters.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
 LOGGER =		Logger.cpp
 UTILS =			openFile.cpp ftstring.cpp http.cpp utils.cpp
