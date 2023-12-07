@@ -25,19 +25,19 @@
 # define POLLNOEVENT 0x000
 
 // server types
-typedef std::map<std::string, std::string>	t_infoServer;
+// typedef std::map<std::string, std::string>	t_infoServer;
 typedef std::map<int, Server*> t_server_map;
 typedef std::map<int, Server*>::iterator t_server_iterator;
 
 // request types
-typedef std::map<int, Request*> t_request_map;
-typedef std::map<int, Request*>::iterator t_request_iterator;
+// typedef std::map<int, Request*> t_request_map;
+// typedef std::map<int, Request*>::iterator t_request_iterator;
 typedef std::map<int, RequestBuilder*> t_req_builder_map;
 typedef std::map<int, RequestBuilder*>::iterator t_req_builder_iterator;
 
 // response types
-typedef std::map<int, Response*> t_response_map;
-typedef std::map<int, Response*>::iterator t_response_iterator;
+// typedef std::map<int, Response*> t_response_map;
+// typedef std::map<int, Response*>::iterator t_response_iterator;
 
 // other types
 typedef std::vector<struct pollfd> t_pollfd_vector;
@@ -65,8 +65,8 @@ private:
 	WebServ const& operator=(WebServ const& copy);
 
 	t_server_map		_servers;
-	t_request_map		_requests;
-	t_response_map		_responses;
+	// t_request_map		_requests;
+	// t_response_map		_responses;
 	void				_receive(int fd);
 	void				_respond(Request* request);
 
