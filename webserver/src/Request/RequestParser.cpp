@@ -710,12 +710,12 @@ void RequestParser::_print_body(void) {
 				<< BLUE << "Received body of size " << _body_bytes_readed
 				<< ":\n" << GREY;
 		for(it = _body.begin(); it != end; ++it) {
-			if (*it == CR)
-				std::cout << " CR";
-			else if (*it == LF)
-				std::cout << "LF" << *it;
-			else
-				std::cout << *it;
+			// if (*it == CR)
+			// 	std::cout << " CR";
+			// else if (*it == LF)
+			// 	std::cout << "LF" << *it;
+			// else
+			std::cout << *it;
 		}
 		std::cout
 				<< "\n------------------------------------------------------\n"
