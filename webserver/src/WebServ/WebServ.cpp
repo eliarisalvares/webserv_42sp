@@ -6,8 +6,8 @@ WebServ::WebServ(void): _total_fds(0) {
 	this->_pfds.clear();
 	this->_fds_map.clear();
 	this->_serverSockets.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 }
 
@@ -21,8 +21,8 @@ WebServ::~WebServ(void) {
 
 	// is this necessary?
 	this->_servers.clear();
-	this->_requests.clear();
-	this->_responses.clear();
+	// this->_requests.clear();
+	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 }
 
@@ -280,8 +280,8 @@ void WebServ::clean(void) {
 // for server we need to create other function
 void WebServ::_end_connection(int fd) {
 	t_pollfd_iterator it, end = this->_pfds.end();
-	t_request_iterator request;
-	t_response_iterator response;
+	// t_request_iterator request;
+	// t_response_iterator response;
 	t_req_builder_iterator builder;
 	std::map<int, int>::iterator fds_map;
 
@@ -292,16 +292,16 @@ void WebServ::_end_connection(int fd) {
 		delete builder->second;
 		this->_requestBuilderMap.erase(fd);
 	}
-	request = this->_requests.find(fd);
-	if (request != this->_requests.end()) {
-		delete request->second;
-		this->_requests.erase(fd);
-	} // acho que vamos poder tirar toda essa estrutura, não estou usando mais
-	response = this->_responses.find(fd);
-	if (response != this->_responses.end()) {
-		delete response->second;
-		this->_responses.erase(fd);
-	}
+	// request = this->_requests.find(fd);
+	// if (request != this->_requests.end()) {
+	// 	delete request->second;
+	// 	this->_requests.erase(fd);
+	// }
+	// response = this->_responses.find(fd);
+	// if (response != this->_responses.end()) {
+	// 	delete response->second;
+	// 	this->_responses.erase(fd);
+	// }
 
 	// clean fds structures
 	for (it = this->_pfds.begin(); it != end; ++it) {
@@ -335,8 +335,6 @@ std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {
 	o << RESET;
 	return o;
 }
-
-
 
 const char* WebServ::ServerPortAlreadySetted::what() const throw() {
 	return ("Port already setted to other server.");
