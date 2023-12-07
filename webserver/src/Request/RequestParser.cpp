@@ -146,7 +146,7 @@ void RequestParser::uri(char c) {
 		return ;
 	else if (c == CR || c == LF)
 		_bad_request("missing data on request first line");
-	if (c != SP) { // make first validation
+	if (c != SP && http::is_uri_char(c)) {
 		if (init_uri) {
 			if (c == HTAB)
 				_bad_request("invalid method/uri separator: horizontal tab");
@@ -160,7 +160,7 @@ void RequestParser::uri(char c) {
 		init_uri = true;
 	}
 	else
-		_invalid_request("invalid uri", _uri, http::BAD_REQUEST);
+		_invalid_request("invalid uri character", c, http::BAD_REQUEST);
 }
 
 // The HTTP version always takes the form "HTTP/x.x", uppercase
