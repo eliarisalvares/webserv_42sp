@@ -63,10 +63,12 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 }
 
 
-std::string responseBuilder(std::string& filePath) {
-    Response response;
-
+Response responseBuilder(Request* request, Response response) {
     // isso aqui é um teste:
+    // get uri from request
+	std::string filePath = request->uri();
+	std::cout << "filePath: " << filePath << std::endl;
+
     if (filePath == "/") {
         if (access("content/index.html", F_OK) == 0) {
             filePath = "content/index.html";

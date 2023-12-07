@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/04 22:07:51 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 14:32:28 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ namespace http {
 		NOT_ACCEPTABLE = 406,
 		REQUEST_TIMEOUT = 408,
 		CONFLICT = 409,  // checar se vamos usar
-		LENGTH_REQUIRED = 411,  // checar se vamos usar
+		LENGTH_REQUIRED = 411,
 		CONTENT_TOO_LARGE = 413,
 		URI_TOO_LONG = 414,
 		UNSUPPORTED_MEDIA_TYPE = 415,
