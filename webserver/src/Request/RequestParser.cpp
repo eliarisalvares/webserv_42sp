@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 22:43:50 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/06 22:44:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,7 +497,7 @@ void RequestParser::_check_method(void) {
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
 		_invalid_request(
-			"POST without 'Transfer-Enconding' or 'Content-Length' headers",
+			"POST without 'Transfer-Encoding' or 'Content-Length' headers",
 			http::LENGTH_REQUIRED
 		);
 	if (_is_chunked && _has_content_length && _content_length)
@@ -669,9 +669,7 @@ void RequestParser::_parse_chunk_size(char c) {
 			_step = CHUNK_DATA;
 		else if (c == SEMICOLON)
 			_step = CHUNK_PARAMETERS;
-		// TODO: transform to decimal number
-		std::stringstream ss(_chunk_size_str);
-		ss >> _chunk_size;
+		_chunk_size = utils::xtod(_chunk_size_str);
 		_chunk_bytes_readed = 0;
 		Logger::debug("chunk size hex:", _chunk_size_str);
 		Logger::debug("chunk size decimal:", _chunk_size);
@@ -685,8 +683,8 @@ void RequestParser::_parse_chunk_size(char c) {
 		}
 		_chunk_size_str.clear();
 	}
-	// else if (!utils::is_hexa(c))
-	// 	_bad_request("Invalid character on chunk size");
+	else if (!std::isxdigit(c))
+		_bad_request("Invalid character on chunk size");
 	else
 		_chunk_size_str.push_back(c);
 }
