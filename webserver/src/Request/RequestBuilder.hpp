@@ -29,26 +29,33 @@ public:
 	RequestBuilder& operator=(RequestBuilder const& copy);
 	~RequestBuilder(void);
 
-	bool		read(void);
-	void		parse(void);
-	Request*	build(void);
+	bool			read(void);
+	void			parse(void);
+	Request*		build(void);
 
-	bool		is_ready(void) const;
+	// getters
+	bool			is_ready(void) const;
+	int				getServerFd(void) const;
+	Server*			getServer(void) const;
+	Request*		getRequest(void) const;
+	size_t			bytes_readed(void) const;
+	char*			getBuffer(void) const;
+	RequestParser	getParser(void) const;
 
 private:
 	RequestBuilder(void);
 
-	int					_fd;
-	bool				_ready;
-	Server*				_server; // talvez não seja necessário
-	Request*			_request;
+	int				_fd;
+	bool			_ready;
+	Server*			_server; // talvez não seja necessário
+	Request*		_request;
 
 	// parse data
-	size_t				_bytes_readed;
-	char*				_buffer;
-	RequestParser		_parser;
-	void				_setRequestError(http::InvalidRequest& e);
-	void				_setRequestError(std::exception& e);
+	size_t			_bytes_readed;
+	char*			_buffer;
+	RequestParser	_parser;
+	void			_setRequestError(http::InvalidRequest& e);
+	void			_setRequestError(std::exception& e);
 };
 
 #endif

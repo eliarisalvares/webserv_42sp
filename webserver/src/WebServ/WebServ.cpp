@@ -116,21 +116,11 @@ void	WebServ::run(void) {
 				}
 			}
 			if (this->_pfds[i].revents & POLLOUT) {  // can send
-				if (_is_ready_to_respond(fd)) {  // when request parsing ends*
+				if (_is_ready_to_respond(fd)) {  // when request parsing ends
 					Logger::debug("POLLOUT event and request parsing ended");
-					// *pode ser que o parsing da request pegue um erro sem ter recebido
-					// todos os dados; pra ser mais eficaz e seguro a gente já
-					// vai retornar uma resposta com o erro adequado
-
-					// create Request object
-					Request* request;
-					request = this->_requestBuilderMap[fd]->build();
-
-					_respond(request);
-					delete request;
-					delete this->_requestBuilderMap[fd];  // ou dá um clean nele
+					_respond(this->_requestBuilderMap[fd]->build());
+					delete this->_requestBuilderMap[fd]; // deletes the Request also
 					this->_requestBuilderMap.erase(fd);
-					// clean requestBuilder or delete it?
 				}
 			}
 		}
@@ -299,7 +289,7 @@ void WebServ::_end_connection(int fd) {
 	if (request != this->_requests.end()) {
 		delete request->second;
 		this->_requests.erase(fd);
-	}
+	} // acho que vamos poder tirar toda essa estrutura, não estou usando mais
 	response = this->_responses.find(fd);
 	if (response != this->_responses.end()) {
 		delete response->second;

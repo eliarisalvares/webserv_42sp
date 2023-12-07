@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 10:23:36 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 12:14:57 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 std::string const RequestParser::_right_protocol = "HTTP";
 
 RequestParser::RequestParser(void): _step(INIT) {
-	_request = new Request();
+	_request = NULL;
 	_has_content_length = false;
 	_is_chunked = false;
 	_content_length = 0;
@@ -42,7 +42,7 @@ RequestParser::RequestParser(RequestParser const& copy) {
 RequestParser& RequestParser::operator=(RequestParser const& copy) {
 	if (this != &copy) {
 		_step = copy.step();
-		if (_request)
+		if (_request && _request != copy.getRequest())
 			delete _request;
 		_request = copy.getRequest();
 		_method = copy.getMethod();

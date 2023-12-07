@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/06 22:45:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 12:17:48 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ namespace utils {
 		GENERAL = 0,
 		INVALID_METHOD,
 		INVALID_DIRECTORY,
+		MISSING_REQUEST_ON_PARSER,
 	};
 
 	class GeneralException;

@@ -6,25 +6,31 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 10:09:52 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 12:19:29 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestBuilder.hpp"
 
 // private constructor
-RequestBuilder::RequestBuilder(void) {}
+RequestBuilder::RequestBuilder(void):
+	_fd(0), _ready(false), _server(NULL), _request(NULL), _bytes_readed(0),
+	_buffer(NULL) {
+	}
 
 RequestBuilder::RequestBuilder(Server* server, int connection):
 	_fd(connection), _ready(false), _server(server), _bytes_readed(0) {
-	_request = new Request(connection, server);  // deletar fora porque vamos devolver
+	_request = new Request(connection, server);
 	_buffer = new char[server->getBufferSize()];
 	memset(_buffer, 0, server->getBufferSize());
 	_parser = RequestParser(_request);
 }
 
 RequestBuilder::~RequestBuilder(void) {
+	Logger::debug("Deleting RequestBuilder");
 	delete[] _buffer;
+	if (_request)
+		delete _request;
 }
 
 RequestBuilder::RequestBuilder(RequestBuilder const& copy) {
@@ -34,7 +40,17 @@ RequestBuilder::RequestBuilder(RequestBuilder const& copy) {
 // private operator
 RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 	if (this != &copy) {
-		(void)copy;
+		_fd = copy.getServerFd();
+		_ready = copy.is_ready();
+		_server = copy.getServer();
+		if (_request && _request != copy.getRequest())
+			delete _request;
+		_request = copy.getRequest();
+		_bytes_readed = copy.bytes_readed();
+		if (_buffer && _buffer != copy.getBuffer())
+			delete[] _buffer;
+		_buffer = copy.getBuffer();
+		_parser = copy.getParser();
 	}
 	return *this;
 }
@@ -42,18 +58,16 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 bool RequestBuilder::read(void) {
 	int error;
 
-	Logger::debug("reading data and saving it...");
+	Logger::debug("reading received data...");
 	_bytes_readed = recv(_fd, _buffer, _server->getBufferSize(), 0);
-	error = errno;
+	error = errno;  // checkar se podemos usar assim
 
 	if (_bytes_readed <= 0) {
-		std::cout << ORANGE << "error: " << errno << std::endl;  // remover, deixei apenas pra nos auxiliar
 		if (_bytes_readed == 0) {
 			Logger::warning_no_lf("client connection closed: ");
 			printf(GREY "socket %d hung up\n" RESET, this->_fd); // podemos usar a printf (por ser cpp)?
 		} else
 			Logger::strerror("recv", error);
-
 		close(this->_fd);
 		return false;
 	}
@@ -70,6 +84,10 @@ void RequestBuilder::parse(void) {
 			switch (_parser.step())
 			{
 				case RequestParser::INIT:
+					if(!_parser.getRequest())
+						throw utils::GeneralException(
+							utils::MISSING_REQUEST_ON_PARSER
+						);
 					_parser.init(c);
 					break;
 				case RequestParser::METHOD:
@@ -166,3 +184,28 @@ void RequestBuilder::_setRequestError(std::exception& e) {
 	_request->setError(true);
 	_parser.setStep(RequestParser::END);
 }
+
+int	RequestBuilder::getServerFd(void) const {
+	return this->_fd;
+}
+
+Server*	RequestBuilder::getServer(void) const {
+	return this->_server;
+}
+
+Request* RequestBuilder::getRequest(void) const {
+	return this->_request;
+}
+
+size_t	RequestBuilder::bytes_readed(void) const {
+	return this->_bytes_readed;
+}
+
+char*	RequestBuilder::getBuffer(void) const {
+	return this->_buffer;
+}
+
+RequestParser	RequestBuilder::getParser(void) const {
+	return this->_parser;
+}
+
