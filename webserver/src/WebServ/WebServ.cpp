@@ -238,7 +238,6 @@ bool WebServ::_is_ready_to_respond(int fd) {
 }
 
 void WebServ::_respond(Request* request) {
-	Response response;
 	int response_fd = request->fd();
 
 	// get uri from request
@@ -246,7 +245,7 @@ void WebServ::_respond(Request* request) {
 	std::cout << "filePath: " << filePath << std::endl;
 
 	Logger::debug("creating response...");
-	std::string response_string = responseBuilder(filePath);
+	std::string response_string = responseBuilder(filePath, request);
 	Logger::debug("sending response...");
 	send(response_fd, response_string.c_str(), response_string.length(), 0);
 }

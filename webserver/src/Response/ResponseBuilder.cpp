@@ -48,13 +48,11 @@ std::string getCurrentDate() {
     return oss.str();
 }
 
-void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength) {
-    Request request;
-
+void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength, Request* request) {    
     response.addHeader("Content-Type", contentType);
     response.addHeader("Content-Length", contentLength);
     response.addHeader("Date", getCurrentDate());
-    response.addHeader("Server", "localhost"); // TODO: get hostname from server
+    response.addHeader("Server", request->host());
     response.addHeader("Access-Control-Allow-Origin", "*");
     response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE"); // TODO: get allowed methods from server
     response.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -63,7 +61,7 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
 }
 
 
-std::string responseBuilder(std::string& filePath) {
+std::string responseBuilder(std::string& filePath, Request* request) {
     Response response;
 
     // isso aqui é um teste:
@@ -97,7 +95,7 @@ std::string responseBuilder(std::string& filePath) {
     std::stringstream ss;
     ss << body.length();
 
-    setResponseHeaders(response, contentType, ss.str());
+    setResponseHeaders(response, contentType, ss.str(), request);
 
     return response.toString();
 }
