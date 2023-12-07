@@ -30,7 +30,7 @@ class Response {
 
 public:
 	Response(void);
-	Response(int status_code, std::string message, std::string body, std::map<std::string, std::string> headers);
+	Response(Request* request);
 	~Response(void);
 	Response(Response const& copy);
 	Response const& operator=(Response const& copy);
@@ -46,11 +46,15 @@ public:
 	void setBody(std::string body);
 	void addHeader(const std::string& key, const std::string& value);
 
+	void	sendResponse(void);
+
 	std::string toString(void) const;
 
 private:
-	int status_code;
-	std::string message;
+	int			_fd;
+	int			_status_code;
+	std::string	_message;
+
 	std::string body;
 	std::map<std::string, std::string> headers;
 
