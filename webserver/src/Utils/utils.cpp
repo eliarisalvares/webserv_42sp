@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 12:18:48 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 13:38:31 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,15 +90,4 @@ size_t xtod(std::string hex) {
 	return decimal;
 }
 
-}
-
-void	clear_fds(void)
-{
-	int	fd;
-
-	fd = 100;
-	if (fd < 0)
-		return ;
-	while (fd > STDERR_FILENO)
-		close(fd--);
 }
