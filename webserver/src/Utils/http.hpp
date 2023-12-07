@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 14:32:28 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/07 18:24:56 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ namespace http {
 	// headers that needs a validation / singletons
 	std::set<std::string>				_fill_content_types(void);
 	static std::set<std::string> const	special_headers = http::_fill_content_types();
+
+	bool is_uri_char(char c);
 
 	// http exceptions
 	class InvalidRequest;
