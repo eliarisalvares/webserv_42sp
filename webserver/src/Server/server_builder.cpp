@@ -240,8 +240,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr(0, 9) == "location ") {
 			locName = ftstring::split(input[i].substr(9), ' ');
-			Logger::debug("Init location parsing", location.location);
 			location.location = locName[0];
+			Logger::debug("Init location parsing", location.location);
 			if (locName[1] != "{")
 				throw LocationNotOpenedException();
 		}
