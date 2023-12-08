@@ -8,7 +8,8 @@
 # include <map>
 # include <set>
 # include <algorithm>
-#include <dirent.h> //verifying or opening directories
+# include <dirent.h> //verifying or opening directories
+
 # include "define_server.hpp"
 # include "ftstring.hpp"
 # include "Logger.hpp"
@@ -24,15 +25,13 @@ typedef struct	s_permissions
 typedef struct	s_location
 {
 	bool									cgi;
-	std::string								location; // /data
+	std::string								location;
 	std::string								root;
-	std::string								redirection; // a fazer
+	std::string								redirection;
 	std::set<std::string>					allowed_methods;
-	std::set<std::string>					index;  // content/
+	std::set<std::string>					index;
 	std::map<int, std::string>				error_pages;
 	t_permissions							permit;
-	// std::vector<std::string>				http_methods;
-	// std::pair<unsigned int, std::string>	http_redirection;
 }				t_location;
 
 bool						obtainAutoIndex(std::vector<std::string> input, int index);
@@ -48,7 +47,7 @@ t_location					obtainLoc(std::vector<std::string> input, int index);
 std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index);
 std::set<std::string>		obtainIndex(std::vector<std::string> input, int index);
-std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std::string root);
+std::set<std::string>		obtainIndex(std::vector<std::string> input, int index, std::string root);
 
 t_location					initLocation(void);
 
@@ -115,6 +114,10 @@ class DirListWrongArgumentException : public std::exception {
 };
 
 class DirListInvalidException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class PortAlreadyInUseException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
