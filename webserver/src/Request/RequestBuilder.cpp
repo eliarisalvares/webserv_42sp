@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 12:19:29 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 00:38:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ void RequestBuilder::parse(void) {
 			switch (_parser.step())
 			{
 				case RequestParser::INIT:
-					if(!_parser.getRequest())
+					if(!_parser.getRequest() || !_request)
 						throw utils::GeneralException(
-							utils::MISSING_REQUEST_ON_PARSER
+							utils::REQUEST_DELETED_ON_BUILDER_OR_PARSER
 						);
 					_parser.init(c);
 					break;
