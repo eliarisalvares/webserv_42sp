@@ -27,6 +27,8 @@ Response Class
 # include "http.hpp"
 # include "ftstring.hpp"
 
+# define HTML_CHAR ";charset=utf-8"
+
 class Response {
 
 public:
