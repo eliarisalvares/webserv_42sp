@@ -56,14 +56,13 @@ std::string getHtmlContent(const std::string& filePath) {
  * @return std::string the current date and time string
  */
 std::string getCurrentDate() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    time_t now = tv.tv_sec;
-    struct tm *bt = localtime(&now);
-    char dateStr[20];
-    strftime(dateStr, sizeof(dateStr), "%Y-%m-%d %H:%M:%S", bt);
-    std::ostringstream oss;
-    oss << dateStr;
-    oss << '.' << std::setfill('0') << std::setw(6) << tv.tv_usec;
-    return oss.str();
+    time_t   now;
+    std::tm *local_time;
+    char     buffer[64];
+
+    now        = std::time(NULL);
+    local_time = std::localtime(&now);
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %T %Z", local_time);
+
+    return (buffer);
 }
