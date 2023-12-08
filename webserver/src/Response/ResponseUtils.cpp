@@ -13,6 +13,7 @@ static const std::map<std::string, std::string> initializeContentTypeMap() {
     m.insert(std::make_pair(".jpg", "image/jpeg"));
     m.insert(std::make_pair(".jpeg", "image/jpeg"));
     m.insert(std::make_pair(".gif", "image/gif"));
+    m.insert(std::make_pair(".py", "text/html"));
     return m;
 }
 
