@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 10:25:44 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 16:24:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,8 @@ const char* InvalidRequest::what() const throw() {
 	switch (_error) {
     case BAD_REQUEST:
       return "400 Bad request";
+    case NOT_FOUND:
+      return "404 Not found";
     case METHOD_NOT_ALLOWED:
       return "405 Method not allowed";
     case LENGTH_REQUIRED:
