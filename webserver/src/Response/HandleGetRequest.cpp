@@ -2,7 +2,7 @@
 
 /**
  * @brief Get the Directory Listing for the given folder path.
- * 
+ *
  * @param folderPath folder path to get the listing for.
  * @return std::string html string with the directory listing.
  */
@@ -27,8 +27,8 @@ std::string getDirectoryListing(const std::string& folderPath) {
  * there is a file named "index.html" in the content folder, it
  * will be returned. Otherwise, the autoindex.py file will be
  * returned.
- * 
- * @return std::string 
+ *
+ * @return std::string
  */
 std::string getDefaultFilePath() {
      if (access("content/index.html", F_OK) == 0) {
@@ -61,12 +61,12 @@ std::string getResponseBody(const std::string& filePath, const std::string& cont
 /**
  * @brief Handles the GET request. It will return the response with the
  * status code, message, body and headers.
- * 
+ *
  * @param request the request to be handled.
  * @return Response the response to be sent.
  */
 Response handleGetRequest(Request* request) {
-    std::string filePath = request->uri();
+    std::string filePath = request->path();
     Logger::debug("handleGetRequest - filePath: " + filePath);
 
     if (filePath == "/") {

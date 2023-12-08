@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 10:53:14 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 11:06:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,6 +274,7 @@ void RequestParser::_check_uri(void) {
 	}
 
 	_request->setPath(path);
+	_request->setUri(_uri); // precisa tirar a parte final se receber parâmetros?
 }
 
 void RequestParser::_check_method(void) {

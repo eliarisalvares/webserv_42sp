@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 21:31:51 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 11:10:37 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Request::Request(void):
 	_error(false),
 	_method(http::GET),
 	_status_code(http::OK),
+	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
@@ -31,6 +32,7 @@ Request::Request(int fd, Server* server):
 	_error(false),
 	_method(http::GET),
 	_status_code(http::OK),
+	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
@@ -50,6 +52,7 @@ Request const& Request::operator=(Request const & copy) {
 		this->_method = copy.method();
 		this->_fd = copy.fd();
 		this->_status_code = copy.status_code();
+		this->_path = copy.path();
 		this->_uri = copy.uri();
 		this->_host = copy.host();
 		this->_location = copy.location();
@@ -81,8 +84,13 @@ http::HttpStatus Request::status_code(void) const {
 	return this->_status_code;
 }
 
+std::string Request::path(void) const {
+	Logger::info("path", this->_path);
+	return this->_path;
+}
+
 std::string Request::uri(void) const {
-	std::cout << "uri: " << this->_uri << std::endl;
+	Logger::info("uri", this->_uri);
 	return this->_uri;
 }
 
@@ -121,8 +129,12 @@ void Request::setStatusCode(http::HttpStatus status) {
 	this->_status_code = status;
 }
 
-void Request::setPath(std::string const uri) {
+void Request::setUri(std::string const uri) {
 	this->_uri = uri;
+}
+
+void Request::setPath(std::string const path) {
+	this->_path = path;
 }
 
 void Request::setLocation(t_location* location) {
