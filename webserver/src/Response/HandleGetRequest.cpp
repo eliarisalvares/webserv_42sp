@@ -30,11 +30,12 @@ std::string getDirectoryListing(const std::string& folderPath) {
  *
  * @return std::string
  */
-std::string getDefaultFilePath() {
-     if (access("content/index.html", F_OK) == 0) {
-        return "content/index.html";
+std::string getDefaultFilePath(std::string directoryPath) {
+    std::string indexPath = directoryPath + "/index.html";
+     if (access(indexPath.c_str(), F_OK) != -1) {
+        return indexPath;
     } else {
-        std::string folderPath = "content";
+        std::string folderPath = directoryPath + "/";
         std::string wholePath = folderPath + "/autoindex.html";
         std::string directoryListing = getDirectoryListing(folderPath);
         std::ofstream file(wholePath.c_str());
@@ -50,12 +51,35 @@ std::string getDefaultFilePath() {
  * @brief If the request is for a html file, it will return the html content.
  * Prevents the server from sending the html file as a string.
  */
-std::string getResponseBody(const std::string& filePath, const std::string& contentType) {
+std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request) {
     if (contentType == "text/html") {
         return getHtmlContent(filePath);
-    } else {
-        return "";
+    } else if (filePath.find(".py") != std::string::npos) {
+        return handleCGI(request);
     }
+    std::ifstream file(filePath.c_str());
+    if (!file.is_open())
+        return "";
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    return buffer.str();
+}
+
+/**
+ * @brief Sets the content type flags for the given content type.
+ *
+ * @param contentType the content type to be set.
+ * @return std::string the content type with the flags.
+ */
+std::string	setFlagsContent(std::string contentType) {
+    std::string	result;
+
+    result = contentType;
+    if (contentType == "text/html") {
+        result += HTML_CHAR;
+    }
+    return result;
 }
 
 /**
@@ -68,14 +92,25 @@ std::string getResponseBody(const std::string& filePath, const std::string& cont
 Response handleGetRequest(Request* request) {
     std::string filePath = request->path();
     Logger::debug("handleGetRequest - filePath: " + filePath);
+    int statusCode = request->status_code();
 
-    if (filePath == "/") {
-        filePath = getDefaultFilePath();
+
+    if (filePath[filePath.length() - 1] == '/') {
+        filePath = getDefaultFilePath(filePath);
     }
 
+    if (request->has_error()) {
+		filePath = (
+			std::string("content/error_pages/")
+			+ ftstring::itostr(statusCode)
+			+ std::string(".html")
+		);
+	}
+
     std::string contentType = getContentType(filePath);
-    std::string body = getResponseBody(filePath, contentType);
-    int statusCode = body.empty() ? 404 : 200;
+    contentType = setFlagsContent(contentType);
+
+    std::string body = getResponseBody(filePath, contentType, request);
     std::string message = getStatusMessage(statusCode);
 
     Response response(request->fd(), statusCode);
