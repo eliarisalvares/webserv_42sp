@@ -28,6 +28,12 @@ static const std::map<int, std::string> initializeMessageMap() {
 
 static const std::map<int, std::string> messageMap = initializeMessageMap();
 
+/**
+ * @brief Auxiliary function to get the status message of a status code.
+ * 
+ * @param statusCode the status code.
+ * @return std::string the status message.
+ */
 std::string getStatusMessage(int statusCode) {
     std::map<int, std::string>::const_iterator it = messageMap.find(statusCode);
     if (it == messageMap.end())

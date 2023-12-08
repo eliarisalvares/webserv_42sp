@@ -48,7 +48,7 @@ public:
 	void setBody(std::string body);
 	void addHeader(const std::string& key, const std::string& value);
 
-	void	sendResponse(void);
+	void sendResponse(void);
 
 	std::string toString(void) const;
 
@@ -62,12 +62,24 @@ private:
 
 };
 
-std::string handleCGI(void);
 Response	responseBuilder(Request* request);
+Response	handleGetRequest(Request* request);
+Response	handlePostRequest(Request* request);
+Response	handleDeleteRequest(Request* request);
+Response	handleMethodNotImplemented(Request* request);
+
+bool 		isFileUpload(const std::string& body);
+std::string getFileName(const std::string& body);
+std::string getFilePath(const std::string& fileName);
+Response 	processFileUpload(Request* request);
+std::string getDefaultFilePath();
+std::string getResponseBody(const std::string& filePath, const std::string& contentType);
+
+std::string handleCGI(Request* request);
 std::string getHtmlContent(const std::string& filePath);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);
 std::string getCurrentDate(void);
-void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength);
+void 		setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength, Request* request);
 
 #endif
