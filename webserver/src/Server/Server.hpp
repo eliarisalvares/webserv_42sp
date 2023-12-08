@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 13:09:31 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/08 15:54:33 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Server {
 		void	setName(std::vector<std::string> name);
 		void	addLocation(t_location location);
 
+		bool						getAutoindex(void) const;
 		bool						getCGI(void) const;
 		int							getSocket(void) const;
 		int							getPort(void) const;
@@ -59,7 +60,7 @@ class Server {
 		std::string					getUpPath(void) const;
 		std::set<std::string>		getMethods(void) const;
 		std::set<std::string>		getIndex(void) const;
-		std::vector<t_location>		getLocations(void);
+		std::vector<t_location>*	getLocations(void);
 		t_location					getLocations(int index);
 		std::vector<std::string>	getName(void);
 		std::string					getName(int index);

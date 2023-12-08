@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 12:12:18 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 16:21:59 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,46 +200,65 @@ void RequestParser::_check_uri(void) {
 			http::INTERNAL_SERVER_ERROR
 		); // ver se pode vir sem / no início
 
-	std::vector<t_location> locations = _request->server()->getLocations();
+	std::vector<t_location>* locations = _request->server()->getLocations();
 	std::string::iterator it = _uri.begin(), end = _uri.end();
-	int i, location_pos = 0, locations_size = locations.size();
+	int i, location_pos = -1, locations_size = locations->size();
+	// std::cout << RED << locations[0].root << RESET << "\n";
+	// bool use_server_config = locations->size() ? false : true;
+	bool use_server_config = true;
+	if (locations_size)
+		use_server_config = false;
+	std::cout << "Locations size: " << locations_size << "\n";
 	std::string path;
+	std::string location;
+	location.clear();
 
-	// get first location:
-	std::cout << BLUE << "Checking URI:\n" << GREY;
+	std::cout << BLUE << "Checking URI:\n" << _uri << "\n" << GREY;
 	path.clear();
-	path.push_back(_uri[0]);
-	location_pos = 0;
-	Logger::debug("First location", locations[0].location);
-
+	path.push_back(*it);
 	// /data -> content/html/index.html -> passar pelos locations do server, compara com o location
 	// /data/index2.html -> content/html/data/index2.html
 	bool increment = true;
 	while (++it != end && !http::uri_path_end(*it)) {
 		if (*it == SLASH || (it + 1) == end) {
-			std::cout << "Entrou pra procurar um novo location" << std::endl;
+			std::cout << "Entrou pra procurar um novo location: " << *it << std::endl;
 			if ((it + 1) == end && *it != SLASH) {
 				increment = false;
 				path.push_back(*it);
 			}
-			for (i = 0; i < locations_size; ++i) {
-				if (path.compare(locations[i].location) == 0) {
-					Logger::debug("location found", locations[i].location);
-					location_pos = i;
-					break;
+			if (!use_server_config) { // procura a location se tem locations
+				for (i = 0; i < locations_size; ++i) {
+					std::cout << RED << "path procurado na location: " << path
+						<< "- location: " << (*locations)[i].location
+						<< std::endl;
+					if (path.compare((*locations)[i].location) == 0) {
+						Logger::debug("location found", (*locations)[i].location);
+						location_pos = i;
+						break;
+					}
 				}
 			}
 		}
 		if (increment)
 			path.push_back(*it);
 	}
+	if (location_pos == -1)
+		use_server_config = true;
+
+	// se é diretório
+
+	Logger::debug("Path from URI", path);
 
 	// substitui o location na path pelo root do location
-	std::string location = locations[location_pos].location;
-	std::string root = locations[location_pos].root;
-	Logger::debug("Final path", path);
-	Logger::debug("Final location", location);
-	if (location.size() > 0)
+	if (location_pos > -1) {
+		location = (*locations)[location_pos].location;
+		Logger::debug("Has a defined location", location);
+	}
+	std::string root;
+	std::cout << "Usa a config do server? " << use_server_config << "\n";
+	root = use_server_config ? _request->server()->getRoot() : (*locations)[location_pos].root;
+	Logger::debug("root", root);
+	if (location_pos > -1 && location.size() > 0)
 		path.erase(0, location.size());
 	Logger::debug("Final path", path);
 	path.insert(path.begin(), root.begin(), root.end());
@@ -256,12 +275,18 @@ void RequestParser::_check_uri(void) {
 			_invalid_request("Directory not found", path, http::NOT_FOUND);
 		closedir(dr);
 		Logger::debug("Found directory", path);
-		if (!locations[location_pos].permit.autoindex) {
-			Logger::warning("Index file", *(locations[location_pos].index.begin()));
-			path = *(locations[location_pos].index.begin());
+		if (use_server_config && !_request->server()->getAutoindex()) {
+			path = *(_request->server()->getIndex().begin());
+			Logger::warning("Index file", path);
 		}
-		else
-			path.push_back(SLASH);
+		else {
+			if (!(*locations)[location_pos].permit.autoindex) {
+				path = *((*locations)[location_pos].index.begin());
+				Logger::warning("Index file", path);
+			}
+			else
+				path.push_back(SLASH);
+		}
 	}
 	else { // => é um arquivo => verificar se arquivo existe => not found
 		std::ifstream file;

@@ -36,8 +36,8 @@ std::set<std::string>	Server::getIndex(void) const {
 	return this->_index;
 }
 
-std::vector<t_location>	Server::getLocations(void) {
-	return this->_locations;
+std::vector<t_location>*	Server::getLocations(void) {
+	return &(this->_locations);
 }
 
 t_location	Server::getLocations(int index) {
@@ -58,6 +58,10 @@ std::map<int, std::string>	Server::getErrorPages(void) const {
 
 std::string	Server::getErrorPages(int value) const {
 	return this->_error_pages.at(value);
+}
+
+bool Server::getAutoindex(void) const {
+	return this->_permit.autoindex;
 }
 
 //---------------------------------------------------/

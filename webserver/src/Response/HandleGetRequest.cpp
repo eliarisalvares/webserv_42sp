@@ -31,12 +31,12 @@ std::string getDirectoryListing(const std::string& folderPath) {
  * @return std::string
  */
 std::string getDefaultFilePath(std::string directoryPath) {
-    std::string indexPath = directoryPath + "/index.html";
+    std::string indexPath = directoryPath + "index.html";
      if (access(indexPath.c_str(), F_OK) != -1) {
         return indexPath;
     } else {
-        std::string folderPath = directoryPath + "/";
-        std::string wholePath = folderPath + "/autoindex.html";
+        std::string folderPath = directoryPath;
+        std::string wholePath = folderPath + "autoindex.html";
         std::string directoryListing = getDirectoryListing(folderPath);
         std::ofstream file(wholePath.c_str());
         if (!file.is_open())
@@ -94,11 +94,6 @@ Response handleGetRequest(Request* request) {
     Logger::debug("handleGetRequest - filePath: " + filePath);
     int statusCode = request->status_code();
 
-
-    if (filePath[filePath.length() - 1] == '/') {
-        filePath = getDefaultFilePath(filePath);
-    }
-
     if (request->has_error()) {
 		filePath = (
 			std::string("content/error_pages/")
@@ -106,6 +101,11 @@ Response handleGetRequest(Request* request) {
 			+ std::string(".html")
 		);
 	}
+
+    else if (filePath[filePath.length() - 1] == '/') {
+        filePath = getDefaultFilePath(filePath);
+    }
+
 
     std::string contentType = getContentType(filePath);
     contentType = setFlagsContent(contentType);
