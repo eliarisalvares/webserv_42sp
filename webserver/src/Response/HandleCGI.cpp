@@ -6,23 +6,39 @@
  * to set **envp for execve().
  * @return char** with environment variables.
 */
-char** setEnvironment() {
-    char **envp = static_cast<char**>(malloc(11 * sizeof(char*)));
+char** setEnvironment(Request* request) {
+    Server *server = request->server();
 
-    envp[0] = strdup("GATEWAY_INTERFACE=CGI/1.1");
-    envp[1] = strdup("PATH_INFO=/cgi/current_time.py");
-    envp[2] = strdup("PATH_TRANSLATED=content/cgi/current_time.py");
-    envp[3] = strdup("QUERY_STRING=");
-    envp[4] = strdup("REQUEST_METHOD=GET");
-    envp[5] = strdup("SCRIPT_NAME=/cgi/current_time.py");
-    envp[6] = strdup("SERVER_NAME=localhost");
-    envp[7] = strdup("SERVER_PORT=8080");
-    envp[8] = strdup("SERVER_PROTOCOL=HTTP/1.1");
-    envp[9] = strdup("SERVER_SOFTWARE=webserv");
-    envp[10] = NULL;
+    size_t content_length = request->content_length();
+    std::stringstream ss;
+    ss << content_length;
+    std::string content_length_str = ss.str();
+
+    std::string path_info = "PATH_INFO=" + request->uri();
+    std::string path_translated = "PATH_TRANSLATED=" + server->getRoot() + request->uri();
+    std::string script_name = "SCRIPT_NAME=" + request->uri();
+    std::string server_name = "SERVER_NAME=" + server->getName(0);
+    std::string server_port = "SERVER_PORT=" + server->getCurrentPort();
+    std::string final_content_length = "CONTENT_LENGTH=" + content_length_str;
+    std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
+    std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
+    std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
+    
+    char **envp = new char*[10];
+    envp[0] = strdup(gateway_interface.c_str());
+    envp[1] = strdup(path_info.c_str());
+    envp[2] = strdup(path_translated.c_str());
+    envp[3] = strdup(script_name.c_str());
+    envp[4] = strdup(server_name.c_str());
+    envp[5] = strdup(server_port.c_str());
+    envp[6] = strdup(final_content_length.c_str());
+    envp[7] = strdup(protocol.c_str());
+    envp[8] = strdup(request_method.c_str());
+    envp[9] = NULL;
 
     return envp;
 }
+
 /**
  * @brief This function creates a pipe and a child process using fork().
  * In the child process, it executes a specified Python CGI script using
@@ -46,7 +62,7 @@ char** setEnvironment() {
  *    e. Checks the exit status of the child process.
  *    f. Returns the read output.
  */
-std::string handleCGI() {
+std::string handleCGI(Request* request) {
 
     int pipefd[2];
     pid_t pid;
@@ -61,7 +77,7 @@ std::string handleCGI() {
     }
 
     if (pid == 0) {
-        char **envp = setEnvironment();
+        char **envp = setEnvironment(request);
 
         close(pipefd[0]);
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {

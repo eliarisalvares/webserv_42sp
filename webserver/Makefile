@@ -23,7 +23,9 @@ SERVER =		Server.cpp ServerParser.cpp server_builder.cpp server_getters.cpp \
 				server_setters.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp \
 				request_parser_getters.cpp
-RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp
+RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp \
+				HandleGetRequest.cpp HandlePostRequest.cpp HandleDeleteRequest.cpp \
+				ResponseUtils.cpp
 LOGGER =		Logger.cpp
 UTILS =			openFile.cpp ftstring.cpp http.cpp utils.cpp
 
