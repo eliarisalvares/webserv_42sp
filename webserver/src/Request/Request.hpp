@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 21:31:51 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 11:03:21 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 	http::RequestMethod		method(void) const;
 	int						fd(void) const;
 	http::HttpStatus		status_code(void) const;
+	std::string				path(void) const;
 	std::string				uri(void) const;
 	std::string				host(void) const;
 	t_location*				location(void) const;
@@ -47,6 +48,7 @@ public:
 	void					setMethod(http::RequestMethod method);
 	void					setStatusCode(http::HttpStatus status);
 	void					setPath(std::string const uri);
+	void					setUri(std::string const uri);
 	void					setLocation(t_location* location);
 	void					setHost(std::string const host);
 	void					setError(bool has_error);
@@ -61,6 +63,7 @@ private:
 	bool					_error;
 	http::RequestMethod		_method;
 	http::HttpStatus		_status_code;
+	std::string				_path;
 	std::string				_uri;
 	t_location*				_location;
 

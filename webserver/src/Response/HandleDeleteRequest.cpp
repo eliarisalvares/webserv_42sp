@@ -1,7 +1,7 @@
 #include "Response.hpp"
 
 Response handleDeleteRequest(Request* request) {
-    std::string filePath = request->uri();
+    std::string filePath = request->path();
     Logger::debug("handleDeleteRequest - filePath: " + filePath);
 
     if (filePath == "/") {

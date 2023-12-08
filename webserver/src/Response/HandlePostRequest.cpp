@@ -49,7 +49,7 @@ Response handlePostRequest(Request* request) {
     if (isFileUpload(body)) {
         return processFileUpload(request, body);
     } else {
-        std::string filePath = request->uri();
+        std::string filePath = request->path();
         Logger::debug("handlePostRequest - filePath: " + filePath);
         std::string contentType = getContentType(filePath);
         std::string body = getResponseBody(filePath, contentType);
