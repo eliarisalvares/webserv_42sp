@@ -242,11 +242,12 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std
 		words = ftstring::split(input[index].substr(6), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
 			page = root + "/" + words[j];
+			std::cout << RED << page << std::endl;
 			if (!checkFileWorks(page))
 				throw InvalidFileException();
 			value.insert(page);
 		}
-		Logger::debug("Index setted", input[index].substr(6));
+		Logger::debug("Index setted", page);
 	}
 	return (value);
 }

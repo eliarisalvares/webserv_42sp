@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 13:07:54 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/08 13:57:36 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server::Server(int port): _port(port) {
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
-	int	extraBrackets = 0;
+	int		extraBrackets = 0;
 
 	setBasics();
 	setPort(input, index);
@@ -86,7 +86,6 @@ Server& Server::operator=(Server const & copy) {
 void	Server::setBasics() {
 	std::vector<std::string>	serverName;
 	std::set<std::string>		index;
-	t_location					location;
 	t_permissions				permit;
 
 	permit.autoindex = false;
@@ -94,13 +93,12 @@ void	Server::setBasics() {
 	permit.has_redir = false;
 	serverName.push_back(SERVER_NAME);
 	index.insert("index.html");
-	location = initLocation();
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
 	setCGI(true);
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
-	_locations.push_back(location);
+	_locations.clear();
 	_permit = permit;
 	setUpPath(DEFAULT_UPLOAD);
 	setMethods(http::methods);
