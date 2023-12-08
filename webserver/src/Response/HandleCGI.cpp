@@ -23,7 +23,7 @@ char** setEnvironment(Request* request) {
     std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
     std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
     std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
-    
+
     char **envp = new char*[10];
     envp[0] = strdup(gateway_interface.c_str());
     envp[1] = strdup(path_info.c_str());
@@ -66,7 +66,7 @@ std::string handleCGI(Request* request) {
 
     int pipefd[2];
     pid_t pid;
-    std::string filePath = request->uri();
+    std::string filePath = request->path();
 
     if (pipe(pipefd) == -1) {
         throw std::runtime_error("pipe failed: " + std::string(strerror(errno)));

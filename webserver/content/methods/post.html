@@ -6,6 +6,11 @@
     <title>Post File</title>
 </head>
 <body>
-    <h1>Post a File to Server</h1>
+    <h1>Suba um arquivo para nosso servidor</h1>
+    <form enctype="multipart/form-data" method="POST">
+        <label for="file">File: </label>
+        <input type="file" name="file" id="file">
+        <input type="submit" value="Upload">
+    </form>
 </body>
 </html>
