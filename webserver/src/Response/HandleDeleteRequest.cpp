@@ -2,9 +2,13 @@
 
 Response handleDeleteRequest(Request* request) {
     std::string filePath = request->path();
-    Logger::debug("handling DELETE request - filePath: " + filePath);
+    Logger::debug("handleDeleteRequest - filePath: " + filePath);
     int statusCode = request->status_code();
-    
+
+    if (filePath[filePath.length() - 1] == '/') {
+        filePath = getDefaultFilePath(filePath);
+    }
+
     std::string contentType = getContentType(filePath);
     std::string body = getResponseBody(filePath, contentType, request);
     std::string message = getStatusMessage(statusCode);

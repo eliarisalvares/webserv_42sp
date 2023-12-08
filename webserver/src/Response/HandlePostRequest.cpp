@@ -45,7 +45,7 @@ Response processFileUpload(Request* request, const std::string& body) {
 
 Response handlePostRequest(Request* request) {
     std::string body = getBodyFromRequest(request);
-    Logger::debug("handling POST request - body: " + body);
+    Logger::debug("handlePostRequest - body: " + body);
     if (isFileUpload(body)) {
         return processFileUpload(request, body);
     } else {

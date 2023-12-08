@@ -66,7 +66,7 @@ std::string handleCGI(Request* request) {
 
     int pipefd[2];
     pid_t pid;
-    std::string filePath = request->uri();
+    std::string filePath = request->uri(); // ou path?
 
     if (pipe(pipefd) == -1) {
         throw std::runtime_error("pipe failed: " + std::string(strerror(errno)));
