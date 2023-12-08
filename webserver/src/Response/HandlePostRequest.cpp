@@ -52,7 +52,7 @@ Response handlePostRequest(Request* request) {
         std::string filePath = request->path();
         Logger::debug("handlePostRequest - filePath: " + filePath);
         std::string contentType = getContentType(filePath);
-        std::string body = getResponseBody(filePath, contentType);
+        std::string body = getResponseBody(filePath, contentType, request);
         int statusCode = body.empty() ? 404 : 200;
         std::string message = getStatusMessage(statusCode);
         Response response(request->fd(), statusCode);

@@ -66,6 +66,7 @@ std::string handleCGI(Request* request) {
 
     int pipefd[2];
     pid_t pid;
+    std::string filePath = request->uri();
 
     if (pipe(pipefd) == -1) {
         throw std::runtime_error("pipe failed: " + std::string(strerror(errno)));
@@ -86,7 +87,7 @@ std::string handleCGI(Request* request) {
 
         char *const argv[] = {
             const_cast<char*>("python3"),
-            const_cast<char*>("content/cgi/current_time.py"),
+            const_cast<char*>(filePath.c_str()),
             NULL
         };
 

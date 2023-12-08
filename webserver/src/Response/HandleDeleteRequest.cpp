@@ -3,14 +3,14 @@
 Response handleDeleteRequest(Request* request) {
     std::string filePath = request->path();
     Logger::debug("handleDeleteRequest - filePath: " + filePath);
+    int statusCode = request->status_code();
 
-    if (filePath == "/") {
-        filePath = getDefaultFilePath();
+    if (filePath[filePath.length() - 1] == '/') {
+        filePath = getDefaultFilePath(filePath);
     }
 
     std::string contentType = getContentType(filePath);
-    std::string body = getResponseBody(filePath, contentType);
-    int statusCode = body.empty() ? 404 : 200;
+    std::string body = getResponseBody(filePath, contentType, request);
     std::string message = getStatusMessage(statusCode);
 
     Response response(request->fd(), statusCode);
