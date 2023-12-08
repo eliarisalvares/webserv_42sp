@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 19:42:17 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 10:25:53 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ namespace http {
 
 	bool is_uri_char(char c);
 	bool uri_path_end(char c);
+	bool is_path_to_file(std::string const& path);
 
 	// http exceptions
 	class InvalidRequest;

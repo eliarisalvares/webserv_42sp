@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:33:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 10:53:14 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,30 +195,34 @@ void RequestParser::_check_uri(void) {
 	// se não começa com / mandar um erro -> por hora não vou verificar scheme e authority
 	if (_uri[0] != SLASH) // localhost:8080/data
 		_invalid_request(
-			"uri different from expected", _uri, http::INTERNAL_SERVER_ERROR
+			"URI different from expected. Check it",
+			_uri,
+			http::INTERNAL_SERVER_ERROR
 		); // ver se pode vir sem / no início
+
 	std::vector<t_location> locations = _request->server()->getLocations();
 	std::string::iterator it = _uri.begin(), end = _uri.end();
 	int i, location_pos = 0, locations_size = locations.size();
 	std::string path;
 
 	// get first location:
-	std::cout << BLUE << "Checking uri:\n" << GREY;
+	std::cout << BLUE << "Checking URI:\n" << GREY;
 	path.clear();
 	path.push_back(_uri[0]);
-	// /data -> /data/index.html -> passar pelos locations do server, compara com o location
-	// /data/index2.html -> /data/index2.html
-	for (i = 0; i < locations_size; ++i) {
-		if (path.compare(locations[i].location) == 0) {
-			Logger::debug("location found", locations[i].location);
-			location_pos = i;
-			break;
-		}
-	}
+	location_pos = 0;
+	Logger::debug("First location", locations[0].location);
+
+	// /data -> content/html/index.html -> passar pelos locations do server, compara com o location
+	// /data/index2.html -> content/html/data/index2.html
+	bool increment = true;
 	while (++it != end && !http::uri_path_end(*it)) {
 		std::cout << "char path: " << *it << std::endl;
 		if (*it == SLASH || (it + 1) == end) {
-			std::cout << "char path: " << *it << std::endl;
+			std::cout << "Entrou pra procurar um novo location" << std::endl;
+			if ((it + 1) == end && *it != SLASH) {
+				increment = false;
+				path.push_back(*it);
+			}
 			for (i = 0; i < locations_size; ++i) {
 				if (path.compare(locations[i].location) == 0) {
 					Logger::debug("location found", locations[i].location);
@@ -227,14 +231,15 @@ void RequestParser::_check_uri(void) {
 				}
 			}
 		}
-		path.push_back(*it); // check position
+		if (increment)
+			path.push_back(*it);
 	}
+
+	// substitui o location na path pelo root do location
 	std::string location = locations[location_pos].location;
 	std::string root = locations[location_pos].root;
 	Logger::debug("Final path", path);
 	Logger::debug("Final location", location);
-
-	// substitui o location na path pelo root do location
 	if (location.size() > 1)
 		path.erase(0, location.size());
 	Logger::debug("Final path", path);
@@ -244,11 +249,11 @@ void RequestParser::_check_uri(void) {
 	// se não tiver ponto => é um diretório => verificar se existe; => not found
 	//                                 => se autoindex -> cgi?
 	//                                    else index?
-	if (path.find('.') == std::string::npos) { // tem ponto na path?
+	if (!http::is_path_to_file(path)) { // não tem ponto na path?
 		DIR *dr;
 
 		dr = opendir(path.c_str());
-		if (dr == NULL)
+		if (dr == NULL) // talvez verificar se é um arquivo tb...
 			_invalid_request("Directory not found", path, http::NOT_FOUND);
 		closedir(dr);
 		Logger::debug("Found directory", path);
@@ -256,9 +261,8 @@ void RequestParser::_check_uri(void) {
 			Logger::warning("Index file", *(locations[location_pos].index.begin()));
 			path = *(locations[location_pos].index.begin());
 		}
-		else {
-			// adicionar um barra no final (se não tiver)
-		}
+		else
+			path.push_back(SLASH);
 	}
 	else { // => é um arquivo => verificar se arquivo existe => not found
 		std::ifstream file;
@@ -269,10 +273,6 @@ void RequestParser::_check_uri(void) {
 		file.close();
 	}
 
-	// substituir o location pelo caminho: content/(root)/arquivo?
-	// retornar o index -> /data/index.html, /data/index2.html -> iterar pra encontrar
-	// filePath
-	// localhost:8080/data/outro_caminho
 	_request->setPath(path);
 }
 
