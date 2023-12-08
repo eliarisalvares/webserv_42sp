@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 13:38:31 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 00:38:55 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ const char* GeneralException::what() const throw() {
 		return "Method not present in allowed methods list";
 	case INVALID_DIRECTORY:
 		return "Directory does not exist";
-	case MISSING_REQUEST_ON_PARSER:
-		return "Object Request is NULL on RequestParser";
+	case REQUEST_DELETED_ON_BUILDER_OR_PARSER:
+		return "Object Request is NULL on RequestBuilder and/or RequestParser";
 	default:
 		return "GeneralException";
 	}
