@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/07 18:49:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/08 13:57:36 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,12 @@ Server::Server(void) { }
 
 Server::Server(int port): _port(port) {
 	setBasics();
-	configSocket(port);
-	_location_root.clear();
-	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
-	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
+	if (!configSocket(port))
+		throw PortAlreadyInUseException();
 }
 
 Server::Server(std::vector<std::string> input, size_t index) {
-	int	extraBrackets = 0;
+	int		extraBrackets = 0;
 
 	setBasics();
 	setPort(input, index);
@@ -51,7 +49,7 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		if (input[i].substr(0, 11) == "error_page ")
 			addErrorPages(obtainErrorPages(input, i));
 		if (input[i].substr(0, 6) == "index ") {
-			if (getRoot() != "/")
+			if (getRoot() != ROOT)
 				setIndex(obtainIndex(input, i, getRoot()));
 			else
 				setIndex(obtainIndex(input, i));
@@ -69,10 +67,6 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		else if (input[i].substr() == "}")
 			extraBrackets--;
 	}
-	
-	_location_root.clear();
-	_location_root.insert(std::pair<std::string, std::string>(LOCATION, ROOT));
-	_location_root.insert(std::pair<std::string, std::string>(CGI_LOCATION, "content/cgi"));
 }
 
 Server::~Server(void) {
@@ -92,7 +86,6 @@ Server& Server::operator=(Server const & copy) {
 void	Server::setBasics() {
 	std::vector<std::string>	serverName;
 	std::set<std::string>		index;
-	t_location					location;
 	t_permissions				permit;
 
 	permit.autoindex = false;
@@ -100,13 +93,12 @@ void	Server::setBasics() {
 	permit.has_redir = false;
 	serverName.push_back(SERVER_NAME);
 	index.insert("index.html");
-	location = initLocation();
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
 	setCGI(true);
 	addErrorPages(std::pair<int, std::string>(404, "404.html"));
-	_locations.push_back(location);
+	_locations.clear();
 	_permit = permit;
 	setUpPath(DEFAULT_UPLOAD);
 	setMethods(http::methods);
@@ -115,7 +107,7 @@ void	Server::setBasics() {
 }
 
 // vamos usar para cada server do arquivo de config
-void	Server::configSocket(int port) {
+bool	Server::configSocket(int port) {
 	struct sockaddr_in address;  // Struct para o endereço do servidor
 
 	// Cria o socket do servidor, AF_INET para IPv4, SOCK_STREAM para TCP, 0 para o protocolo
@@ -131,15 +123,17 @@ void	Server::configSocket(int port) {
 	// lose the pesky "Address already in use" error message
 	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
 		perror("setsockopt");
-		exit(1);
+		return false;
 	}
 	// Associa o socket do servidor ao endereço e à porta especificados
 	if (bind(this->_socket, (struct sockaddr*)&address, sizeof(address)) == -1) {
 		perror("bind");
+		return false;
 	}
 
 	// Coloca o socket do servidor em modo de escuta, com um limite de 500 conexões pendentes (isso temos que ver, esse número os meninos usaram no projeto deles,
 	// mas não sei se é o ideal, acho que a gente tem que ver isso, meu sistema mostra 4096)
 	listen(this->_socket, 500);
+	return true;
 }
 

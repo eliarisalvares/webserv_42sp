@@ -8,7 +8,8 @@ void	Server::setPort(std::vector<std::string> input, int index) {
 			i++ ;
 		if (input[i].substr(0, 7) == "listen ") {
 			_port = obtainPort(input, i);
-			configSocket(_port);
+			if (!configSocket(_port))
+				throw PortAlreadyInUseException();
 		}
 		if (input[i].substr(0, 9) == "location ")
 			extraBrackets++;
@@ -53,11 +54,15 @@ void	Server::addErrorPages(std::pair<int, std::string> paired) {
 }
 
 void	Server::addLocation(t_location location) {
-	for (size_t i = 0; i < _locations.size(); i++) {
-		if (_locations[i].location == location.location)
-			_locations[i] = location;
-		else
-			_locations.push_back(location);
+	if (_locations.size() == 0)
+		_locations.push_back(location);
+	else {
+		for (size_t i = 0; i < _locations.size(); i++) {
+			if (_locations[i].location == location.location)
+				_locations[i] = location;
+			else
+				_locations.push_back(location);
+		}
 	}
 }
 

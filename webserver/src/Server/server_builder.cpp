@@ -78,6 +78,7 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 		if (dr == NULL) {
 			throw utils::GeneralException(utils::INVALID_DIRECTORY);
 		}
+		closedir(dr);
 		Logger::debug("Root setted", root);
 	}
 	return (root);
@@ -222,7 +223,7 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 6) == "index ") {
 		words = ftstring::split(input[index].substr(6), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
-			page = "content/" + words[j];
+			page = ROOT + words[j];
 			if (!checkFileWorks(page))
 				throw InvalidFileException();
 			value.insert(page);
@@ -241,11 +242,12 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std
 		words = ftstring::split(input[index].substr(6), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
 			page = root + "/" + words[j];
+			std::cout << RED << page << std::endl;
 			if (!checkFileWorks(page))
 				throw InvalidFileException();
 			value.insert(page);
 		}
-		Logger::debug("Index setted", input[index].substr(6));
+		Logger::debug("Index setted", page);
 	}
 	return (value);
 }
@@ -270,7 +272,7 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		if (input[i].substr(0, 16) == "allowed_methods ")
 			location.allowed_methods = obtainMethod(input, i);
 		if (input[i].substr(0, 6) == "index ") {
-			if (location.root != "/")
+			if (location.root != ROOT)
 				location.index = obtainIndex(input, i, location.root);
 			else
 				location.index = obtainIndex(input, i);
@@ -356,4 +358,8 @@ const char* DirListWrongArgumentException::what() const throw() {
 
 const char* DirListInvalidException::what() const throw() {
 	return ("Not a valid argument for directory_listing.");
+}
+
+const char* PortAlreadyInUseException::what() const throw() {
+	return ("Port is already in use, check if there is another server working.");
 }
