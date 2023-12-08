@@ -8,7 +8,7 @@
 # define ERROR_PAGES "404 404.html"
 # define LOCATION "/"
 # define METHODS "GET, POST, DELETE"
-# define ROOT "/"
+# define ROOT "content/"
 # define SERVER_NAME "WebWizards"
 # define SERVER_PORT "8080"
 # define TIMEOUT 5000
