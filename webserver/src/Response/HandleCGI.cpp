@@ -23,8 +23,8 @@ char** setEnvironment(Request* request) {
     std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
     std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
     std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
-    
-    char **envp = new char*[11];
+
+    char **envp = new char*[10];
     envp[0] = strdup(gateway_interface.c_str());
     envp[1] = strdup(path_info.c_str());
     envp[2] = strdup(path_translated.c_str());
@@ -34,8 +34,7 @@ char** setEnvironment(Request* request) {
     envp[6] = strdup(final_content_length.c_str());
     envp[7] = strdup(protocol.c_str());
     envp[8] = strdup(request_method.c_str());
-    envp[9] = strdup("CONTENT_TYPE=text/html");
-    envp[10] = NULL;
+    envp[9] = NULL;
 
     return envp;
 }
