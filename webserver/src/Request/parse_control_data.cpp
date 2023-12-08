@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 11:06:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/08 12:12:18 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,6 @@ void RequestParser::_check_uri(void) {
 	// /data/index2.html -> content/html/data/index2.html
 	bool increment = true;
 	while (++it != end && !http::uri_path_end(*it)) {
-		std::cout << "char path: " << *it << std::endl;
 		if (*it == SLASH || (it + 1) == end) {
 			std::cout << "Entrou pra procurar um novo location" << std::endl;
 			if ((it + 1) == end && *it != SLASH) {
@@ -240,7 +239,7 @@ void RequestParser::_check_uri(void) {
 	std::string root = locations[location_pos].root;
 	Logger::debug("Final path", path);
 	Logger::debug("Final location", location);
-	if (location.size() > 1)
+	if (location.size() > 0)
 		path.erase(0, location.size());
 	Logger::debug("Final path", path);
 	path.insert(path.begin(), root.begin(), root.end());
