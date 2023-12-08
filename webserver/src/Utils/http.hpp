@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 18:24:56 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 19:42:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ namespace http {
 	static std::set<std::string> const	special_headers = http::_fill_content_types();
 
 	bool is_uri_char(char c);
+	bool uri_path_end(char c);
 
 	// http exceptions
 	class InvalidRequest;

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 10:08:37 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 22:01:18 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <string>
 # include <iostream>
 # include <algorithm> // transform
+# include <stdio.h> // opendir, closedir
 
 # include "Logger.hpp"
 # include "http.hpp"

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 18:28:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 19:43:13 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,10 @@ bool is_uri_char(char c) {
 	default:
 		return false;
 	}
+}
+
+bool uri_path_end(char c) {
+	return (c == '?' || c == '#');
 }
 
 const char* InvalidErrorCode::what() const throw() {
