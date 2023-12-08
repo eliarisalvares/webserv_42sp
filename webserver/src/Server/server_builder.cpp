@@ -73,7 +73,10 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
-		root = "content" + words[0];
+		if (words[0] == "/")
+			root = ROOT;
+		else
+			root = ROOT + words[0];
 		dr = opendir(root.data());
 		if (dr == NULL) {
 			throw utils::GeneralException(utils::INVALID_DIRECTORY);
@@ -223,7 +226,7 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index) {
 	if (input[index].substr(0, 6) == "index ") {
 		words = ftstring::split(input[index].substr(6), ' ');
 		for (size_t j = 0; j < words.size(); j++) {
-			page = ROOT + words[j];
+			page = ROOT "/" + words[j];
 			if (!checkFileWorks(page))
 				throw InvalidFileException();
 			value.insert(page);
