@@ -6,6 +6,20 @@
     <title>Delete File</title>
 </head>
 <body>
-    <h1>Delete a File from Server</h1>
+    <h1>Escolha o arquivo que deseja deletar</h1>
+    <form>
+        <label for="file_name">Nome do arquivo: </label>
+        <input type="text" name="file_name" id="file_name">
+        <input type="submit" value="Deletar">
+    </form>
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const file_name = document.querySelector('#file_name').value;
+            const request = new XMLHttpRequest();
+            request.open('DELETE', `http://localhost:8080/${file_name}`);
+            request.send();
+        });
+    </script>
 </body>
-</html>
