@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 13:16:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 21:31:51 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ public:
 	// setters
 	void					setMethod(http::RequestMethod method);
 	void					setStatusCode(http::HttpStatus status);
-	void					setUri(std::string const uri);
+	void					setPath(std::string const uri);
 	void					setLocation(t_location* location);
 	void					setHost(std::string const host);
 	void					setError(bool has_error);

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 13:17:02 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/07 21:31:51 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void Request::setStatusCode(http::HttpStatus status) {
 	this->_status_code = status;
 }
 
-void Request::setUri(std::string const uri) {
+void Request::setPath(std::string const uri) {
 	this->_uri = uri;
 }
 
