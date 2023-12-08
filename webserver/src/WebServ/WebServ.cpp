@@ -135,13 +135,10 @@ void	WebServ::stop(void) {
 	for (it = _requestBuilderMap.begin(); it != end; ++it) {
 		delete it->second;
 	}
-	for(int i = 0; i < _total_fds; i++)
+	for (int i = 0; i < _total_fds; i++)
 		close(_pfds[i].fd);
-	if (_servers.size()) {
-		for (size_t i = 0; i < _servers.size(); i++) {
-			if (_servers[i])
-				delete _servers[i];
-		}
+	for (t_server_iterator it = _servers.begin(); it!= _servers.end(); ++it) {
+		delete it->second;
 	}
 }
 

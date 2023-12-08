@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/06 20:54:19 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/08 13:09:31 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@
 # include <sys/socket.h> // socket(), bind(), listen(), accept()
 # include <netinet/in.h> // struct sockaddr_in
 # include <stdio.h> // errors
+
 # include "ServerParser.hpp"
 # include "server_builder.hpp"
 # include "define_server.hpp"
 # include "http.hpp"
-
 
 class Server {
 	friend class Response;
@@ -35,7 +35,6 @@ class Server {
 		Server& operator=(Server const& copy);
 
 		void	setPort(std::vector<std::string> input, int index);
-		void	configSocket(int port);
 		void	setBasics(void);
 		void	setBufferSize(int size);
 		void	setSocket(int port);
@@ -67,6 +66,7 @@ class Server {
 		std::map<int, std::string>	getErrorPages(void) const;
 		std::string					getErrorPages(int value) const;
 
+		bool				configSocket(int port);
 		static std::string	getServerName(void);
 		static std::string	getCurrentPort(void);
 		static std::string	getAllowedMethods(void);
@@ -86,7 +86,6 @@ class Server {
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
-		std::map<std::string, std::string>		_location_root;  // temporário -> EXCLUIR
 };
 
 #endif
