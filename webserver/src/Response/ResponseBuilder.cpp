@@ -31,16 +31,6 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
     response.addHeader("Access-Control-Allow-Credentials", "true");
 }
 
-/**
- * @brief handler for requests that are neither GET, POST or DELETE,
- * the mandatory methods for this project. Returns a 501 response.
- */
-Response handleMethodNotImplemented(Request* request) {
-    Response response(request->fd(), 501);
-    response.setMessage("Not Implemented");
-    response.setBody("Method not implemented");
-    return response;
-}
 
 /**
  * @brief Checks the requested method and calls the appropriate
@@ -51,14 +41,11 @@ Response responseBuilder(Request* request) {
     Logger::debug("Creating response...");
 
     std::string methodStr = http::enum_to_str_method(method);
-    Logger::debug("Method: " + methodStr);
 
-    if (methodStr == "GET")
-        return handleGetRequest(request);
-    else if (methodStr == "POST")
-        return handlePostRequest(request);
-    else if (methodStr == "DELETE")
+    if (methodStr == "DELETE") {
         return handleDeleteRequest(request);
-    else
-        return handleMethodNotImplemented(request);
+    } else if (methodStr == "POST") {
+        return handlePostRequest(request);
+    }
+    return handleGetRequest(request);
 }

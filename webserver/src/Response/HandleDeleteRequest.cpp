@@ -2,7 +2,7 @@
 
 Response handleDeleteRequest(Request* request) {
     std::string filePath = request->path();
-    Logger::debug("handleDeleteRequest - filePath: " + filePath);
+    Logger::debug("handling DELETE request - filePath: " + filePath);
     int statusCode = request->status_code();
 
     if (filePath[filePath.length() - 1] == '/') {
