@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 09:20:25 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 15:41:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:56:04 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,19 @@ std::string RequestParser::getLastHeader(void) const {
 }
 
 std::string RequestParser::getContentType(void) const {
-	return this->_str_content_type;
+	return this->_content_type;
+}
+
+std::string RequestParser::getMediaTypeStr(void) const {
+	return this->_media_type_str;
+}
+
+std::string RequestParser::getBoundary(void) const {
+	return this->_boundary;
+}
+
+http::ContentType RequestParser::getMediaType(void) const {
+	return this->_media_type;
 }
 
 t_header_map RequestParser::getHeaders(void) const {

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 15:41:32 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:54:51 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 # define COLON ':'
 # define POINT '.'
 # define SLASH '/'
+# define EQUAL '='
 # define SEMICOLON ';'
 
 // error messages
@@ -142,6 +143,9 @@ public:
 	t_header_map				getHeaders(void) const;
 	std::vector<char>			getBody(void) const;
 	std::string					getContentType(void) const;
+	std::string					getMediaTypeStr(void) const;
+	std::string					getBoundary(void) const;
+	http::ContentType			getMediaType(void) const;
 
 	// setters
 	void						setStep(Step s);
@@ -189,11 +193,10 @@ private:
 	std::string					_chunk_size_str;
 	std::vector<char>			_body;
 	bool						_has_content_type;
-	std::string					_str_content_type;
-	std::string					_media_type;
-	std::string					_media_type;
+	std::string					_content_type;
+	std::string					_media_type_str;
 	std::string					_boundary;
-	http::ContentType			_content_type;
+	http::ContentType			_media_type;
 
 	void						_print_body(void);
 	void						_body_chunked(char c);
