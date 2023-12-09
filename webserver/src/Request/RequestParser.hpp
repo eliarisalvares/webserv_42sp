@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/07 22:01:18 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:54:51 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 # define COLON ':'
 # define POINT '.'
 # define SLASH '/'
+# define EQUAL '='
 # define SEMICOLON ';'
 
 // error messages
@@ -123,6 +124,7 @@ public:
 	// getters
 	Step						step(void) const;
 	bool						has_content_length(void) const;
+	bool						has_content_type(void) const;
 	bool						is_chunked(void) const;
 	size_t						content_length(void) const;
 	size_t						max_body_size(void) const;
@@ -140,6 +142,10 @@ public:
 	std::string					getChunkSizeStr(void) const;
 	t_header_map				getHeaders(void) const;
 	std::vector<char>			getBody(void) const;
+	std::string					getContentType(void) const;
+	std::string					getMediaTypeStr(void) const;
+	std::string					getBoundary(void) const;
+	http::ContentType			getMediaType(void) const;
 
 	// setters
 	void						setStep(Step s);
@@ -158,7 +164,8 @@ private:
 	void						_check_method(void);
 
 	// headers
-	// static int const			_header_size;
+	// static int const			_max_headers_size;
+	// static int const			_max_header_value_size;
 	std::string					_field_name;
 	std::string					_field_value;
 	std::string					_last_header;
@@ -168,8 +175,10 @@ private:
 	void						_print_headers(void);
 	void						_check_host(void);
 	void						_check_content_length(void);
+	void						_set_content_type(void);
 	void						_check_transfer_encoding(void);
 	void						_check_post_headers(void);
+	void						_check_content_type(void);
 	void						_parse_field_name(char c);
 	void						_parse_field_value(char c);
 
@@ -183,6 +192,11 @@ private:
 	size_t						_chunk_bytes_readed;
 	std::string					_chunk_size_str;
 	std::vector<char>			_body;
+	bool						_has_content_type;
+	std::string					_content_type;
+	std::string					_media_type_str;
+	std::string					_boundary;
+	http::ContentType			_media_type;
 
 	void						_print_body(void);
 	void						_body_chunked(char c);

@@ -39,6 +39,8 @@ void	Server::setRoot(std::string root) {
 void	Server::setRedirect(std::string redirect) {
 	this->_permit.has_redir = true;
 	this->_redirect = redirect;
+	if (redirect.substr(0, 1) != "/")
+		this->_permit.redirExternal = true;
 }
 
 void	Server::setCGI(bool boolean) {

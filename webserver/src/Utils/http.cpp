@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 16:24:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 15:47:49 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,16 +62,66 @@ std::string enum_to_str_method(RequestMethod method) {
 	return it->second;
 }
 
-// headers that needs a validation / singletons
-std::set<std::string> _fill_content_types(void) {
-	std::string _content_types[] = {
+std::set<std::string> _fill_media_types(void) {
+	std::string _media_types[] = {
+		"text/plain",
 		"text/html",
-		"application/x-www-form-urlencoded",
+		"text/css",
 		"application/json",
+		"application/javascript",
+		"application/xml",
+		"image/png",
+		"image/jpeg",
+		"image/gif",
+		"application/x-www-form-urlencoded",
 		"multipart/form-data"
 	};
-	std::set<std::string> content_types (_content_types, _content_types + 2);
-	return content_types;
+	std::set<std::string> media_types (_media_types, _media_types + 11);
+	return media_types;
+}
+
+std::map<std::string, ContentType> _fill_map_media_type_str_to_enum(void) {
+	std::map<std::string, ContentType> str_to_enum;
+
+	str_to_enum.insert(std::make_pair("text/plain", TEXT_PLAIN));
+	str_to_enum.insert(std::make_pair("image/png", IMAGE_PNG));
+	str_to_enum.insert(std::make_pair("image/jpeg", IMAGE_JPEG));
+	str_to_enum.insert(std::make_pair("image/gif", IMAGE_GIF));
+	str_to_enum.insert(std::make_pair("application/x-www-form-urlencoded", FORM_URLENCODED));
+	str_to_enum.insert(std::make_pair("multipart/form-data", MULTIPART_FORM_DATA));
+	return str_to_enum;
+}
+
+std::map<ContentType, std::string> _fill_map_media_type_enum_to_str(void) {
+	std::map<ContentType, std::string> enum_to_str;
+
+	enum_to_str.insert(std::make_pair(TEXT_PLAIN, "text/plain"));
+	enum_to_str.insert(std::make_pair(IMAGE_PNG, "image/png"));
+	enum_to_str.insert(std::make_pair(IMAGE_JPEG, "image/jpeg"));
+	enum_to_str.insert(std::make_pair(IMAGE_GIF, "image/gif"));
+	enum_to_str.insert(std::make_pair(FORM_URLENCODED, "application/x-www-form-urlencoded"));
+	enum_to_str.insert(std::make_pair(MULTIPART_FORM_DATA, "multipart/form-data"));
+	return enum_to_str;
+}
+
+ContentType str_to_enum_media_type(std::string media_type) {
+	std::map<std::string, ContentType>::const_iterator it;
+
+	it = map_str_to_enum_media_type.find(media_type);
+	if (it == map_str_to_enum_media_type.end()) {
+		Logger::warning("request parser error: invalid media type", media_type);
+		throw InvalidRequest(UNSUPPORTED_MEDIA_TYPE);
+	}
+	return it->second;
+}
+
+std::string enum_to_str_media_type(ContentType media_type) {
+	std::map<ContentType, std::string>::const_iterator it;
+
+	it = map_enum_to_str_media_type.find(media_type);
+	if (it == map_enum_to_str_media_type.end())
+		throw utils::GeneralException(utils::UNSUPPORTED_MEDIA_TYPE);
+	return it->second;
 }
 
 bool is_uri_char(char c) {
@@ -134,22 +184,43 @@ InvalidRequest::InvalidRequest(HttpStatus error) {
 
 const char* InvalidRequest::what() const throw() {
 	switch (_error) {
-    case BAD_REQUEST:
-      return "400 Bad request";
-    case NOT_FOUND:
-      return "404 Not found";
-    case METHOD_NOT_ALLOWED:
-      return "405 Method not allowed";
-    case LENGTH_REQUIRED:
-      return "411 Length required";
-    case URI_TOO_LONG:
-      return "414 Request URI too long";
-    case CONTENT_TOO_LARGE:
-      return "501 Content Too Large";
-    case HTTP_VERSION_NOT_SUPPORTED:
-      return "505 HTTP version not supported";
-    default:
-      return "Unknown error";
+		case BAD_REQUEST:
+			return "400 Bad request";
+		case UNAUTHORIZED:
+			return "401 Unauthorized";
+		case FORBIDDEN:
+			return "403 Forbidden";
+		case NOT_FOUND:
+			return "404 Not found";
+		case METHOD_NOT_ALLOWED:
+			return "405 Method not allowed";
+		case NOT_ACCEPTABLE:
+			return "406 Not Acceptable";
+		case REQUEST_TIMEOUT:
+			return "408 Request Timeout";
+		case CONFLICT:
+			return "409 Conflict";
+		case LENGTH_REQUIRED:
+			return "411 Length required";
+		case CONTENT_TOO_LARGE:
+			return "413 Content Too Large";
+		case URI_TOO_LONG:
+			return "414 URI too long";
+		case UNSUPPORTED_MEDIA_TYPE:
+			return "415 Unsupported Media Type";
+		case UNPROCESSABLE_CONTENT:
+			return "422 Unprocessable Content";
+		case INTERNAL_SERVER_ERROR:
+			return "500 Internal Server Error";
+		case NOT_IMPLEMENTED:
+			return "501 Not Implemented";
+		case HTTP_VERSION_NOT_SUPPORTED:
+			return "505 HTTP Version Not Supported";
+		default:
+			return (
+				std::string("Unknown error code: ")
+				+ ftstring::itostr(int(_error))
+			).c_str();
   }
 }
 

@@ -1,28 +1,6 @@
 #include "Response.hpp"
 
 /**
- * @brief Get the Directory Listing for the given folder path.
- *
- * @param folderPath folder path to get the listing for.
- * @return std::string html string with the directory listing.
- */
-std::string getDirectoryListing(const std::string& folderPath) {
-    std::string directoryListing = "<html><head><title>Index of /</title></head><body><h1>Index of /</h1><hr><pre>";
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir (folderPath.c_str())) != NULL) {
-        while ((ent = readdir (dir)) != NULL) {
-            directoryListing += "<a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n";
-        }
-        closedir (dir);
-    } else {
-        throw std::runtime_error("Could not open directory: " + folderPath);
-    }
-    directoryListing += "</pre><hr></body></html>";
-    return directoryListing;
-}
-
-/**
  * @brief Gets the default file path when the request is "/". If
  * there is a file named "index.html" in the content folder, it
  * will be returned. Otherwise, the autoindex.py file will be
@@ -31,20 +9,17 @@ std::string getDirectoryListing(const std::string& folderPath) {
  * @return std::string
  */
 std::string getDefaultFilePath(std::string directoryPath) {
+    Logger::debug("getDefaultFilePath - directoryPath: " + directoryPath);
     std::string indexPath = directoryPath + "index.html";
-     if (access(indexPath.c_str(), F_OK) != -1) {
-        return indexPath;
-    } else {
-        std::string folderPath = directoryPath;
-        std::string wholePath = folderPath + "autoindex.html";
-        std::string directoryListing = getDirectoryListing(folderPath);
-        std::ofstream file(wholePath.c_str());
-        if (!file.is_open())
-            throw std::runtime_error("Could not open file: " + wholePath);
-        file << directoryListing;
-        file.close();
-        return wholePath;
-    }
+    std::string folderPath = directoryPath;
+    std::string wholePath = folderPath + "autoindex.html";
+    std::string directoryListing = getDirectoryListing(folderPath);
+    std::ofstream file(wholePath.c_str());
+    if (!file.is_open())
+        throw std::runtime_error("Could not open file: " + wholePath);
+    file << directoryListing;
+    file.close();
+    return wholePath;
 }
 
 /**
@@ -52,10 +27,13 @@ std::string getDefaultFilePath(std::string directoryPath) {
  * Prevents the server from sending the html file as a string.
  */
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request) {
+    Server* server = request->server();
     if (contentType == "text/html") {
-        return getHtmlContent(filePath);
+        return getHtmlContent(filePath, server);
     } else if (filePath.find(".py") != std::string::npos) {
         return handleCGI(request);
+    } else if (filePath.find(".json") != std::string::npos) {
+        return getJsonContent();
     }
     std::ifstream file(filePath.c_str());
     if (!file.is_open())
@@ -102,10 +80,9 @@ Response handleGetRequest(Request* request) {
 		);
 	}
 
-    else if (filePath[filePath.length() - 1] == '/') {
+    if (filePath[filePath.length() - 1] == '/') {
         filePath = getDefaultFilePath(filePath);
     }
-
 
     std::string contentType = getContentType(filePath);
     contentType = setFlagsContent(contentType);

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:35:32 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:58:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ RequestParser::RequestParser(void): _step(INIT) {
 	_body_bytes_readed = 0;
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
+	_has_content_type = false;
+	_media_type = http::NONE;
 }
 
 RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
@@ -33,6 +35,8 @@ RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_body_bytes_readed = 0;
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
+	_has_content_type = false;
+	_media_type = http::NONE;
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -62,6 +66,11 @@ RequestParser& RequestParser::operator=(RequestParser const& copy) {
 		_chunk_bytes_readed = copy.chunk_bytes_readed();
 		_chunk_size_str = copy.getChunkSizeStr();
 		_body = getBody();
+		_has_content_type = copy.has_content_type();
+		_content_type = copy.getContentType();
+		_media_type_str = copy.getMediaTypeStr();
+		_boundary = copy.getBoundary();
+		_media_type = copy.getMediaType();
 	}
 	return *this;
 }
@@ -92,6 +101,11 @@ void RequestParser::init(char c) {
 	_body_bytes_readed = 0;
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
+	_has_content_type = false;
+	_content_type.clear();
+	_media_type_str.clear();
+	_boundary.clear();
+	_media_type = http::NONE;
 
 	_step = METHOD;
 	method(c);
@@ -153,6 +167,7 @@ void RequestParser::check_request(void) {
 	_check_host();
 	_check_content_length();
 	_check_transfer_encoding();
+	_set_content_type();
 	_headers.clear();
 
 	// check if the path exists and set it; get location
