@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 15:41:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:58:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ RequestParser::RequestParser(void): _step(INIT) {
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
 	_has_content_type = false;
+	_media_type = http::NONE;
 }
 
 RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
@@ -35,6 +36,7 @@ RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
 	_has_content_type = false;
+	_media_type = http::NONE;
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -65,7 +67,10 @@ RequestParser& RequestParser::operator=(RequestParser const& copy) {
 		_chunk_size_str = copy.getChunkSizeStr();
 		_body = getBody();
 		_has_content_type = copy.has_content_type();
-		_str_content_type = copy.getContentType();
+		_content_type = copy.getContentType();
+		_media_type_str = copy.getMediaTypeStr();
+		_boundary = copy.getBoundary();
+		_media_type = copy.getMediaType();
 	}
 	return *this;
 }
@@ -97,7 +102,10 @@ void RequestParser::init(char c) {
 	_chunk_size = 0;
 	_chunk_bytes_readed = 0;
 	_has_content_type = false;
-	_str_content_type.clear();
+	_content_type.clear();
+	_media_type_str.clear();
+	_boundary.clear();
+	_media_type = http::NONE;
 
 	_step = METHOD;
 	method(c);

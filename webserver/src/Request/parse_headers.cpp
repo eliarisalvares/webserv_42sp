@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:21:52 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:29:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 16:50:58 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,19 +213,19 @@ void RequestParser::_set_content_type(void) {
 	end = ct_v.end();
 	for (it = ct_v.begin(); it != end; ++it) {
 		if ((*it).size() > 0)
-			_str_content_type = *it;
+			_content_type = *it;
 	}
 
-	if (_str_content_type.find(',') != std::string::npos) {
-		ct_v = ftstring::split(_str_content_type, ',');
+	if (_content_type.find(',') != std::string::npos) {
+		ct_v = ftstring::split(_content_type, ',');
 		end = ct_v.end();
 		for (it = ct_v.begin(); it != end; ++it) {
 			if ((*it).size() > 0)
-				_str_content_type = *it;
+				_content_type = *it;
 		}
 	}
 
-	if (_str_content_type.size())
+	if (_content_type.size())
 		_has_content_type = true;
 }
 
@@ -242,6 +242,53 @@ void RequestParser::_check_post_headers(void) {
 	_step = BODY;
 	if (_is_chunked)
 		_step = CHUNK_SIZE;
+	if (!_has_content_type)
+		_bad_request("missing Content-Type");
+	_check_content_type();
+}
+
+void RequestParser::_check_content_type(void) {
+	std::set<std::string>::const_iterator it;
+	std::string::iterator it_str, end_str;
+
+	Logger::debug("_content_type", _content_type);
+	end_str = _content_type.end();
+	for (it_str = _content_type.begin(); it_str != end_str; ++it_str)
+		*it_str = utils::c_tolower(*it_str);
+
+	std::vector<std::string> ct_split = ftstring::split(
+		_content_type, SEMICOLON
+	);
+	_media_type_str = ct_split[0];
+	Logger::debug("_media_type_str", _media_type_str);
+	_media_type = http::str_to_enum_media_type(_media_type_str);
+
+	if (_media_type == http::MULTIPART_FORM_DATA) {
+		if (ct_split.size() < 2)
+			_bad_request(
+				"Missing boundary info for Content-Type = multipart/form-data"
+			);
+		std::vector<std::string>::iterator it_v, end_v = ct_split.end();
+		for (it_v = ct_split.begin() + 1; it_v != end_v; ++it_v) {
+			Logger::debug("ct_split", *it_v);
+			std::vector<std::string> bdry = ftstring::split(*it_v, EQUAL);
+			if (bdry.size() == 2) {
+				size_t i = 0;
+				while (i < bdry[0].size() && bdry[0][i] == SP)
+					++i;
+				if (i > 0)
+					bdry[0].erase(0, i);
+				if(bdry[0] == "boundary") {
+					_boundary = bdry[1];
+					Logger::warning("Found boundary", _boundary);
+				}
+			}
+		}
+		if (_boundary.size() == 0)
+			_bad_request(
+				"Boundary info for Content-Type = multipart/form-data is empty"
+			);
+	}
 }
 
 void RequestParser::_print_headers(void) {
