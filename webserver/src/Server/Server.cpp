@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 23:12:19 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/09 11:32:44 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,12 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			setName(obtainName(input, i));
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
-		if (input[i].substr(0, 9) == "location ")
-			extraBrackets++;
 		if (input[i].substr(0, 16) == "allowed_methods ") {
 			_allowed_methods.clear();
 			setMethods(obtainMethod(input, i));
 		}
-		if (input[i].substr() == "}" && extraBrackets == 0)
+		if (input[i].substr(0, 9) == "location " || input[i].substr() == "}")
 			break ;
-		else if (input[i].substr() == "}")
-			extraBrackets--;
 	}
 	for (size_t i = index; i < input.size(); i++) {
 		if (input[i].substr() == "server {")

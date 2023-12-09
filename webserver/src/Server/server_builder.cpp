@@ -60,7 +60,7 @@ std::string	obtainRoot(std::vector<std::string> input, int index) {
 
 	if (input[index].substr(0, 5) == "root ") {
 		words = ftstring::split(input[index].substr(5), ' ');
-		if (words[0] == "/")
+		if (input[index].substr(5) == "/ {")
 			root = ROOT;
 		else
 			root = ROOT + words[0];
