@@ -134,22 +134,43 @@ InvalidRequest::InvalidRequest(HttpStatus error) {
 
 const char* InvalidRequest::what() const throw() {
 	switch (_error) {
-    case BAD_REQUEST:
-      return "400 Bad request";
-    case NOT_FOUND:
-      return "404 Not found";
-    case METHOD_NOT_ALLOWED:
-      return "405 Method not allowed";
-    case LENGTH_REQUIRED:
-      return "411 Length required";
-    case URI_TOO_LONG:
-      return "414 Request URI too long";
-    case CONTENT_TOO_LARGE:
-      return "501 Content Too Large";
-    case HTTP_VERSION_NOT_SUPPORTED:
-      return "505 HTTP version not supported";
-    default:
-      return "Unknown error";
+		case BAD_REQUEST:
+			return "400 Bad request";
+		case UNAUTHORIZED:
+			return "401 Unauthorized";
+		case FORBIDDEN:
+			return "403 Forbidden";
+		case NOT_FOUND:
+			return "404 Not found";
+		case METHOD_NOT_ALLOWED:
+			return "405 Method not allowed";
+		case NOT_ACCEPTABLE:
+			return "406 Not Acceptable";
+		case REQUEST_TIMEOUT:
+			return "408 Request Timeout";
+		case CONFLICT:
+			return "409 Conflict";
+		case LENGTH_REQUIRED:
+			return "411 Length required";
+		case CONTENT_TOO_LARGE:
+			return "413 Content Too Large";
+		case URI_TOO_LONG:
+			return "414 URI too long";
+		case UNSUPPORTED_MEDIA_TYPE:
+			return "415 Unsupported Media Type";
+		case UNPROCESSABLE_CONTENT:
+			return "422 Unprocessable Content";
+		case INTERNAL_SERVER_ERROR:
+			return "500 Internal Server Error";
+		case NOT_IMPLEMENTED:
+			return "501 Not Implemented";
+		case HTTP_VERSION_NOT_SUPPORTED:
+			return "505 HTTP Version Not Supported";
+		default:
+			return (
+				std::string("Unknown error code: ")
+				+ ftstring::itostr(int(_error))
+			).c_str();
   }
 }
 

@@ -48,7 +48,7 @@ namespace http {
 		CONTENT_TOO_LARGE = 413,
 		URI_TOO_LONG = 414,
 		UNSUPPORTED_MEDIA_TYPE = 415,
-		// 422 Unprocessable Content - erro de código em python (cgi gera automático?)
+		UNPROCESSABLE_CONTENT = 422, // erro de código em python (cgi gera automático?)
 		INTERNAL_SERVER_ERROR = 500,
 		NOT_IMPLEMENTED = 501,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
