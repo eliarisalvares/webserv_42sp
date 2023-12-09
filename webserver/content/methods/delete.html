@@ -3,44 +3,45 @@
 <body>
     <h1>Escolha o arquivo que deseja deletar</h1>
     <h2>Arquivos disponíveis:</h2>
-    <lu></lu>
+    <ul id="fileList"></ul>
     <script>
-        const fileList = document.querySelector('lu');
+        const fileList = document.getElementById('fileList');
         const request = new XMLHttpRequest();
         request.open('GET', 'http://localhost:8080/upload/listing.json');
         request.send();
         request.onload = () => {
-            let files = JSON.parse(request.response);
-            console.log(files);
-            files = files.files;
-            files.forEach(file => {
-                if (file === '.' || file === '..' || file === 'listing.json') {
-                    return;
-                }
-                const li = document.createElement('li');
-                li.textContent = file;
-    
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.style.marginLeft = '1rem';
-                button.textContent = 'Delete';
-                button.addEventListener('click', () => {
-                    const request = new XMLHttpRequest();
-                    request.open('DELETE', `http://localhost:8080/upload/${file}`);
-                    request.send();
-                    request.onload = () => {
-                        if (request.status === 200) {
-                            alert('File deleted successfully!');
-                            location.reload();
-                        } else {
-                            alert('Something went wrong!');
-                        }
-                    };
+            let files = JSON.parse(request.response).files;
+            files = files.filter(file => ![ '.', '..', 'listing.json' ].includes(file));
+            if (files.length === 0) {
+                fileList.innerHTML = '<li>Ops! Parece que não há arquivos disponíveis para deletar :( </li>';
+            } else {
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.textContent = file;
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.style.marginLeft = '1rem';
+                    button.textContent = 'Delete';
+                    button.addEventListener('click', () => {
+                        const deleteRequest = new XMLHttpRequest();
+                        deleteRequest.open('DELETE', `http://localhost:8080/upload/${file}`);
+                        deleteRequest.send();
+                        deleteRequest.onload = () => {
+                            if (deleteRequest.status === 200) {
+                                alert('File deleted successfully!');
+                                location.reload();
+                            } else {
+                                alert('Something went wrong!');
+                            }
+                        };
+                    });
+                    li.style.marginBottom = '1rem';
+                    li.appendChild(button);
+                    fileList.appendChild(li);
                 });
-                li.style.marginBottom = '1rem';
-                li.appendChild(button);
-                fileList.appendChild(li);
-            });
+            }
         };
     </script>
 </body>
+</html>
