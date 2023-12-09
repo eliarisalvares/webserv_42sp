@@ -6,6 +6,7 @@
 # define CGI_LOCATION "/cgi"
 # define CGI_EXECUTOR "python3"
 # define ERROR_PAGES "404 404.html"
+# define ERROR_LOCATION "content/error_pages/"
 # define LOCATION "/"
 # define METHODS "GET, POST, DELETE"
 # define ROOT "content"
