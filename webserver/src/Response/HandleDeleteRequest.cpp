@@ -12,7 +12,7 @@ Response handleDeleteRequest(Request* request) {
     Logger::debug("handleDeleteRequest - filePath: " + filePath);
     int statusCode = request->status_code();
 
-    if (remove(filePath.c_str()) != 0) {
+    if (std::remove(filePath.c_str()) != 0) {
         statusCode = 500;
         Logger::error("handleDeleteRequest - Could not delete file: " + filePath);
     } else {
