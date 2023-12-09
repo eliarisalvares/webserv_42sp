@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete File</title>
-</head>
 <body>
     <h1>Escolha o arquivo que deseja deletar</h1>
-    <form>
-        <label for="file_name">Nome do arquivo: </label>
-        <input type="text" name="file_name" id="file_name">
-        <input type="submit" value="Deletar">
-    </form>
+    <h2>Arquivos disponíveis:</h2>
+    <lu></lu>
     <script>
-        const form = document.querySelector('form');
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const file_name = document.querySelector('#file_name').value;
-            const request = new XMLHttpRequest();
-            request.open('DELETE', `http://localhost:8080/${file_name}`);
-            request.send();
-        });
+        const fileList = document.querySelector('lu');
+        const request = new XMLHttpRequest();
+        request.open('GET', 'http://localhost:8080/upload/listing.json');
+        request.send();
+        request.onload = () => {
+            let files = JSON.parse(request.response);
+            console.log(files);
+            files = files.files;
+            files.forEach(file => {
+                if (file === '.' || file === '..' || file === 'listing.json') {
+                    return;
+                }
+                const li = document.createElement('li');
+                li.textContent = file;
+    
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.style.marginLeft = '1rem';
+                button.textContent = 'Delete';
+                button.addEventListener('click', () => {
+                    const request = new XMLHttpRequest();
+                    request.open('DELETE', `http://localhost:8080/upload/${file}`);
+                    request.send();
+                    request.onload = () => {
+                        if (request.status === 200) {
+                            alert('File deleted successfully!');
+                            location.reload();
+                        } else {
+                            alert('Something went wrong!');
+                        }
+                    };
+                });
+                li.style.marginBottom = '1rem';
+                li.appendChild(button);
+                fileList.appendChild(li);
+            });
+        };
     </script>
 </body>
