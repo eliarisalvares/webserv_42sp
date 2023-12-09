@@ -19,7 +19,8 @@ typedef struct	s_permissions
 {
 	bool	autoindex;
 	bool	directory_listing;
-	bool	has_redir; // a fazer
+	bool	has_redir;
+	bool	redirExternal;
 }				t_permissions;
 
 typedef struct	s_location
@@ -114,6 +115,10 @@ class DirListWrongArgumentException : public std::exception {
 };
 
 class DirListInvalidException : public std::exception {
+	virtual const char* what(void) const throw();
+};
+
+class RedirWrongArgumentException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 
