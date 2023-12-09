@@ -80,6 +80,8 @@ std::string	obtainRedirect(std::vector<std::string> input, int index) {
 
 	if (input[index].substr(0, 9) == "redirect ") {
 		words = ftstring::split(input[index].substr(9), ' ');
+		if (words.size() != 1)
+			throw RedirWrongArgumentException();
 		redir = words[0];
 		Logger::debug("Redirect setted", redir);
 	}
@@ -304,4 +306,8 @@ const char* DirListInvalidException::what() const throw() {
 
 const char* PortAlreadyInUseException::what() const throw() {
 	return ("Port is already in use, check if there is another server working.");
+}
+
+const char* RedirWrongArgumentException::what() const throw() {
+	return ("Wrong number of arguments for redirect.");
 }
