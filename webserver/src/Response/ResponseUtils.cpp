@@ -34,22 +34,6 @@ std::string getContentType(const std::string& filePath) {
 }
 
 /**
- * @brief Auxiliary function to get the content of a html file
- * as a string.
- * 
- * @param filePath path to the file.
- * @return std::string the content of the file.
- */
-std::string getHtmlContent(const std::string& filePath) {
-    std::ifstream file(filePath.c_str());
-    if (!file.is_open())
-        throw std::runtime_error("Could not open file: " + filePath);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-/**
  * @brief Auxiliary function to get the current date and time 
  * to be used in the response headers.
  * 
@@ -66,3 +50,4 @@ std::string getCurrentDate() {
 
     return (buffer);
 }
+
