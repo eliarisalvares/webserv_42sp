@@ -27,9 +27,8 @@ std::string getDefaultFilePath(std::string directoryPath) {
  * Prevents the server from sending the html file as a string.
  */
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request) {
-    Server* server = request->server();
     if (contentType == "text/html") {
-        return getHtmlContent(filePath, server);
+        return getHtmlContent(filePath);
     } else if (filePath.find(".py") != std::string::npos) {
         return handleCGI(request);
     } else if (filePath.find(".json") != std::string::npos) {
