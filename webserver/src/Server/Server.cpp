@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/09 11:32:44 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/09 13:33:22 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	Server::setBasics() {
 	permit.autoindex = false;
 	permit.directory_listing = false;
 	permit.has_redir = false;
+	permit.redirExternal = false;
 	serverName.push_back(SERVER_NAME);
 	index.insert("index.html");
 	setBufferSize(BUFFSIZE);

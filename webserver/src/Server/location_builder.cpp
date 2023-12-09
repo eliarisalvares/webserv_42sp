@@ -10,6 +10,7 @@ t_location	initLocation(void) {
 	location.permit.autoindex = false;
 	location.permit.directory_listing = false;
 	location.permit.has_redir = false;
+	location.permit.redirExternal = false;
 	return (location);
 }
 
@@ -59,6 +60,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		if (input[i].substr(0, 9) == "redirect ") {
 			location.permit.has_redir = true;
 			location.redirection = obtainRedirect(input, i);
+			if (location.redirection.substr(0, 1) != "/")
+				location.permit.redirExternal = true;
 		}
 		if (input[i] == "}")
 			break ;
