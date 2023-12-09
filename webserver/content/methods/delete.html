@@ -78,8 +78,10 @@
     <h3>Arquivos disponíveis para deletar:</h1>
     <ul id="fileList"></ul>
     <script>
+        const port = window.location.port;
         const fileList = document.getElementById('fileList');
         const request = new XMLHttpRequest();
+        request.open('GET', `http://localhost:${port}/upload/listing.json`);
         request.send();
         request.onload = () => {
             let files = JSON.parse(request.response).files;
@@ -97,7 +99,7 @@
                     button.textContent = 'Delete';
                     button.addEventListener('click', () => {
                         const deleteRequest = new XMLHttpRequest();
-                        deleteRequest.open('DELETE', `http://localhost:8080/upload/${file}`);
+                        deleteRequest.open('DELETE', `http://localhost:${port}/upload/${file}`);
                         deleteRequest.send();
                         deleteRequest.onload = () => {
                             if (deleteRequest.status === 204) {

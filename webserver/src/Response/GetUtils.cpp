@@ -58,18 +58,11 @@ std::string getJsonContent() {
  * @param filePath path to the file.
  * @return std::string the content of the file.
  */
-std::string getHtmlContent(const std::string& filePath, Server* server) {
-    std::string port = server->getCurrentPort();
+std::string getHtmlContent(const std::string& filePath) {
     std::ifstream file(filePath.c_str());
     if (!file.is_open())
         throw std::runtime_error("Could not open file: " + filePath);
     std::stringstream buffer;
     buffer << file.rdbuf();
-    // replace localhost:8080 with the current port
-    std::string content = buffer.str();
-    if (content.find("localhost:8080") != std::string::npos) {
-        content.replace(content.find("localhost:8080"), 13, "localhost:" + port);
-    }
-    file.close();
-    return content;
+    return buffer.str();
 }
