@@ -80,7 +80,6 @@
     <script>
         const fileList = document.getElementById('fileList');
         const request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:8080/upload/listing.json');
         request.send();
         request.onload = () => {
             let files = JSON.parse(request.response).files;
