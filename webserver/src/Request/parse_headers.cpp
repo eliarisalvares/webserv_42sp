@@ -136,6 +136,7 @@ void RequestParser::_add_header(void) {
 	_field_value.clear();
 	_field_name.clear();
 }
+// remove any leading and trailing HTTP whitespace bytes from potentialValue
 
 // header Host is mandatory and singleton
 void RequestParser::_check_host(void) {
@@ -196,6 +197,38 @@ void RequestParser::_check_transfer_encoding(void) {
 	Logger::debug("found Transfer-Encoding: chunked");
 }
 
+// content-type is singleton and the last value passed is its final value
+// (if it is not an empty value)
+void RequestParser::_set_content_type(void) {
+	t_header_iterator it_header;
+	std::string ct_raw;
+	std::vector<std::string> ct_v;
+	std::vector<std::string>::iterator it, end;
+
+	it_header = _headers.find("content-type");
+	if (it_header == _headers.end())
+		return ;
+
+	ct_v = it_header->second;
+	end = ct_v.end();
+	for (it = ct_v.begin(); it != end; ++it) {
+		if ((*it).size() > 0)
+			_str_content_type = *it;
+	}
+
+	if (_str_content_type.find(',') != std::string::npos) {
+		ct_v = ftstring::split(_str_content_type, ',');
+		end = ct_v.end();
+		for (it = ct_v.begin(); it != end; ++it) {
+			if ((*it).size() > 0)
+				_str_content_type = *it;
+		}
+	}
+
+	if (_str_content_type.size())
+		_has_content_type = true;
+}
+
 void RequestParser::_check_post_headers(void) {
 	if (!_is_chunked && (!_has_content_length || !_content_length))
 		_invalid_request(
@@ -238,3 +271,54 @@ void RequestParser::_print_headers(void) {
 				<< RESET;
 	}
 }
+
+
+
+// Representation headers include: Content-Type, Content-Encoding, Content-Language, and Content-Location.
+
+// Content-Type (ignora os parametros adicionais)
+// application/x-www-form-urlencoded, multipart/form-data, or text/plain, image/...
+// MIME type: type/subtype;parameter=value
+
+
+// application/octet-stream -> arquivo binário -> vou recusar
+// na vdd vou recusar tipos diferentes de imagem, application/x-www-form-urlencoded, multipart/form-data, or text/...
+// Aceitar:
+// application/x-www-form-urlencoded, multipart/form-data
+// text/plain
+// text/html
+// text/css
+// image/gif: Graphics Interchange Format (GIF)
+// image/jpeg: Joint Photographic Expert Group image (JPEG)
+// image/png: Portable Network Graphics (PNG)
+
+// application/json -> tem parse específico... (provavelmente não vou ter tempo)
+
+// - definir o type do arquivo que salva
+
+// 403 Forbidden
+// The 403 (Forbidden) status code indicates that the server understood the request but refuses to fulfill it. A server that wishes to make public why the request has been forbidden can describe that reason in the response content (if any).
+
+// 408 Request Timeout
+// The 408 (Request Timeout) status code indicates that the server did not receive a complete request message within the time that it was prepared to wait.
+
+
+// 414 URI Too Long
+// The 414 (URI Too Long) status code indicates that the server is refusing to service the request because the target URI is longer than the server is willing to interpret.
+
+
+//  Unsupported Media Type
+// The 415 (Unsupported Media Type) status code indicates that the origin server is refusing to service the request because the content is in a format not supported by this method on the target resource.
+
+// The format problem might be due to the request's indicated Content-Type or Content-Encoding, or as a result of inspecting the data directly.
+
+// If the problem was caused by an unsupported content coding, the Accept-Encoding response header field (Section 12.5.3) ought to be used to indicate which (if any) content codings would have been accepted in the request.
+
+// On the other hand, if the cause was an unsupported media type, the Accept response header field (Section 12.5.1) can be used to indicate which media types would have been accepted in the request.
+
+// 15.5.21. 422 Unprocessable Content
+// The 422 (Unprocessable Content) status code indicates that the server understands the content type of the request content (hence a 415 (Unsupported Media Type) status code is inappropriate), and the syntax of the request content is correct, but it was unable to process the contained instructions. For example, this status code can be sent if an XML request content contains well-formed (i.e., syntactically correct), but semantically erroneous XML instructions.
+
+// check de content-type - se POST apenas
+// - verifica se é um tipo aceito
+// - pega parametro se tiver (deppis do ;)
