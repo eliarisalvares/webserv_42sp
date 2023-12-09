@@ -12,12 +12,12 @@ Response handleDeleteRequest(Request* request) {
     Logger::debug("handleDeleteRequest - filePath: " + filePath);
     int statusCode = request->status_code();
 
-    if (std::remove(filePath.c_str()) != 0) {
+    if (filePath.find("content/upload") == std::string::npos) {
+        statusCode = 403;
+    } else if (std::remove(filePath.c_str()) != 0) {
         statusCode = 500;
-        Logger::error("handleDeleteRequest - Could not delete file: " + filePath);
     } else {
         statusCode = 204;
-        Logger::debug("handleDeleteRequest - File deleted: " + filePath);
     }
 
     Response response(request->fd(), statusCode);

@@ -35,6 +35,7 @@ static const std::map<int, std::string> messageMap = initializeMessageMap();
  * @return std::string the status message.
  */
 std::string getStatusMessage(int statusCode) {
+    Logger::debug("getStatusMessage - statusCode: " + ftstring::itostr(statusCode));
     std::map<int, std::string>::const_iterator it = messageMap.find(statusCode);
     if (it == messageMap.end())
         return "Internal Server Error";
