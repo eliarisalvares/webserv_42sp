@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 16:24:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 13:41:42 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,16 +62,64 @@ std::string enum_to_str_method(RequestMethod method) {
 	return it->second;
 }
 
-// headers that needs a validation / singletons
 std::set<std::string> _fill_content_types(void) {
 	std::string _content_types[] = {
+		"text/plain",
 		"text/html",
-		"application/x-www-form-urlencoded",
+		"text/css",
 		"application/json",
+		"application/javascript",
+		"application/xml",
+		"image/png",
+		"image/jpeg",
+		"image/gif",
+		"application/x-www-form-urlencoded",
 		"multipart/form-data"
 	};
-	std::set<std::string> content_types (_content_types, _content_types + 2);
+	std::set<std::string> content_types (_content_types, _content_types + 11);
 	return content_types;
+}
+
+std::map<std::string, ContentType> _fill_map_content_type_str_to_enum(void) {
+	std::map<std::string, ContentType> str_to_enum;
+
+	str_to_enum.insert(std::make_pair("text/plain", TEXT_PLAIN));
+	str_to_enum.insert(std::make_pair("image/png", IMAGE_PNG));
+	str_to_enum.insert(std::make_pair("image/jpeg", IMAGE_JPEG));
+	str_to_enum.insert(std::make_pair("image/gif", IMAGE_GIF));
+	str_to_enum.insert(std::make_pair("application/x-www-form-urlencoded", FORM_URLENCODED));
+	str_to_enum.insert(std::make_pair("multipart/form-data", MULTIPART_FORM_DATA));
+	return str_to_enum;
+}
+
+std::map<ContentType, std::string> _fill_map_content_type_enum_to_str(void) {
+	std::map<ContentType, std::string> enum_to_str;
+
+	enum_to_str.insert(std::make_pair(TEXT_PLAIN, "text/plain"));
+	enum_to_str.insert(std::make_pair(IMAGE_PNG, "image/png"));
+	enum_to_str.insert(std::make_pair(IMAGE_JPEG, "image/jpeg"));
+	enum_to_str.insert(std::make_pair(IMAGE_GIF, "image/gif"));
+	enum_to_str.insert(std::make_pair(FORM_URLENCODED, "application/x-www-form-urlencoded"));
+	enum_to_str.insert(std::make_pair(MULTIPART_FORM_DATA, "multipart/form-data"));
+	return enum_to_str;
+}
+
+ContentType str_to_enum_content_type(std::string content_type) {
+	std::map<std::string, ContentType>::const_iterator it;
+
+	it = map_str_to_enum_content_type.find(content_type);
+	if (it == map_str_to_enum_content_type.end())
+		throw InvalidRequest(UNSUPPORTED_MEDIA_TYPE);
+	return it->second;
+}
+
+std::string enum_to_str_content_type(ContentType content_type) {
+	std::map<ContentType, std::string>::const_iterator it;
+
+	it = map_enum_to_str_content_type.find(content_type);
+	if (it == map_enum_to_str_content_type.end())
+		throw utils::GeneralException(utils::UNSUPPORTED_MEDIA_TYPE);
+	return it->second;
 }
 
 bool is_uri_char(char c) {
