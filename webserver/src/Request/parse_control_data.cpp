@@ -275,9 +275,13 @@ void RequestParser::_check_uri(void) {
 			_invalid_request("Directory not found", path, http::NOT_FOUND);
 		closedir(dr);
 		Logger::debug("Found directory", path);
-		if (use_server_config && !_request->server()->getAutoindex()) {
-			path = *(_request->server()->getIndex().begin());
-			Logger::warning("Index file", path);
+		if (use_server_config) {
+			if (!_request->server()->getAutoindex()) {
+				path = *(_request->server()->getIndex().begin());
+				Logger::warning("Index file", path);
+			} else {
+				path.push_back(SLASH);
+			}
 		}
 		else {
 			if (!(*locations)[location_pos].permit.autoindex) {
