@@ -1,8 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DELETE</title>
+    <link rel="icon" href="./favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
+    <style>
+        body {
+            background-color: #333333FF;
+            font-family: Montserrat;
+            color: #9435d3; /* Cute purple color */
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 4rem;
+        }
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: normal;
+            color: rgb(255, 255, 255);
+            font-size: 1.2rem;
+        }
+        h3 {
+            margin: 0 0 20px 0;
+            font-size: 2.5rem;
+            color: #777777FF;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            align-items: center;
+        }
+        li {
+            margin-bottom: 1rem;
+            align-items: center;
+            display: flex;
+            font-size: 1.5rem;
+        }
+        li::before {
+            content: '★'; 
+            color: yellow;
+            margin-right: 10px;
+        }
+        button {
+            margin-left: 1rem;
+            background-color: rgb(155, 91, 155);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #7e57c2;
+        }
+        #content {
+            background-color: #CCCCCCFF;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+}
+    </style>
+</head>
 <body>
-    <h1>Escolha o arquivo que deseja deletar</h1>
-    <h2>Arquivos disponíveis:</h2>
+    <h1>Método DELETE </h1>
+    <h2>Vamos usar o método DELETE para deletar um arquivo do servidor! </h2>
+    <h2>Para deletar um arquivo, basta clicar no botão <b>DELETE</b> ao lado do nome do arquivo. </h2>
+    <h2>O arquivo será deletado e a página será recarregada. </h2>
+    <h2>Você pode verificar que o arquivo foi deletado ao ver que ele não aparece mais na lista de arquivos disponíveis </h2>      
+    <h3>Arquivos disponíveis para deletar:</h1>
     <ul id="fileList"></ul>
     <script>
         const fileList = document.getElementById('fileList');
@@ -28,7 +101,7 @@
                         deleteRequest.open('DELETE', `http://localhost:8080/upload/${file}`);
                         deleteRequest.send();
                         deleteRequest.onload = () => {
-                            if (deleteRequest.status === 200) {
+                            if (deleteRequest.status === 204) {
                                 alert('File deleted successfully!');
                                 location.reload();
                             } else {
@@ -43,5 +116,12 @@
             }
         };
     </script>
-</body>
+        <div id="content">
+            <p>Would you like to go back to the <a href="/" style="color:#777777FF;">homepage</a>?</p>
+            <p>Or maybe learn more about HTTP <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404" style="color:#777777FF;">status codes</a>?</p>
+            <p>------------------------------------------------</p>
+            <p>Você gostaria de voltar para o <a href="/" style="color:#777777FF;">início</a>?</p>
+            <p>Ou talvez aprender um pouco mais sobre os <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404" style="color:#777777FF;">códigos HTTP</a>?</p>
+        </div>
+    </body>
 </html>
