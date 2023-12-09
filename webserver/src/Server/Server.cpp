@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 13:57:36 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/08 23:12:19 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,24 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			i++ ;
 		if (input[i].substr(0, 12) == "server_name ")
 			setName(obtainName(input, i));
-		if (input[i].substr(0, 21) == "client_max_body_size ")
-			setBodySize(obtainBodySize(input, i));
 		if (input[i].substr(0, 5) == "root ")
 			setRoot(obtainRoot(input, i));
+		if (input[i].substr(0, 9) == "location ")
+			extraBrackets++;
+		if (input[i].substr(0, 16) == "allowed_methods ") {
+			_allowed_methods.clear();
+			setMethods(obtainMethod(input, i));
+		}
+		if (input[i].substr() == "}" && extraBrackets == 0)
+			break ;
+		else if (input[i].substr() == "}")
+			extraBrackets--;
+	}
+	for (size_t i = index; i < input.size(); i++) {
+		if (input[i].substr() == "server {")
+			i++ ;
+		if (input[i].substr(0, 21) == "client_max_body_size ")
+			setBodySize(obtainBodySize(input, i));
 		if (input[i].substr(0, 9) == "location ") {
 			extraBrackets++;
 			addLocation(obtainLoc(input, i));
@@ -42,18 +56,10 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		}
 		if (input[i].substr(0, 4) == "cgi ")
 			setCGI(obtainCGI(input, i));
-		if (input[i].substr(0, 16) == "allowed_methods ") {
-			_allowed_methods.clear();
-			setMethods(obtainMethod(input, i));
-		}
 		if (input[i].substr(0, 11) == "error_page ")
 			addErrorPages(obtainErrorPages(input, i));
-		if (input[i].substr(0, 6) == "index ") {
-			if (getRoot() != ROOT)
-				setIndex(obtainIndex(input, i, getRoot()));
-			else
-				setIndex(obtainIndex(input, i));
-		}
+		if (input[i].substr(0, 6) == "index ")
+			setIndex(obtainIndex(input, i, getRoot()));
 		if (input[i].substr(0, 12) == "buffer_size ")
 			setBufferSize(obtainBufferSize(input, i));
 		if (input[i].substr(0, 10) == "autoindex ")
