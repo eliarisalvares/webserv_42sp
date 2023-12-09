@@ -78,8 +78,11 @@ std::string getDefaultFilePath(std::string directoryPath);
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request);
 std::string setFlagsContent(std::string contentType);
 
-std::string handleCGI(Request* request);
+std::string getJsonContent();
+std::string getDirectoryListing(const std::string& directoryPath);
 std::string getHtmlContent(const std::string& filePath);
+
+std::string handleCGI(Request* request);
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);
 std::string getCurrentDate(void);
