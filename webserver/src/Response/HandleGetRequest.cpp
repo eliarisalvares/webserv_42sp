@@ -31,20 +31,17 @@ std::string getDirectoryListing(const std::string& folderPath) {
  * @return std::string
  */
 std::string getDefaultFilePath(std::string directoryPath) {
+    Logger::debug("getDefaultFilePath - directoryPath: " + directoryPath);
     std::string indexPath = directoryPath + "index.html";
-     if (access(indexPath.c_str(), F_OK) != -1) {
-        return indexPath;
-    } else {
-        std::string folderPath = directoryPath;
-        std::string wholePath = folderPath + "autoindex.html";
-        std::string directoryListing = getDirectoryListing(folderPath);
-        std::ofstream file(wholePath.c_str());
-        if (!file.is_open())
-            throw std::runtime_error("Could not open file: " + wholePath);
-        file << directoryListing;
-        file.close();
-        return wholePath;
-    }
+    std::string folderPath = directoryPath;
+    std::string wholePath = folderPath + "autoindex.html";
+    std::string directoryListing = getDirectoryListing(folderPath);
+    std::ofstream file(wholePath.c_str());
+    if (!file.is_open())
+        throw std::runtime_error("Could not open file: " + wholePath);
+    file << directoryListing;
+    file.close();
+    return wholePath;
 }
 
 /**
@@ -102,7 +99,10 @@ Response handleGetRequest(Request* request) {
 		);
 	}
 
-    else if (filePath[filePath.length() - 1] == '/') {
+    Logger::debug("handleGetRequest - filePath 2: " + filePath);
+
+    if (filePath[filePath.length() - 1] == '/') {
+        Logger::debug("inside if");
         filePath = getDefaultFilePath(filePath);
     }
 
