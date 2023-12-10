@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 01:30:58 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 16:22:04 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,13 @@ void RequestParser::body(char c) {
 	if (_is_chunked)
 		return _body_chunked(c);
 	if (_body_bytes_readed < _content_length) {
-		_body.push_back(c);
+		if (_media_type == http::MULTIPART_FORM_DATA)
+			_parse_multipart(c);
+		else
+			_body.push_back(c);
 		++_body_bytes_readed;
-		if (_body_bytes_readed == _content_length) {
+		if (_body_bytes_readed == _content_length)
 			_step = BODY_LENGTH_END;
-			_print_body();
-		}
 	}
 }
 
@@ -129,7 +130,7 @@ void RequestParser::_body_chunked(char c) {
 		default:
 			break;
 	}
-	_print_body();
+	// _print_body();
 }
 
 void RequestParser::_parse_chunk_size(char c) {
@@ -167,12 +168,15 @@ void RequestParser::_parse_chunk_data(char c) {
 			http::CONTENT_TOO_LARGE
 		);
 	if (_chunk_bytes_readed < _chunk_size) {
-		_body.push_back(c);
+		if (_media_type == http::MULTIPART_FORM_DATA)
+			_parse_multipart(c);
+		else
+			_body.push_back(c);
 		++_chunk_bytes_readed;
 		++_body_bytes_readed;
 		if (_chunk_bytes_readed == _chunk_size) {
 			_step = CHUNK_DATA_END;
-			_print_body();
+			// _print_body();
 		}
 	}
 }
@@ -201,9 +205,12 @@ void RequestParser::_print_body(void) {
 
 void RequestParser::parse_body(void) {
 	if (_media_type == http::MULTIPART_FORM_DATA)
-		_parse_multipart();
-	else if (_media_type == http::FORM_URLENCODED)
+		_remove_boundary();
+	if (_media_type == http::FORM_URLENCODED)
 		_parse_form_data();
+	else if (_multipart_type == http::FORM_URLENCODED)
+		_parse_form_data();
+	_print_body();
 }
 
 void RequestParser::_parse_form_data(void) {
@@ -278,214 +285,224 @@ void RequestParser::_parse_form_data(void) {
 	_field_value.clear();
 }
 
-void RequestParser::_parse_multipart(void) {
-	// ParseBody parse_body_step = INITIAL_BOUNDARY;
-
-	_check_boundary_delimiter(0);
-	_check_boundary();
-	_check_content_disposition();
-	_check_data_content_type();
-	_check_multipart_crfl();
-	_separate_data();
-	if (_body.size()) {
-		_request->setHasImage(true);
-		_request->setImage(&_body);
-		_request->setImageType("png");
+void RequestParser::_parse_multipart(char c) {
+	switch (_multipart_step)
+	{
+	case INITIAL_BOUNDARY:
+		_check_boundary_delimiter(c);
+		break;
+	case BOUNDARY:
+		_check_boundary(c);
+		break;
+	case CONTENT_DISPOSITION:
+		_check_content_disposition(c);
+		break;
+	case CONTENT_TYPE:
+		_check_data_content_type(c);
+		break;
+	case CONTENT:
+		_get_multipart_data(c);
+		break;
+	case CRLF_BOUNDARY:
+	case CRLF_DISPOSITION:
+	case CRLF_CONTENT_TYPE:
+	case CRLF_INITIAL_CONTENT1:
+	case CRLF_INITIAL_CONTENT2:
+	case CRLF_CONTENT:
+		_check_multipart_crfl(c);
+		break;
+	default:
+		break;
 	}
-	// _check_multipart_crfl();
-	// _check_boundary_delimiter();
+
+	// _check_boundary_delimiter(0);
 	// _check_boundary();
-
-
-	// switch (parse_body_step)
-	// {
-	// case INITIAL_BOUNDARY:
-	// 	/* code */
-	// 	break;
-	// case BOUNDARY:
-	// cas CO
-
-	// default:
-	// 	break;
+	// _check_content_disposition();
+	// _check_data_content_type();
+	// _check_multipart_crfl();
+	// _separate_data();
+	// if (_body.size()) {
+	// 	_request->setHasImage(true);
+	// 	_request->setImage(&_body);
+	// 	_request->setImageType("png");
 	// }
-	// INITIAL_BOUNDARY
-	// BOUNDARY
-	// CONTENT_DISPOSITION
-	// CONTENT_TYPE
-	// CRLF
-	// BODY
-	// CRLF
+
 }
 
-void RequestParser::_check_boundary_delimiter(size_t pos) {
-	_body_iterator_first = _body.begin();
-	_body_iterator_end = _body.end();
-	_body_iterator = _body_iterator_first;
-	Logger::debug("Boundary delimiter:");
-	for (pos = 0; pos < 2; ++pos) {
-		// passar para uma string
-		std::cout << GREY << *_body_iterator;
-		++_body_iterator;
+void RequestParser::_check_boundary_delimiter(char c) {
+	_multipart_tmp.push_back(c);
+	if (_multipart_tmp.size() == 2) {
+		if (_multipart_tmp == "--") {
+			_multipart_step = BOUNDARY;
+			Logger::debug("Boundary delimiter OK", _multipart_tmp);
+			_multipart_tmp.clear();
+		}
+		else {
+			Logger::error("Boundary delimiter KO", _multipart_tmp);
+			_bad_request("Wrong boundary delimiter");
+		}
 	}
-	std::cout << RESET << "\n";
-	// checkar string
-	_body.erase(_body_iterator_first, _body_iterator);
 }
 
-void RequestParser::_check_boundary(void) {
-	_body_iterator_first = _body.begin();
-	_body_iterator_end = _body.end();
-	_body_iterator = _body_iterator_first;
-	Logger::debug("Boundary:");
-	while (
-		_body_iterator != _body_iterator_end &&
-		*_body_iterator != CR &&
-		*_body_iterator != LF
-	) {
-		// passar para uma string
-		std::cout << GREY << *_body_iterator;
-		++_body_iterator;
-	}
-	std::cout << RESET << "\n";
-	// check string
-	if (*_body_iterator == CR) {
-		++_body_iterator;
-	}
-	if (*_body_iterator == LF) {
-		++_body_iterator;
-	}
-	_body.erase(_body_iterator_first, _body_iterator);
-}
-
-void RequestParser::_check_content_disposition(void) {
-	_body_iterator_first = _body.begin();
-	_body_iterator_end = _body.end();
-	_body_iterator = _body_iterator_first;
-	Logger::debug("Content-Disposition:");
-	while (
-		_body_iterator != _body_iterator_end &&
-		*_body_iterator != CR &&
-		*_body_iterator != LF
-	) {
-		// passar para uma string
-		std::cout << GREY << *_body_iterator;
-		++_body_iterator;
-	}
-	std::cout << RESET << "\n";
-	// check string
-	if (*_body_iterator == CR)
-		++_body_iterator;
-	if (*_body_iterator == LF)
-		++_body_iterator;
-	_body.erase(_body_iterator_first, _body_iterator);
-}
-
-void RequestParser::_check_data_content_type(void) {
-	_body_iterator_first = _body.begin();
-	if (*_body_iterator_first == CR)
+void RequestParser::_check_boundary(char c) {
+	if (c != CR) {
+		_multipart_tmp.push_back(c);
 		return ;
-	_body_iterator_end = _body.end();
-	_body_iterator = _body_iterator_first;
-	Logger::debug("Content-Type:");
-	while (
-		_body_iterator != _body_iterator_end &&
-		*_body_iterator != CR &&
-		*_body_iterator != LF
-	) {
-		// passar para uma string
-		std::cout << GREY << *_body_iterator;
-		++_body_iterator;
 	}
-	std::cout << RESET << "\n";
-	// check string
-	if (*_body_iterator == CR)
-		++_body_iterator;
-	if (*_body_iterator == LF)
-		++_body_iterator;
-	_body.erase(_body_iterator_first, _body_iterator);
+	if (_multipart_tmp != _boundary)
+			_bad_request("Different boundary than specified");
+	_multipart_step = CRLF_BOUNDARY;
+	Logger::debug("Boundary OK", _multipart_tmp);
+	_multipart_tmp.clear();
 }
 
-void RequestParser::_check_multipart_crfl(void) {
-	_body_iterator_first = _body.begin();
-	_body_iterator = _body_iterator_first;
-
-	if (*_body_iterator == CR)
-		++_body_iterator;
-	if (*_body_iterator == LF)
-		++_body_iterator;
-	_body.erase(_body_iterator_first, _body_iterator);
+void RequestParser::_check_multipart_crfl(char c) {
+	if (_multipart_step == CRLF_CONTENT && c != LF) {
+		_body.push_back(CR);
+		_body.push_back(c);
+		std::cout << CR << c;
+		return ;
+	}
+	if (_multipart_step == CRLF_INITIAL_CONTENT1) {
+		if (c == CR)
+			_multipart_step = CRLF_INITIAL_CONTENT2;
+		else
+			_bad_request("Wrong character to init content on multipart/form-data");
+		return ;
+	}
+	if (c != LF)
+		_bad_request("Wrong CRLF on multipart/form-data");
+	switch (_multipart_step)
+	{
+	case CRLF_BOUNDARY:
+		_multipart_step = CONTENT_DISPOSITION;
+		break;
+	case CRLF_DISPOSITION:
+		_multipart_step = CONTENT_TYPE;
+		break;
+	case CRLF_CONTENT_TYPE:
+		_multipart_step = CRLF_INITIAL_CONTENT1;
+		break;
+	case CRLF_INITIAL_CONTENT2:
+		_multipart_step = CONTENT;
+		break;
+	case CRLF_CONTENT:
+		_multipart_step = INITIAL_BOUNDARY;
+		break;
+	default:
+		break;
+	}
 }
 
-void RequestParser::_separate_data(void) {
-	// bool end = false;
-	// bool dash = false;
+void RequestParser::_check_content_disposition(char c) {
+	if (c != CR) {
+		_multipart_tmp.push_back(c);
+		return ;
+	}
+	Logger::debug("Content-Disposition line", _multipart_tmp);
+	std::transform(
+		_multipart_tmp.begin(),
+		_multipart_tmp.end(),
+		_multipart_tmp.begin(),
+		&utils::c_tolower
+	);
 
-	// size_t body_size = _body.size();
-	// for (int i = body_size; i > body_size )
+	std::vector<std::string> ctd = ftstring::split(_multipart_tmp, SEMICOLON);
+	if (ctd.size() < 2)
+		_bad_request("missing data for Content-Disposition on multipart data");
+	Logger::debug("Content-Disposition name", ctd[0]);
+	if (ctd[0] != "content-disposition: form-data")
+		_bad_request("bad Content-Disposition on multipart data");
+
+	size_t i = 0;
+	while (ctd[1][i] == SP)
+		i++;
+	Logger::debug("Content-Disposition name parameter", ctd[1]);
+	if (ctd[1].substr(i, 5) != "name=")
+		_bad_request("missing Content-Disposition name parameter");
+
+	std::vector<std::string>::iterator it, end = ctd.end();
+	std::string aux_str;
+	size_t aux;
+
+	for (it = ctd.begin() + 1; it != end; ++it) {
+		aux = (*it).find(EQUAL);
+		if (aux == std::string::npos)
+			_bad_request("Content-Disposition parameter");
+
+		i = 0;
+		while ((*it)[i] == SP)
+			i++;
+
+		aux_str = (*it).substr(i, aux - i);
+		if (aux_str == "filename")
+			_request->addPostData(
+				"filename", (*it).substr(aux + 2, (*it).size() - aux - 2)
+			);
+	}
+	if (DEBUG)
+		Logger::info("Verify if parameters were saved");
+	_request->post_data();
+
+	Logger::debug("Content-Disposition OK");
+	_multipart_tmp.clear();
+	_multipart_step = CRLF_DISPOSITION;
+}
+
+void RequestParser::_check_data_content_type(char c) {
+	if (c != CR) {
+		_multipart_tmp.push_back(c);
+		return ;
+	}
+	Logger::debug("Content-Type line", _multipart_tmp);
+	_multipart_step = CRLF_CONTENT_TYPE;
+
+	if (_multipart_tmp.size() == 0) {
+		_multipart_type = http::TEXT_PLAIN;
+		return ;
+	}
+
+	std::transform(
+		_multipart_tmp.begin(),
+		_multipart_tmp.end(),
+		_multipart_tmp.begin(),
+		&utils::c_tolower
+	);
+	size_t i = _multipart_tmp.find(COLON);
+	++i;
+	Logger::debug("Content-Type name", _multipart_tmp.substr(0, i));
+	if (_multipart_tmp.substr(0, i) != "content-type:")
+		_bad_request("bad Content-Type header on multipart/form-data");
+	while (_multipart_tmp[i] == SP)
+		i++;
+	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
+	Logger::debug("Content-Type type", _multipart_tmp);
+	_request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
+	Logger::debug("Content-Type OK");
+	_multipart_tmp.clear();
+}
+
+void RequestParser::_get_multipart_data(char c) {
+	_body.push_back(c);
+}
+
+void RequestParser::_remove_boundary(void) {
 	_body_iterator_end = _body.end();
 	_body_iterator_first = _body_iterator_end - 8 - _boundary.size();
 	_body.erase(_body_iterator_first, _body_iterator_end);
-	Logger::warning("Image data:");
-	_print_body();
-	// while (
-	// 	_body_iterator != _body_iterator_end
-	// 	&& (*_body_iterator != CR || *_body_iterator != LF)
-	// ) {
-	// 	// passar para uma string
-	// 	std::cout << GREY << *_body_iterator;
-	// 	++_body_iterator;
-	// } // PNG
-	// if (*_body_iterator == CR)
-	// 	++_body_iterator;
-	// if (*_body_iterator == LF)
-	// 	++_body_iterator;
-	// while (
-	// 	_body_iterator != _body_iterator_end
-	// 	&& (*_body_iterator != CR || *_body_iterator != LF)
-	// ) {
-	// 	if (*_body_iterator == DASH) {
-	// 		Logger::error("Found dash");
-	// 		if (!dash)
-	// 			dash = true;
-	// 		else
-	// 			end = _check_end_boundary(_body_iterator - 1);
-	// 		if (end)
-	// 			break;
-	// 		else
-	// 			dash = true;
-	// 	}
-	// 	// passar para uma string
-	// 	std::cout << GREY << *_body_iterator;
-	// 	++_body_iterator;
-	// }
-	// std::cout << RESET << "\n";
-	// check string
-	// if (*_body_iterator == CR)
-	// 	++_body_iterator;
-	// if (*_body_iterator == LF)
-	// 	++_body_iterator;
-	// _body.erase(_body_iterator_first, _body_iterator);
+	_multipart_type = _request->media_type();
 }
-
-bool RequestParser::_check_end_boundary(std::vector<char>::iterator initial) {
-	Logger::error("end boundary");
-	_body_iterator_end = _body.end();
-	_body.erase(initial, initial + 2 + _boundary.size());
-	return true;
-}
-
-
 
 // --------------------------f069bd9492f6146e
 // ------------------------f069bd9492f6146e
 
-// 2 DASHS - BOUNDARY - CRFL
+// 2 DASHS - BOUNDARY - CRLF
 // BODY_HEADERS:
 // Content-Disposition: form-data; params (name="" pelo menos...) - CRLF
 // Content-Type (opcional) - CRLF
 // CRLF
-// content ... CRFL
-// 2 DASHS - BOUNDARY - CRFL
+// content ... CRLF
+// 2 DASHS - BOUNDARY - CRLF
 
 // --------------------------62774971962833fd
 // Content-Disposition: form-data; name="file"; filename="txt.txt"
