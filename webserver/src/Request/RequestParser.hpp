@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:09:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:19:31 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ public:
 	std::string					getContentType(void) const;
 	std::string					getMediaTypeStr(void) const;
 	std::string					getBoundary(void) const;
-	http::ContentType			getMediaType(void) const;
+	http::MediaType				getMediaType(void) const;
 
 	// setters
 	void						setStep(Step s);
@@ -211,7 +211,7 @@ private:
 	std::string					_content_type;
 	std::string					_media_type_str;
 	std::string					_boundary;
-	http::ContentType			_media_type;
+	http::MediaType				_media_type;
 
 	void						_print_body(void);
 	void						_body_chunked(char c);
