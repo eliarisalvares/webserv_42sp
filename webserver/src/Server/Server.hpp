@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:15:10 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 19:31:58 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,9 @@ class Server {
 		std::set<std::string>		getMethods(void) const;
 		std::vector<std::string>	getName(void);
 		std::string					getName(int index);
+		t_permissions				getPermit(void) const;
 		int							getPort(void) const;
+		std::string					getRedirect(void) const;
 		std::string					getRoot(void) const;
 		int							getSocket(void) const;
 		std::string					getUpPath(void) const;

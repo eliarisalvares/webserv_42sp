@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_getters.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:17:40 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 19:32:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,12 @@ std::string	Server::getCurrentPort(void) const {
 
 	port = ftstring::itostr(_port);
 	return port;
+}
+
+t_permissions	Server::getPermit(void) const {
+	return this->_permit;
+}
+
+std::string	Server::getRedirect(void) const {
+	return this->_redirect;
 }
