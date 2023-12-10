@@ -252,64 +252,64 @@ void RequestParser::_parse_multipart(void) {
 void RequestParser::_check_boundary_delimiter(size_t pos) {
 	_body_iterator_first = _body.begin();
 	_body_iterator_end = _body.end();
-	_body_iterator_final = _body_iterator_first;
+	_body_iterator = _body_iterator_first;
 	Logger::debug("Boundary delimiter:");
 	for (pos = 0; pos < 2; ++pos) {
 		// passar para uma string
-		std::cout << GREY << *_body_iterator_final;
-		++_body_iterator_final;
+		std::cout << GREY << *_body_iterator;
+		++_body_iterator;
 	}
 	std::cout << RESET << "\n";
 	// checkar string
-	_body.erase(_body_iterator_first, _body_iterator_final);
+	_body.erase(_body_iterator_first, _body_iterator);
 }
 
 void RequestParser::_check_boundary(void) {
 	_body_iterator_first = _body.begin();
 	_body_iterator_end = _body.end();
-	_body_iterator_final = _body_iterator_first;
+	_body_iterator = _body_iterator_first;
 	Logger::debug("Boundary:");
 	while (
-		_body_iterator_final != _body_iterator_end &&
-		*_body_iterator_final != CR &&
-		*_body_iterator_final != LF
+		_body_iterator != _body_iterator_end &&
+		*_body_iterator != CR &&
+		*_body_iterator != LF
 	) {
 		// passar para uma string
-		std::cout << GREY << *_body_iterator_final;
-		++_body_iterator_final;
+		std::cout << GREY << *_body_iterator;
+		++_body_iterator;
 	}
 	std::cout << RESET << "\n";
 	// check string
-	if (*_body_iterator_final == CR) {
-		++_body_iterator_final;
+	if (*_body_iterator == CR) {
+		++_body_iterator;
 	}
-	if (*_body_iterator_final == LF) {
-		++_body_iterator_final;
+	if (*_body_iterator == LF) {
+		++_body_iterator;
 	}
-	_body.erase(_body_iterator_first, _body_iterator_final);
+	_body.erase(_body_iterator_first, _body_iterator);
 }
 
 void RequestParser::_check_content_disposition(void) {
 	_body_iterator_first = _body.begin();
 	_body_iterator_end = _body.end();
-	_body_iterator_final = _body_iterator_first;
+	_body_iterator = _body_iterator_first;
 	Logger::debug("Content-Disposition:");
 	while (
-		_body_iterator_final != _body_iterator_end &&
-		*_body_iterator_final != CR &&
-		*_body_iterator_final != LF
+		_body_iterator != _body_iterator_end &&
+		*_body_iterator != CR &&
+		*_body_iterator != LF
 	) {
 		// passar para uma string
-		std::cout << GREY << *_body_iterator_final;
-		++_body_iterator_final;
+		std::cout << GREY << *_body_iterator;
+		++_body_iterator;
 	}
 	std::cout << RESET << "\n";
 	// check string
-	if (*_body_iterator_final == CR)
-		++_body_iterator_final;
-	if (*_body_iterator_final == LF)
-		++_body_iterator_final;
-	_body.erase(_body_iterator_first, _body_iterator_final);
+	if (*_body_iterator == CR)
+		++_body_iterator;
+	if (*_body_iterator == LF)
+		++_body_iterator;
+	_body.erase(_body_iterator_first, _body_iterator);
 }
 
 void RequestParser::_check_data_content_type(void) {
@@ -317,35 +317,35 @@ void RequestParser::_check_data_content_type(void) {
 	if (*_body_iterator_first == CR)
 		return ;
 	_body_iterator_end = _body.end();
-	_body_iterator_final = _body_iterator_first;
+	_body_iterator = _body_iterator_first;
 	Logger::debug("Content-Type:");
 	while (
-		_body_iterator_final != _body_iterator_end &&
-		*_body_iterator_final != CR &&
-		*_body_iterator_final != LF
+		_body_iterator != _body_iterator_end &&
+		*_body_iterator != CR &&
+		*_body_iterator != LF
 	) {
 		// passar para uma string
-		std::cout << GREY << *_body_iterator_final;
-		++_body_iterator_final;
+		std::cout << GREY << *_body_iterator;
+		++_body_iterator;
 	}
 	std::cout << RESET << "\n";
 	// check string
-	if (*_body_iterator_final == CR)
-		++_body_iterator_final;
-	if (*_body_iterator_final == LF)
-		++_body_iterator_final;
-	_body.erase(_body_iterator_first, _body_iterator_final);
+	if (*_body_iterator == CR)
+		++_body_iterator;
+	if (*_body_iterator == LF)
+		++_body_iterator;
+	_body.erase(_body_iterator_first, _body_iterator);
 }
 
 void RequestParser::_check_multipart_crfl(void) {
 	_body_iterator_first = _body.begin();
-	_body_iterator_final = _body_iterator_first;
+	_body_iterator = _body_iterator_first;
 
-	if (*_body_iterator_final == CR)
-		++_body_iterator_final;
-	if (*_body_iterator_final == LF)
-		++_body_iterator_final;
-	_body.erase(_body_iterator_first, _body_iterator_final);
+	if (*_body_iterator == CR)
+		++_body_iterator;
+	if (*_body_iterator == LF)
+		++_body_iterator;
+	_body.erase(_body_iterator_first, _body_iterator);
 }
 
 void RequestParser::_separate_data(void) {
@@ -360,43 +360,43 @@ void RequestParser::_separate_data(void) {
 	Logger::warning("Image data:");
 	_print_body();
 	// while (
-	// 	_body_iterator_final != _body_iterator_end
-	// 	&& (*_body_iterator_final != CR || *_body_iterator_final != LF)
+	// 	_body_iterator != _body_iterator_end
+	// 	&& (*_body_iterator != CR || *_body_iterator != LF)
 	// ) {
 	// 	// passar para uma string
-	// 	std::cout << GREY << *_body_iterator_final;
-	// 	++_body_iterator_final;
+	// 	std::cout << GREY << *_body_iterator;
+	// 	++_body_iterator;
 	// } // PNG
-	// if (*_body_iterator_final == CR)
-	// 	++_body_iterator_final;
-	// if (*_body_iterator_final == LF)
-	// 	++_body_iterator_final;
+	// if (*_body_iterator == CR)
+	// 	++_body_iterator;
+	// if (*_body_iterator == LF)
+	// 	++_body_iterator;
 	// while (
-	// 	_body_iterator_final != _body_iterator_end
-	// 	&& (*_body_iterator_final != CR || *_body_iterator_final != LF)
+	// 	_body_iterator != _body_iterator_end
+	// 	&& (*_body_iterator != CR || *_body_iterator != LF)
 	// ) {
-	// 	if (*_body_iterator_final == DASH) {
+	// 	if (*_body_iterator == DASH) {
 	// 		Logger::error("Found dash");
 	// 		if (!dash)
 	// 			dash = true;
 	// 		else
-	// 			end = _check_end_boundary(_body_iterator_final - 1);
+	// 			end = _check_end_boundary(_body_iterator - 1);
 	// 		if (end)
 	// 			break;
 	// 		else
 	// 			dash = true;
 	// 	}
 	// 	// passar para uma string
-	// 	std::cout << GREY << *_body_iterator_final;
-	// 	++_body_iterator_final;
+	// 	std::cout << GREY << *_body_iterator;
+	// 	++_body_iterator;
 	// }
 	// std::cout << RESET << "\n";
 	// check string
-	// if (*_body_iterator_final == CR)
-	// 	++_body_iterator_final;
-	// if (*_body_iterator_final == LF)
-	// 	++_body_iterator_final;
-	// _body.erase(_body_iterator_first, _body_iterator_final);
+	// if (*_body_iterator == CR)
+	// 	++_body_iterator;
+	// if (*_body_iterator == LF)
+	// 	++_body_iterator;
+	// _body.erase(_body_iterator_first, _body_iterator);
 }
 
 bool RequestParser::_check_end_boundary(std::vector<char>::iterator initial) {
