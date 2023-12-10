@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 11:03:21 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 01:24:44 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,11 @@ public:
 	std::string				host(void) const;
 	t_location*				location(void) const;
 	bool					has_error(void) const;
-	bool					is_chuncked(void) const;
-	// http::ContentType		content_type(void) const;
 	size_t					content_length(void) const;
+	bool					has_image(void) const;
+	std::vector<char>*		image(void) const;
+	std::string				image_type(void) const;
+	std::map<std::string, std::string> post_data(void) const;
 
 	// setters
 	void					setMethod(http::RequestMethod method);
@@ -52,9 +54,15 @@ public:
 	void					setLocation(t_location* location);
 	void					setHost(std::string const host);
 	void					setError(bool has_error);
-	void					setChuncked(bool is_chuncked);
-	void					setContentType(http::ContentType type);
 	void					setContentLength(size_t length);
+	void					setHasImage(bool has_image);
+	void					setImageType(std::string const& type);
+	void					setImage(std::vector<char>* image);
+	void					addPostData(
+								std::string const& name, std::string const& value
+							);
+
+	void					printPostData(void) const;
 
 private:
 
@@ -69,10 +77,16 @@ private:
 
 	// headers data
 	std::string				_host;
-	// http::ContentType		_content_type;
 	size_t					_content_length;
-	bool					_is_chuncked;
 
+	// image
+	bool					_has_image;
+	std::string				_image_type;
+	std::string				_image_file_name;
+	std::vector<char>*		_image;
+
+	// form
+	std::map<std::string, std::string> _post_data;
 };
 
 #endif

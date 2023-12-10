@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 11:10:37 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:06:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,29 +16,32 @@ Request::Request(void):
 	_server(NULL),
 	_fd(0),
 	_error(false),
-	_method(http::GET),
+	_method(http::NOT_ALLOWED),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	// _content_type(),
 	_content_length(0),
-	_is_chuncked(false) { }
+	_has_image(false) {
+		_post_data.clear();
+	}
+
 
 Request::Request(int fd, Server* server):
 	_server(server),
 	_fd(fd),
 	_error(false),
-	_method(http::GET),
+	_method(http::NOT_ALLOWED),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	// _content_type(),
 	_content_length(0),
-	_is_chuncked(false) { }
+	_has_image(false) {
+		_post_data.clear();
+	}
 
 Request::~Request(void) { }
 
@@ -57,13 +60,22 @@ Request const& Request::operator=(Request const & copy) {
 		this->_host = copy.host();
 		this->_location = copy.location();
 		this->_error = copy.has_error();
-		this->_is_chuncked = copy.is_chuncked();
 		this->_content_length = copy.content_length();
-		// this->_content_type = copy.content_type();
+		this->_has_image = copy.has_image();
+		this->_image = copy.image();
+		this->_image_type = copy.image_type();
 	}
 	return *this;
 }
 
+void Request::printPostData(void) const {
+	std::map<std::string, std::string>::const_iterator it, end = _post_data.end();
+
+	if (DEBUG)
+		Logger::info("Post data");
+	for (it = _post_data.begin(); it != end; ++it)
+		Logger::debug(it->first, it->second);
+}
 
 /********************************** GETTERS **********************************/
 
@@ -106,16 +118,24 @@ bool Request::has_error(void) const {
 	return this->_error;
 }
 
-bool Request::is_chuncked(void) const {
-	return this->_is_chuncked;
-}
-
-// http::ContentType Request::content_type(void) const {
-// 	return this->_content_type;
-// }
-
 size_t Request::content_length(void) const {
 	return this->_content_length;
+}
+
+bool Request::has_image(void) const {
+	return this->_has_image;
+}
+
+std::vector<char>* Request::image(void) const {
+	return this->_image;
+}
+
+std::string Request::image_type(void) const {
+	return this->_image_type;
+}
+
+std::map<std::string, std::string> Request::post_data(void) const {
+	return this->_post_data;
 }
 
 
@@ -150,15 +170,29 @@ void Request::setError(bool has_error) {
 	this->_error = has_error;
 }
 
-void Request::setChuncked(bool is_chuncked) {
-	this->_is_chuncked = is_chuncked;
-}
-
-// void Request::setContentType(http::ContentType type) {
-// 	this->_content_type = type;
-// }
-
 void Request::setContentLength(size_t length) {
 	this->_content_length = length;
 }
 
+
+void Request::setHasImage(bool has_image) {
+	this->_has_image = has_image;
+}
+
+void Request::setImageType(std::string const& type) {
+	this->_image_type = type;
+}
+
+void Request::setImage(std::vector<char>* image) {
+	this->_image = image;
+}
+
+void Request::addPostData(std::string const& name, std::string const& value) {
+	std::map<std::string, std::string>::iterator it;
+
+	it = _post_data.find(name);
+	if (it == _post_data.end())
+		_post_data.insert(std::make_pair(name, value));
+	else
+		_post_data[name] = value;
+}

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 15:47:49 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:14:39 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,8 @@ std::set<std::string> _fill_media_types(void) {
 	return media_types;
 }
 
-std::map<std::string, ContentType> _fill_map_media_type_str_to_enum(void) {
-	std::map<std::string, ContentType> str_to_enum;
+std::map<std::string, MediaType> _fill_map_media_type_str_to_enum(void) {
+	std::map<std::string, MediaType> str_to_enum;
 
 	str_to_enum.insert(std::make_pair("text/plain", TEXT_PLAIN));
 	str_to_enum.insert(std::make_pair("image/png", IMAGE_PNG));
@@ -92,8 +92,8 @@ std::map<std::string, ContentType> _fill_map_media_type_str_to_enum(void) {
 	return str_to_enum;
 }
 
-std::map<ContentType, std::string> _fill_map_media_type_enum_to_str(void) {
-	std::map<ContentType, std::string> enum_to_str;
+std::map<MediaType, std::string> _fill_map_media_type_enum_to_str(void) {
+	std::map<MediaType, std::string> enum_to_str;
 
 	enum_to_str.insert(std::make_pair(TEXT_PLAIN, "text/plain"));
 	enum_to_str.insert(std::make_pair(IMAGE_PNG, "image/png"));
@@ -104,8 +104,8 @@ std::map<ContentType, std::string> _fill_map_media_type_enum_to_str(void) {
 	return enum_to_str;
 }
 
-ContentType str_to_enum_media_type(std::string media_type) {
-	std::map<std::string, ContentType>::const_iterator it;
+MediaType str_to_enum_media_type(std::string media_type) {
+	std::map<std::string, MediaType>::const_iterator it;
 
 	it = map_str_to_enum_media_type.find(media_type);
 	if (it == map_str_to_enum_media_type.end()) {
@@ -115,8 +115,8 @@ ContentType str_to_enum_media_type(std::string media_type) {
 	return it->second;
 }
 
-std::string enum_to_str_media_type(ContentType media_type) {
-	std::map<ContentType, std::string>::const_iterator it;
+std::string enum_to_str_media_type(MediaType media_type) {
+	std::map<MediaType, std::string>::const_iterator it;
 
 	it = map_enum_to_str_media_type.find(media_type);
 	if (it == map_enum_to_str_media_type.end())

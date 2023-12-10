@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 16:54:15 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:05:59 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ namespace http {
 		GET,
 		POST,
 		DELETE,
+		NOT_ALLOWED,
 	};
 
 	enum HttpStatus {
@@ -55,7 +56,7 @@ namespace http {
 		HTTP_VERSION_NOT_SUPPORTED = 505,
 	};
 
-	enum ContentType {
+	enum MediaType {
 		NONE = 0,
 		TEXT_PLAIN,
 		TEXT_HTML,
@@ -85,13 +86,13 @@ namespace http {
 	// media-types
 	std::set<std::string>				_fill_media_types(void);
 	static std::set<std::string> const	media_types = http::_fill_media_types();
-	std::map<std::string, ContentType>				_fill_map_media_type_str_to_enum(void);
-	static std::map<std::string, ContentType> const	map_str_to_enum_media_type = http::_fill_map_media_type_str_to_enum();
-	std::map<ContentType, std::string>				_fill_map_media_type_enum_to_str(void);
-	static std::map<ContentType, std::string> const	map_enum_to_str_media_type = http::_fill_map_media_type_enum_to_str();
+	std::map<std::string, MediaType>				_fill_map_media_type_str_to_enum(void);
+	static std::map<std::string, MediaType> const	map_str_to_enum_media_type = http::_fill_map_media_type_str_to_enum();
+	std::map<MediaType, std::string>				_fill_map_media_type_enum_to_str(void);
+	static std::map<MediaType, std::string> const	map_enum_to_str_media_type = http::_fill_map_media_type_enum_to_str();
 	// makes transformation easier
-	ContentType	str_to_enum_media_type(std::string media_type);
-	std::string		enum_to_str_media_type(ContentType media_type);
+	MediaType	str_to_enum_media_type(std::string media_type);
+	std::string		enum_to_str_media_type(MediaType media_type);
 
 	bool is_uri_char(char c);
 	bool uri_path_end(char c);
