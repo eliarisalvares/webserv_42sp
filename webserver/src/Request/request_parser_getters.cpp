@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 09:20:25 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:14:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:59:17 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,3 +108,6 @@ std::vector<char> RequestParser::getBody(void) const {
 	return this->_body;
 }
 
+RequestParser::MultipartFormData RequestParser::getMultipartStep(void) const {
+	return this->_multipart_step;
+}

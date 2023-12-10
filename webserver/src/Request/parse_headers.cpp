@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:21:52 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 13:23:40 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:33:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,7 @@ void RequestParser::_check_content_type(void) {
 					bdry[0].erase(0, i);
 				if(bdry[0] == "boundary") {
 					_boundary = bdry[1];
+					_boundary_size = _boundary.size();
 					Logger::warning("Found boundary", _boundary);
 				}
 			}
