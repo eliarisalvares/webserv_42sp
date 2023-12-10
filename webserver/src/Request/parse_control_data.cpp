@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 18:47:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 19:44:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,9 +194,9 @@ void RequestParser::_check_uri(void) {
 	std::string::iterator it = _uri.begin(), end = _uri.end();
 	int i, location_pos = -1, locations_size = locations->size();
 	bool use_server_config = true;
-	std::string path;
-	std::string location;
-	location.clear();
+	std::string path, location_str;
+	t_location *location;
+	location_str.clear();
 	path.clear();
 	path.push_back(*it);
 
@@ -215,7 +215,8 @@ void RequestParser::_check_uri(void) {
 					if (path.compare((*locations)[i].location) == 0) {
 						Logger::debug("location found", (*locations)[i].location);
 						location_pos = i;
-						_request->setLocation(&(*locations)[i]);
+						location = &(*locations)[i];
+						_request->setLocation(location);
 						break;
 					}
 				}
@@ -227,20 +228,33 @@ void RequestParser::_check_uri(void) {
 	Logger::debug("Path from URI", path);
 
 	std::string root;
+	bool is_redirect = false;
 	if (location_pos == -1) {
 		use_server_config = true;
 		root = server->getRoot();
+		is_redirect = server->getPermit().has_redir;
 	}
 	if (location_pos > -1) {
-		location = (*locations)[location_pos].location;
-		root = (*locations)[location_pos].root;
+		location_str = location->location;
+		root = location->root;
+		is_redirect = location->permit.has_redir;
+	}
+	if (is_redirect && use_server_config) {
+		_uri = path;
+		path = server->getRedirect();
+		Logger::debug("Redirection path from server", path);
+	}
+	else if (is_redirect) {
+		_uri = path;
+		path = location->redirection;
+		Logger::debug("Redirection path from location", path);
 	}
 	Logger::debug("root", root);
 
-	if (location_pos > -1 && location.size() > 0)
-		path.erase(0, location.size());
+	if (location_pos > -1 && location_str.size() > 0)
+		path.erase(0, location_str.size());
 	path.insert(path.begin(), root.begin(), root.end());
-	Logger::debug("Path with changing root", path);
+	Logger::debug("Path with changed root", path);
 
 	if (!http::is_path_to_file(path)) {
 		DIR *dr = opendir(path.c_str());
@@ -257,8 +271,8 @@ void RequestParser::_check_uri(void) {
 			}
 		}
 		else {
-			if (!(*locations)[location_pos].permit.autoindex) {
-				path = *((*locations)[location_pos].index.begin());
+			if (!location->permit.autoindex) {
+				path = *(location->index.begin());
 				Logger::debug("Index file", path);
 			}
 			else
@@ -273,6 +287,10 @@ void RequestParser::_check_uri(void) {
 		file.close();
 	}
 
+	if (is_redirect) {
+		Logger::debug("Redirection", path);
+		_request->setStatusCode(http::MOVED_PERMANENTLY);
+	}
 	_request->setPath(path);
 	_request->setUri(_uri);
 }
