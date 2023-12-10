@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 11:10:37 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:15:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Request::Request(void):
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	// _content_type(),
+	// _media_type(),
 	_content_length(0),
 	_is_chuncked(false) { }
 
@@ -36,7 +36,7 @@ Request::Request(int fd, Server* server):
 	_uri("/"),
 	_location(NULL),
 	_host(""),
-	// _content_type(),
+	// _media_type(),
 	_content_length(0),
 	_is_chuncked(false) { }
 
@@ -59,7 +59,7 @@ Request const& Request::operator=(Request const & copy) {
 		this->_error = copy.has_error();
 		this->_is_chuncked = copy.is_chuncked();
 		this->_content_length = copy.content_length();
-		// this->_content_type = copy.content_type();
+		// this->_media_type = copy.content_type();
 	}
 	return *this;
 }
@@ -110,8 +110,8 @@ bool Request::is_chuncked(void) const {
 	return this->_is_chuncked;
 }
 
-// http::ContentType Request::content_type(void) const {
-// 	return this->_content_type;
+// http::MediaType Request::content_type(void) const {
+// 	return this->_media_type;
 // }
 
 size_t Request::content_length(void) const {
@@ -154,8 +154,8 @@ void Request::setChuncked(bool is_chuncked) {
 	this->_is_chuncked = is_chuncked;
 }
 
-// void Request::setContentType(http::ContentType type) {
-// 	this->_content_type = type;
+// void Request::setContentType(http::MediaType type) {
+// 	this->_media_type = type;
 // }
 
 void Request::setContentLength(size_t length) {
