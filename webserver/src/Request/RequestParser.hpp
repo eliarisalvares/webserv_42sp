@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 00:46:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 15:07:27 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 
 // others
 # define COLON ':'
+# define COMMA ','
 # define POINT '.'
 # define SLASH '/'
 # define EQUAL '='
@@ -91,15 +92,19 @@ public:
 		FIELD_VALUE,
 	};
 
-	// enum ParseBody {
-	// 	INITIAL_BOUNDARY,
-	// 	BOUNDARY,
-	// 	CONTENT_DISPOSITION,
-	// 	CONTENT_TYPE,
-	// 	CRFL1,
-	// 	CONTENT,
-	// 	CRFF2,
-	// };
+	enum MultipartFormData {
+		INITIAL_BOUNDARY,
+		BOUNDARY,
+		CRLF_BOUNDARY,
+		CONTENT_DISPOSITION,
+		CRLF_DISPOSITION,
+		CONTENT_TYPE,
+		CRLF_CONTENT_TYPE,
+		CRLF_INITIAL_CONTENT1,
+		CRLF_INITIAL_CONTENT2,
+		CONTENT,
+		CRLF_CONTENT,
+	};
 
 	// enum Error {
 	// 	NONE,
@@ -165,6 +170,7 @@ public:
 	std::string					getMediaTypeStr(void) const;
 	std::string					getBoundary(void) const;
 	http::MediaType				getMediaType(void) const;
+	MultipartFormData			getMultipartStep(void) const;
 
 	// setters
 	void						setStep(Step s);
@@ -218,21 +224,35 @@ private:
 	std::string					_content_type;
 	std::string					_media_type_str;
 	std::string					_boundary;
+	size_t						_boundary_size;
 	http::MediaType				_media_type;
+	MultipartFormData			_multipart_step;
+	std::string					_multipart_tmp;
+	std::map<std::string, std::map<std::string, std::string> > _multipart_data;
+	http::MediaType				_multipart_type;
+	std::string					_multipart_name;
+	int							_multipart_content_crfl;
 
 	void						_print_body(void);
 	void						_body_chunked(char c);
 	void						_parse_chunk_size(char c);
 	void						_parse_chunk_data(char c);
 	void						_parse_form_data(void);
-	void						_parse_multipart(void);
-	void						_check_boundary_delimiter(size_t pos);
-	void						_check_boundary(void);
-	void						_check_content_disposition(void);
-	void						_check_data_content_type(void);
-	void						_check_multipart_crfl(void);
-	void						_separate_data(void);
-	bool						_check_end_boundary(std::vector<char>::iterator initial);
+	void						_parse_multipart(char c);
+	void						_check_boundary_delimiter(char c);
+	void						_check_boundary(char c);
+	void						_check_content_disposition(char c);
+	void						_check_data_content_type(char c);
+	void						_check_multipart_crfl(char c);
+	void						_get_multipart_data(char c);
+	void						_remove_boundary(void);
+	// void						_check_boundary_delimiter(size_t pos);
+	// void						_check_boundary(void);
+	// void						_check_content_disposition(void);
+	// void						_check_data_content_type(void);
+	// void						_check_multipart_crfl(void);
+	// void						_separate_data(void);
+	// bool						_check_end_boundary(std::vector<char>::iterator initial);
 
 	// throw exceptions
 	void	_bad_request(std::string const description);
