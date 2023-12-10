@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 00:05:06 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 01:24:44 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ public:
 	bool					has_image(void) const;
 	std::vector<char>*		image(void) const;
 	std::string				image_type(void) const;
+	std::map<std::string, std::string> post_data(void) const;
 
 	// setters
 	void					setMethod(http::RequestMethod method);
@@ -57,6 +58,11 @@ public:
 	void					setHasImage(bool has_image);
 	void					setImageType(std::string const& type);
 	void					setImage(std::vector<char>* image);
+	void					addPostData(
+								std::string const& name, std::string const& value
+							);
+
+	void					printPostData(void) const;
 
 private:
 
@@ -69,15 +75,18 @@ private:
 	std::string				_uri;
 	t_location*				_location;
 
-	// image
-	bool					_has_image;
-	std::string				_image_type;
-	std::vector<char>*		_image;
-
 	// headers data
 	std::string				_host;
 	size_t					_content_length;
 
+	// image
+	bool					_has_image;
+	std::string				_image_type;
+	std::string				_image_file_name;
+	std::vector<char>*		_image;
+
+	// form
+	std::map<std::string, std::string> _post_data;
 };
 
 #endif

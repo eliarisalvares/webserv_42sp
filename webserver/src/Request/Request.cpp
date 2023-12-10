@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 00:06:30 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 01:32:40 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,11 @@ Request::Request(void):
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
-	_has_image(false),
-	_host("") { }
+	_host(""),
+	_content_length(0),
+	_has_image(false) {
+		_post_data.clear();
+	}
 
 
 Request::Request(int fd, Server* server):
@@ -34,9 +37,11 @@ Request::Request(int fd, Server* server):
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
-	_has_image(false),
 	_host(""),
-	_content_length(0) { }
+	_content_length(0),
+	_has_image(false) {
+		_post_data.clear();
+	}
 
 Request::~Request(void) { }
 
@@ -59,11 +64,18 @@ Request const& Request::operator=(Request const & copy) {
 		this->_has_image = copy.has_image();
 		this->_image = copy.image();
 		this->_image_type = copy.image_type();
-		// this->_media_type = copy.content_type();
 	}
 	return *this;
 }
 
+void Request::printPostData(void) const {
+	std::map<std::string, std::string>::const_iterator it, end = _post_data.end();
+
+	if (DEBUG)
+		Logger::info("Post data");
+	for (it = _post_data.begin(); it != end; ++it)
+		Logger::debug(it->first, it->second);
+}
 
 /********************************** GETTERS **********************************/
 
@@ -122,6 +134,9 @@ std::string Request::image_type(void) const {
 	return this->_image_type;
 }
 
+std::map<std::string, std::string> Request::post_data(void) const {
+	return this->_post_data;
+}
 
 
 /********************************** SETTERS **********************************/
@@ -172,3 +187,12 @@ void Request::setImage(std::vector<char>* image) {
 	this->_image = image;
 }
 
+void Request::addPostData(std::string const& name, std::string const& value) {
+	std::map<std::string, std::string>::iterator it;
+
+	it = _post_data.find(name);
+	if (it == _post_data.end())
+		_post_data.insert(std::make_pair(name, value));
+	else
+		_post_data[name] = value;
+}

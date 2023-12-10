@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 01:07:34 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 01:30:58 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,10 +223,8 @@ void RequestParser::_parse_form_data(void) {
 		switch (step)
 		{
 		case FIELD_NAME:
-			if (*_body_iterator == EQUAL) {
+			if (*_body_iterator == EQUAL)
 				step = FIELD_VALUE;
-				Logger::debug("field name", _field_name);
-			}
 			else if (!http::is_uri_char(*_body_iterator))
 				_bad_request("Field name in POST with invalid character");
 			else if (is_hexadecimal) {
@@ -247,8 +245,7 @@ void RequestParser::_parse_form_data(void) {
 		case FIELD_VALUE:
 			if (*_body_iterator == AMPERSEND) {
 				step = FIELD_NAME;
-				Logger::debug("field value", _field_value);
-				// save it
+				_request->addPostData(_field_name, _field_value);
 				_field_name.clear();
 				_field_value.clear();
 			}
@@ -275,8 +272,8 @@ void RequestParser::_parse_form_data(void) {
 		}
 		++_body_iterator;
 	}
-	Logger::debug("field value", _field_value);
-	// save it
+	_request->addPostData(_field_name, _field_value);
+	_request->printPostData();
 	_field_name.clear();
 	_field_value.clear();
 }
