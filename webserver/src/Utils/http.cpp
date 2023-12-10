@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:14:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 12:47:23 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 namespace http {
 
-// methods implemented in webserv
 std::set<std::string> _fill_methods(void) {
 	std::string methods_names[] = {
 		"GET",

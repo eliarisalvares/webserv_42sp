@@ -45,7 +45,7 @@ public:
 	void	init(void);
 	void	run(void);
 	void	stop(void);
-	void	clean(void);
+	void	clean(void); //check if still needed
 	void	restart_socket_servers(void);
 	bool	checkPort(int port);
 	class ServerPortAlreadySetted : public std::exception {

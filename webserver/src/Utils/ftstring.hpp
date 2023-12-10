@@ -14,6 +14,6 @@ int			strtoi(std::string const &str);
 std::string	itostr(int nbr);
 std::vector<std::string> split(std::string const &str, char delimiter);
 
-} /* ftstring */
+} //end namespace ftstring
 
 #endif
