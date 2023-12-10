@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:21:52 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 00:03:50 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:23:40 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ void RequestParser::_check_content_type(void) {
 				"Boundary info for Content-Type = multipart/form-data is empty"
 			);
 	}
+	_request->setMediaType(_media_type);
 }
 
 void RequestParser::_print_headers(void) {

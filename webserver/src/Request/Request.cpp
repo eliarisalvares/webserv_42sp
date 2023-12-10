@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 02:06:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:25:09 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,14 @@ Request::Request(void):
 	_server(NULL),
 	_fd(0),
 	_error(false),
-	_method(http::NOT_ALLOWED),
+	_method(http::GET),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
 	_content_length(0),
+	_media_type(http::TEXT_PLAIN),
 	_has_image(false) {
 		_post_data.clear();
 	}
@@ -32,13 +33,14 @@ Request::Request(int fd, Server* server):
 	_server(server),
 	_fd(fd),
 	_error(false),
-	_method(http::NOT_ALLOWED),
+	_method(http::GET),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
 	_host(""),
 	_content_length(0),
+	_media_type(http::TEXT_PLAIN),
 	_has_image(false) {
 		_post_data.clear();
 	}
@@ -64,6 +66,7 @@ Request const& Request::operator=(Request const & copy) {
 		this->_has_image = copy.has_image();
 		this->_image = copy.image();
 		this->_image_type = copy.image_type();
+		this->_media_type = copy.media_type();
 	}
 	return *this;
 }
@@ -138,6 +141,10 @@ std::map<std::string, std::string> Request::post_data(void) const {
 	return this->_post_data;
 }
 
+http::MediaType	Request::media_type(void) const {
+	return this->_media_type;
+}
+
 
 /********************************** SETTERS **********************************/
 
@@ -195,4 +202,8 @@ void Request::addPostData(std::string const& name, std::string const& value) {
 		_post_data.insert(std::make_pair(name, value));
 	else
 		_post_data[name] = value;
+}
+
+void Request::setMediaType(http::MediaType type) {
+	this->_media_type = type;
 }

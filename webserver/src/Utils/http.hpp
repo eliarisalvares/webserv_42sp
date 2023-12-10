@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 12:48:20 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:30:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ namespace http {
 		GET,
 		POST,
 		DELETE,
-		NOT_ALLOWED,
 	};
 
 	enum HttpStatus {
