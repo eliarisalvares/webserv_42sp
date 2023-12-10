@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:50:47 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 15:54:33 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 11:15:10 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,43 +34,40 @@ class Server {
 		Server(Server const& copy);
 		Server& operator=(Server const& copy);
 
-		void	setPort(std::vector<std::string> input, int index);
 		void	setBasics(void);
-		void	setBufferSize(int size);
-		void	setSocket(int port);
 		void	setBodySize(int size);
-		void	setRoot(std::string root);
-		void	setRedirect(std::string redirect);
+		void	setBufferSize(int size);
 		void	setCGI(bool boolean);
-		void	addErrorPages(std::pair<int, std::string> paired);
 		void	setErrorPages(std::map<int, std::string> errorPages);
-		void	setUpPath(std::string path);
-		void	setMethods(std::set<std::string> methods);
 		void	setIndex(std::set<std::string> index);
+		void	setMethods(std::set<std::string> methods);
 		void	setName(std::vector<std::string> name);
+		void	setPort(std::vector<std::string> input, int index);
+		void	setRedirect(std::string redirect);
+		void	setRoot(std::string root);
+		void	setUpPath(std::string path);
+		void	addErrorPages(std::pair<int, std::string> paired);
 		void	addLocation(t_location location);
+		bool	configSocket(int port);
 
 		bool						getAutoindex(void) const;
-		bool						getCGI(void) const;
-		int							getSocket(void) const;
-		int							getPort(void) const;
 		int							getBufferSize(void) const;
 		int							getBodySize(void) const;
-		std::string					getRoot(void) const;
-		std::string					getUpPath(void) const;
-		std::set<std::string>		getMethods(void) const;
+		bool						getCGI(void) const;
+		std::string					getCurrentPort(void) const;
+		std::map<int, std::string>	getErrorPages(void) const;
+		std::string					getErrorPages(int value) const;
 		std::set<std::string>		getIndex(void) const;
 		std::vector<t_location>*	getLocations(void);
 		t_location					getLocations(int index);
+		std::set<std::string>		getMethods(void) const;
 		std::vector<std::string>	getName(void);
 		std::string					getName(int index);
-		std::map<int, std::string>	getErrorPages(void) const;
-		std::string					getErrorPages(int value) const;
+		int							getPort(void) const;
+		std::string					getRoot(void) const;
+		int							getSocket(void) const;
+		std::string					getUpPath(void) const;
 
-		bool				configSocket(int port);
-		static std::string	getServerName(void);
-		static std::string	getCurrentPort(void);
-		static std::string	getAllowedMethods(void);
 
 	private:
 		bool									_cgi;
@@ -78,15 +75,15 @@ class Server {
 		int										_client_max_body_size;
 		int										_port;
 		int										_socket;
-		t_permissions							_permit;
-		std::string								_root;
 		std::string								_redirect;
+		std::string								_root;
 		std::string								_uploadPath;
 		std::set<std::string>					_allowed_methods;
 		std::set<std::string>					_index;
 		std::vector<t_location>					_locations;
 		std::vector<std::string>				_server_name;
 		std::map<int, std::string>				_error_pages;
+		t_permissions							_permit;
 };
 
 #endif

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server_setters.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/10 11:17:34 by feralves          #+#    #+#             */
+/*   Updated: 2023/12/10 11:17:35 by feralves         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 void	Server::setPort(std::vector<std::string> input, int index) {
@@ -18,10 +30,6 @@ void	Server::setPort(std::vector<std::string> input, int index) {
 		else if (input[i].substr() == "}")
 			extraBrackets--;
 	}
-}
-
-void	Server::setSocket(int port) {
-	this->_socket = port;
 }
 
 void	Server::setBufferSize(int size) {
