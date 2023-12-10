@@ -1,53 +1,64 @@
 #include "Response.hpp"
 
+bool isFileUpload(Request* request) {
+    std::string mediaType = http::enum_to_str_media_type(request->media_type());
 
-bool isFileUpload(const std::string& body) {
-    if (body.find("Content-Disposition: form-data;") != std::string::npos) {
+    if (mediaType == "multipart/form-data") {
+        std::cout << "isFileUpload: true" << std::endl;
         return true;
     }
+
     return false;
 }
 
-std::string getFileName(const std::string& body) {
-    std::string fileName = body.substr(body.find("filename=\"") + 10);
-    fileName = fileName.substr(0, fileName.find("\""));
+std::string setFileName(Request* request) {
+    std::string imageType = request->image_type();
+
+    std::string fileName = "content/upload/image." + imageType;
+    std::ifstream file;
+    file.open(fileName.c_str());
+    int i = 1;
+
+    while (file.is_open()) {
+        file.close();
+        std::stringstream ss;
+        ss << "content/upload/image" << i << "." << imageType;
+        fileName = ss.str();
+        file.open(fileName.c_str());
+        i++;
+    }
+
+    file.close();
     return fileName;
 }
 
-std::string getFilePath(const std::string& fileName) {
-    std::string filePath = "/content/upload/" + fileName;
-    return filePath;
-}
-
-std::string getBodyFromRequest(Request* request) {
-    //std::string body = request->body();
-    if (request) {
-        std::cout << "blabla" << std::endl;
+Response processFileUpload(Request* request) {
+    int statusCode = request->status_code();
+    std::vector<char> *image = request->image();
+    if (image == NULL) {
+        statusCode = 404;
     }
-    std::string body = "blabla";
-    return body;
-}
 
-Response processFileUpload(Request* request, const std::string& body) {
-    std::string fileName = getFileName(body);
-    std::string filePath = getFilePath(fileName);
-    std::ofstream file(filePath.c_str());
-    if (!file.is_open())
-        throw std::runtime_error("Could not open file: " + filePath);
-    std::string fileContent = body.substr(body.find("\r\n\r\n") + 4);
-    file << fileContent;
+    std::string name = setFileName(request);
+    std::ofstream file(name.c_str(), std::ios::binary);
+
+    if (!file.is_open()) {
+        statusCode = 500;
+    }
+
+    file.write(&(*image)[0], image->size());
+    statusCode = 201;
     file.close();
-    Response response(request->fd(), 200);
-    response.setMessage("OK");
-    response.setBody("File uploaded successfully");
+
+    Response response(request->fd(), statusCode);
+    response.setMessage(getStatusMessage(statusCode));
+    setResponseHeaders(response, "", "0", request);
     return response;
 }
 
 Response handlePostRequest(Request* request) {
-    std::string body = getBodyFromRequest(request);
-    Logger::debug("handlePostRequest - body: " + body);
-    if (isFileUpload(body)) {
-        return processFileUpload(request, body);
+    if (isFileUpload(request)) {
+        return processFileUpload(request);
     } else {
         std::string filePath = request->path();
         Logger::debug("handlePostRequest - filePath: " + filePath);
