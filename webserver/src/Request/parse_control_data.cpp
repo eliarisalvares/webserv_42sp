@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 16:21:59 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:41:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,6 +234,7 @@ void RequestParser::_check_uri(void) {
 					if (path.compare((*locations)[i].location) == 0) {
 						Logger::debug("location found", (*locations)[i].location);
 						location_pos = i;
+						_request->setLocation(&(*locations)[i]);
 						break;
 					}
 				}
