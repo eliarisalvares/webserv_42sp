@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 00:31:30 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 01:07:34 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void RequestParser::_body_chunked(char c) {
 		default:
 			break;
 	}
-	// _print_body();
+	_print_body();
 }
 
 void RequestParser::_parse_chunk_size(char c) {
@@ -208,12 +208,15 @@ void RequestParser::parse_body(void) {
 
 void RequestParser::_parse_form_data(void) {
 	FormData step = FIELD_NAME;
+	std::string hexadecimal;
+	bool is_hexadecimal = false;
 
 	_body_iterator_first = _body.begin();
 	_body_iterator_end = _body.end();
 	_body_iterator = _body_iterator_first;
 	_field_name.clear();
 	_field_value.clear();
+	hexadecimal.clear();
 	if (DEBUG)
 		Logger::info("Parsing form url encoded data:");
 	while (_body_iterator != _body_iterator_end) {
@@ -223,24 +226,48 @@ void RequestParser::_parse_form_data(void) {
 			if (*_body_iterator == EQUAL) {
 				step = FIELD_VALUE;
 				Logger::debug("field name", _field_name);
-				// save it
-				_field_name.clear();
 			}
+			else if (!http::is_uri_char(*_body_iterator))
+				_bad_request("Field name in POST with invalid character");
+			else if (is_hexadecimal) {
+				if (hexadecimal.size() == 1) {
+					hexadecimal.push_back(*_body_iterator);
+					_field_name.push_back(utils::xtod(hexadecimal));
+					is_hexadecimal = false;
+					hexadecimal.clear();
+				}
+				else
+					hexadecimal.push_back(*_body_iterator);
+			}
+			else if (*_body_iterator == PERCENT)
+				is_hexadecimal = true;
 			else
 				_field_name.push_back(*_body_iterator);
-				// check % (hexadecimal 3 caracters - contando %)
-				// is_uri_char
 			break;
 		case FIELD_VALUE:
 			if (*_body_iterator == AMPERSEND) {
 				step = FIELD_NAME;
 				Logger::debug("field value", _field_value);
 				// save it
+				_field_name.clear();
 				_field_value.clear();
 			}
+			else if (!http::is_uri_char(*_body_iterator))
+				_bad_request("Field value in POST with invalida character");
+			else if (is_hexadecimal) {
+				if (hexadecimal.size() == 1) {
+					hexadecimal.push_back(*_body_iterator);
+					_field_value.push_back(utils::xtod(hexadecimal));
+					is_hexadecimal = false;
+					hexadecimal.clear();
+				}
+				else
+					hexadecimal.push_back(*_body_iterator);
+			}
+			else if (*_body_iterator == PERCENT)
+				is_hexadecimal = true;
 			else
 				_field_value.push_back(*_body_iterator);
-				// check % (hexadecimal 3 caracters - contando %)
 			break;
 
 		default:
@@ -248,6 +275,10 @@ void RequestParser::_parse_form_data(void) {
 		}
 		++_body_iterator;
 	}
+	Logger::debug("field value", _field_value);
+	// save it
+	_field_name.clear();
+	_field_value.clear();
 }
 
 void RequestParser::_parse_multipart(void) {
