@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 01:32:40 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:06:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ Request::Request(void):
 	_server(NULL),
 	_fd(0),
 	_error(false),
-	_method(http::GET),
+	_method(http::NOT_ALLOWED),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),
@@ -32,7 +32,7 @@ Request::Request(int fd, Server* server):
 	_server(server),
 	_fd(fd),
 	_error(false),
-	_method(http::GET),
+	_method(http::NOT_ALLOWED),
 	_status_code(http::OK),
 	_path("content/"),
 	_uri("/"),

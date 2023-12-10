@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:14:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:05:59 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ namespace http {
 		GET,
 		POST,
 		DELETE,
+		NOT_ALLOWED,
 	};
 
 	enum HttpStatus {
