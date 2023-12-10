@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 13:30:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 17:14:20 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,10 +83,9 @@ std::map<std::string, MediaType> _fill_map_media_type_str_to_enum(void) {
 	std::map<std::string, MediaType> str_to_enum;
 
 	str_to_enum.insert(std::make_pair("text/plain", TEXT_PLAIN));
-	str_to_enum.insert(std::make_pair("text/html", TEXT_HTML));
 	str_to_enum.insert(std::make_pair("image/png", IMAGE_PNG));
 	str_to_enum.insert(std::make_pair("image/jpeg", IMAGE_JPEG));
-	str_to_enum.insert(std::make_pair("image/gif", IMAGE_GIF));
+	str_to_enum.insert(std::make_pair("image/jpg", IMAGE_JPEG));
 	str_to_enum.insert(std::make_pair("application/x-www-form-urlencoded", FORM_URLENCODED));
 	str_to_enum.insert(std::make_pair("multipart/form-data", MULTIPART_FORM_DATA));
 	return str_to_enum;
@@ -96,10 +95,8 @@ std::map<MediaType, std::string> _fill_map_media_type_enum_to_str(void) {
 	std::map<MediaType, std::string> enum_to_str;
 
 	enum_to_str.insert(std::make_pair(TEXT_PLAIN, "text/plain"));
-	enum_to_str.insert(std::make_pair(TEXT_HTML, "text/html"));
 	enum_to_str.insert(std::make_pair(IMAGE_PNG, "image/png"));
-	enum_to_str.insert(std::make_pair(IMAGE_JPEG, "image/jpeg"));
-	enum_to_str.insert(std::make_pair(IMAGE_GIF, "image/gif"));
+	enum_to_str.insert(std::make_pair(IMAGE_JPEG, "image/jpg"));
 	enum_to_str.insert(std::make_pair(FORM_URLENCODED, "application/x-www-form-urlencoded"));
 	enum_to_str.insert(std::make_pair(MULTIPART_FORM_DATA, "multipart/form-data"));
 	return enum_to_str;
