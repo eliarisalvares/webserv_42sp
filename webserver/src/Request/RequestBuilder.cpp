@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:38:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 19:29:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,8 @@ void RequestBuilder::parse(void) {
 Request* RequestBuilder::build(void) {
 	if (!_request->has_error())
 		Logger::info("Request parsed and created successfully.");
+	if (_request->method() == http::POST)
+		_parser.parse_body();
 	this->_ready = false;
 	return _request;
 }

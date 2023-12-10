@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:27:05 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:07:33 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,9 +161,15 @@ void RequestParser::_parse_chunk_size(char c) {
 }
 
 void RequestParser::_parse_chunk_data(char c) {
+	if (_body_bytes_readed == _max_body_size)
+		_invalid_request(
+			"Data transfered bigger than max body size",
+			http::CONTENT_TOO_LARGE
+		);
 	if (_chunk_bytes_readed < _chunk_size) {
 		_body.push_back(c);
 		++_chunk_bytes_readed;
+		++_body_bytes_readed;
 		if (_chunk_bytes_readed == _chunk_size) {
 			_step = CHUNK_DATA_END;
 			_print_body();
@@ -177,7 +183,7 @@ void RequestParser::_print_body(void) {
 	if (DEBUG) {
 		std::cout << GREY
 				<< "------------------------------------------------------\n"
-				<< BLUE << "Received body of size " << _body_bytes_readed
+				<< BLUE << "Body of size " << _body.size()
 				<< ":\n" << GREY;
 		for(it = _body.begin(); it != end; ++it) {
 			// if (*it == CR)
@@ -192,3 +198,225 @@ void RequestParser::_print_body(void) {
 				<< RESET << std::endl;
 	}
 }
+
+void RequestParser::parse_body(void) {
+	if (_media_type == http::MULTIPART_FORM_DATA)
+		_parse_multipart();
+	else if (_media_type == http::FORM_URLENCODED)
+		_parse_form_data();
+}
+
+void RequestParser::_parse_form_data(void) {
+
+}
+
+void RequestParser::_parse_multipart(void) {
+	// ParseBody parse_body_step = INITIAL_BOUNDARY;
+
+	_check_boundary_delimiter(0);
+	_check_boundary();
+	_check_content_disposition();
+	_check_data_content_type();
+	_check_multipart_crfl();
+	_separate_data();
+	// _check_multipart_crfl();
+	// _check_boundary_delimiter();
+	// _check_boundary();
+
+
+	// switch (parse_body_step)
+	// {
+	// case INITIAL_BOUNDARY:
+	// 	/* code */
+	// 	break;
+	// case BOUNDARY:
+	// cas CO
+
+	// default:
+	// 	break;
+	// }
+	// INITIAL_BOUNDARY
+	// BOUNDARY
+	// CONTENT_DISPOSITION
+	// CONTENT_TYPE
+	// CRLF
+	// BODY
+	// CRLF
+}
+
+void RequestParser::_check_boundary_delimiter(size_t pos) {
+	_body_iterator_first = _body.begin();
+	_body_iterator_end = _body.end();
+	_body_iterator_final = _body_iterator_first;
+	Logger::debug("Boundary delimiter:");
+	for (pos = 0; pos < 2; ++pos) {
+		// passar para uma string
+		std::cout << GREY << *_body_iterator_final;
+		++_body_iterator_final;
+	}
+	std::cout << RESET << "\n";
+	// checkar string
+	_body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+void RequestParser::_check_boundary(void) {
+	_body_iterator_first = _body.begin();
+	_body_iterator_end = _body.end();
+	_body_iterator_final = _body_iterator_first;
+	Logger::debug("Boundary:");
+	while (
+		_body_iterator_final != _body_iterator_end &&
+		*_body_iterator_final != CR &&
+		*_body_iterator_final != LF
+	) {
+		// passar para uma string
+		std::cout << GREY << *_body_iterator_final;
+		++_body_iterator_final;
+	}
+	std::cout << RESET << "\n";
+	// check string
+	if (*_body_iterator_final == CR) {
+		++_body_iterator_final;
+	}
+	if (*_body_iterator_final == LF) {
+		++_body_iterator_final;
+	}
+	_body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+void RequestParser::_check_content_disposition(void) {
+	_body_iterator_first = _body.begin();
+	_body_iterator_end = _body.end();
+	_body_iterator_final = _body_iterator_first;
+	Logger::debug("Content-Disposition:");
+	while (
+		_body_iterator_final != _body_iterator_end &&
+		*_body_iterator_final != CR &&
+		*_body_iterator_final != LF
+	) {
+		// passar para uma string
+		std::cout << GREY << *_body_iterator_final;
+		++_body_iterator_final;
+	}
+	std::cout << RESET << "\n";
+	// check string
+	if (*_body_iterator_final == CR)
+		++_body_iterator_final;
+	if (*_body_iterator_final == LF)
+		++_body_iterator_final;
+	_body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+void RequestParser::_check_data_content_type(void) {
+	_body_iterator_first = _body.begin();
+	if (*_body_iterator_first == CR)
+		return ;
+	_body_iterator_end = _body.end();
+	_body_iterator_final = _body_iterator_first;
+	Logger::debug("Content-Type:");
+	while (
+		_body_iterator_final != _body_iterator_end &&
+		*_body_iterator_final != CR &&
+		*_body_iterator_final != LF
+	) {
+		// passar para uma string
+		std::cout << GREY << *_body_iterator_final;
+		++_body_iterator_final;
+	}
+	std::cout << RESET << "\n";
+	// check string
+	if (*_body_iterator_final == CR)
+		++_body_iterator_final;
+	if (*_body_iterator_final == LF)
+		++_body_iterator_final;
+	_body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+void RequestParser::_check_multipart_crfl(void) {
+	_body_iterator_first = _body.begin();
+	_body_iterator_final = _body_iterator_first;
+
+	if (*_body_iterator_final == CR)
+		++_body_iterator_final;
+	if (*_body_iterator_final == LF)
+		++_body_iterator_final;
+	_body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+void RequestParser::_separate_data(void) {
+	// bool end = false;
+	// bool dash = false;
+
+	// size_t body_size = _body.size();
+	// for (int i = body_size; i > body_size )
+	_body_iterator_end = _body.end();
+	_body_iterator_first = _body_iterator_end - 8 - _boundary.size();
+	_body.erase(_body_iterator_first, _body_iterator_end);
+	Logger::warning("Image data:");
+	_print_body();
+	// while (
+	// 	_body_iterator_final != _body_iterator_end
+	// 	&& (*_body_iterator_final != CR || *_body_iterator_final != LF)
+	// ) {
+	// 	// passar para uma string
+	// 	std::cout << GREY << *_body_iterator_final;
+	// 	++_body_iterator_final;
+	// } // PNG
+	// if (*_body_iterator_final == CR)
+	// 	++_body_iterator_final;
+	// if (*_body_iterator_final == LF)
+	// 	++_body_iterator_final;
+	// while (
+	// 	_body_iterator_final != _body_iterator_end
+	// 	&& (*_body_iterator_final != CR || *_body_iterator_final != LF)
+	// ) {
+	// 	if (*_body_iterator_final == DASH) {
+	// 		Logger::error("Found dash");
+	// 		if (!dash)
+	// 			dash = true;
+	// 		else
+	// 			end = _check_end_boundary(_body_iterator_final - 1);
+	// 		if (end)
+	// 			break;
+	// 		else
+	// 			dash = true;
+	// 	}
+	// 	// passar para uma string
+	// 	std::cout << GREY << *_body_iterator_final;
+	// 	++_body_iterator_final;
+	// }
+	// std::cout << RESET << "\n";
+	// check string
+	// if (*_body_iterator_final == CR)
+	// 	++_body_iterator_final;
+	// if (*_body_iterator_final == LF)
+	// 	++_body_iterator_final;
+	// _body.erase(_body_iterator_first, _body_iterator_final);
+}
+
+bool RequestParser::_check_end_boundary(std::vector<char>::iterator initial) {
+	Logger::error("end boundary");
+	_body_iterator_end = _body.end();
+	_body.erase(initial, initial + 2 + _boundary.size());
+	return true;
+}
+
+
+
+// --------------------------f069bd9492f6146e
+// ------------------------f069bd9492f6146e
+
+// 2 DASHS - BOUNDARY - CRFL
+// BODY_HEADERS:
+// Content-Disposition: form-data; params (name="" pelo menos...) - CRLF
+// Content-Type (opcional) - CRLF
+// CRLF
+// content ... CRFL
+// 2 DASHS - BOUNDARY - CRFL
+
+// --------------------------62774971962833fd
+// Content-Disposition: form-data; name="file"; filename="txt.txt"
+// Content-Type: text/plain
+
+// Hello World
+// --------------------------62774971962833fd--
