@@ -87,7 +87,12 @@
                     if (xhr.status === 201) {
                         var img = document.createElement("img");
                         img.src = `../upload/${xhr.responseText.split("/")[2]}`;
-                        document.body.appendChild(img);
+                        setTimeout(function() {
+                            if (document.getElementsByTagName("img").length > 0) {
+                                document.getElementsByTagName("img")[0].remove();
+                            }
+                            document.body.appendChild(img);
+                        }, 500);
                     } else {
                         alert("Something went wrong!");
                     }
