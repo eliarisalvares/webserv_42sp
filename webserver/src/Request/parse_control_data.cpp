@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:41:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 02:02:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,13 +307,15 @@ void RequestParser::_check_uri(void) {
 }
 
 void RequestParser::_check_method(void) {
-	// verify if method is allowed in specified location:
-	try {
-		// esse check vai ter que levar em conta o location
-		_request->setMethod(http::str_to_enum_method(_method));
-	} catch(const utils::GeneralException& e) {
+	std::set<std::string> allowed_methods;
+	std::set<std::string>::iterator it;
+
+	if (_request->location())
+		allowed_methods = _request->location()->allowed_methods;
+	else
+		allowed_methods = http::methods; // _request->server()->getAllowedMethods()
+	it = allowed_methods.find(_method);
+	if (it == allowed_methods.end())
 		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);
-	} catch(const std::exception& e) {
-		throw e;
-	}
+	_request->setMethod(http::str_to_enum_method(_method));
 }
