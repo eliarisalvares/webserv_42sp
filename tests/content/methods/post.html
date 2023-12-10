@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post File</title>
+    <link rel="icon" href="./favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
+    <style>
+        body {
+            background-color: #333333FF;
+            font-family: Montserrat, sans-serif;
+            color: #9435d3; /* Cute purple color */
+            margin: 0;
+            padding: 20px;
+            text-align: center; /* Center align the content */
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 3rem;
+            color: rgb(255, 255, 255);
+        }
+        form {
+            background-color: #CCCCCCFF;
+            padding: 20px;
+            margin: 20px auto;
+            width: 50%; /* Adjust as per requirement */
+            border-radius: 10px;
+        }
+        label {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            color: #333333FF;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        input[type="submit"] {
+            background-color: rgb(155, 91, 155);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        input[type="submit"]:hover {
+            background-color: #7e57c2;
+        }
+        #content {
+            background-color: #CCCCCCFF;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Suba um arquivo para nosso servidor</h1>
+    <h2>Vamos usar o método POST para subir um arquivo para o servidor.</h2>
+    <form enctype="multipart/form-data" method="POST">
+        <label for="file">Arquivo: </label>
+        <input type="file" name="file" id="file"><br>
+        <input type="submit" value="Upload">
+    </form>
+    <div id="content">
+        <p>Would you like to go back to the <a href="/" style="color:#777777FF;">homepage</a>?</p>
+        <p>Or maybe learn more about HTTP <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404" style="color:#777777FF;">status codes</a>?</p>
+        <p>------------------------------------------------</p>
+        <p>Você gostaria de voltar para o <a href="/" style="color:#777777FF;">início</a>?</p>
+        <p>Ou talvez aprender um pouco mais sobre os <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404" style="color:#777777FF;">códigos HTTP</a>?</p>
+    </div>
+</body>
+</html>

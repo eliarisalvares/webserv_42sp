@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- TODO: nossas fotos, formatação do botão(, escolha um ícone??) -->
+    <title>WebWizards</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+        }
+        .card {
+            position: relative;
+            background-color: #333;
+            border-radius: 8px;
+            padding: 20px;
+            width: 30%;
+        }
+        .card img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        .card-title {
+            font-size: 24px;
+            margin-top: 15px;
+        }
+        .card-info {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+        }
+        #newCharacterForm {
+            display: none;
+            margin-top: 20px;
+        }
+        .form-field {
+            margin-bottom: 10px;
+        }
+        .form-label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>WebWizards</h1>
+    <button onclick="showForm()">Crie seu personagem!</button>
+
+    <!-- New Character Form -->
+    <form id="newCharacterForm" action="cgi/form.py" method="post" style="display: none;">
+        <input type="text" name="newName" placeholder="Name">
+        <input type="text" name="newInfo" placeholder="Information">
+        <input type="text" name="newImageUrl" placeholder="Image URL">
+        <input type="submit" value="Create" onclick="submitForm()">
+    </form>
+
+    <div class="container">
+        <!-- Card 1 -->
+        <div class="card">
+            <img src="https://storage.googleapis.com/pod_public/1300/181028.jpg" alt="Character 1">
+            <img src="./magic-broom_3479815.png" class="icon" alt="Icon">
+            <div class="card-title">Fern</div>
+            <div class="card-info">informações</div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+            <img src="https://storage.googleapis.com/pod_public/1300/180955.jpg" alt="Character 2">
+            <img src="./magic-hat_3449972.png" class="icon" alt="Icon">
+            <div class="card-title">Lili</div>
+            <div class="card-info">informações</div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+            <img src="https://storage.googleapis.com/pod_public/1300/180931.jpg" alt="Character 3">
+            <img src="./serum_3504702.png" class="icon" alt="Icon">
+            <div class="card-title">Sheela</div>
+            <div class="card-info">informações</div>
+        </div>
+
+        <!-- newCard -->
+    </div>
+
+    <script>
+        function showForm() {
+            document.getElementById("newCharacterForm").style.display = "block";
+        }
+
+        function hideForm() {
+            document.getElementById("newCharacterForm").style.display = "none";
+        }
+
+        function submitForm() {
+            console.log("Submitting form...");
+            document.getElementById("newCharacterForm").submit();
+        }
+
+        function resetForm() {
+            document.getElementById("newCharacterForm").reset();
+        }
+
+        function createCharacter() {
+            submitForm();
+            hideForm();
+            resetForm();
+        }
+
+        function cancel() {
+            hideForm();
+            resetForm();
+        }
+    </script>
+
+</body>
+</html>
