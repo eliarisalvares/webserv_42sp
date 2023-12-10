@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 02:02:35 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 12:45:47 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,7 +313,7 @@ void RequestParser::_check_method(void) {
 	if (_request->location())
 		allowed_methods = _request->location()->allowed_methods;
 	else
-		allowed_methods = http::methods; // _request->server()->getAllowedMethods()
+		allowed_methods = _request->server()->getMethods();
 	it = allowed_methods.find(_method);
 	if (it == allowed_methods.end())
 		throw http::InvalidRequest(http::METHOD_NOT_ALLOWED);

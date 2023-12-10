@@ -1,29 +1,15 @@
 #include "WebServ.hpp"
 
 WebServ::WebServ(void): _total_fds(0) {
-	// ensure all maps and vectors are empty
 	this->_servers.clear();
 	this->_pfds.clear();
 	this->_fds_map.clear();
 	this->_serverSockets.clear();
-	// this->_requests.clear();
-	// this->_responses.clear();
 	this->_requestBuilderMap.clear();
 }
 
 WebServ::~WebServ(void) {
-	t_server_iterator it, end = this->_servers.end();
-
-	for (it = this->_servers.begin(); it != end; ++it) {
-		// close each server socket
-		close(it->first);
-	}
-
-	// is this necessary?
-	this->_servers.clear();
-	// this->_requests.clear();
-	// this->_responses.clear();
-	this->_requestBuilderMap.clear();
+	this->stop();
 }
 
 WebServ::WebServ(WebServ const& copy) {
@@ -32,7 +18,6 @@ WebServ::WebServ(WebServ const& copy) {
 
 WebServ const& WebServ::operator=(WebServ const& copy) {
 	if (this != &copy) {
-		// we don't do anything because this operator is private
 		(void)copy;
 	}
 	return *this;
@@ -41,9 +26,9 @@ WebServ const& WebServ::operator=(WebServ const& copy) {
 bool	WebServ::checkPort(int port) {
 	for (t_server_iterator it = _servers.begin(); it!= _servers.end(); ++it) {
 		if (it->second->getPort() == port)
-			return (false);
+			return false;
 	}
-	return (true);
+	return true;
 }
 
 void	WebServ::create_servers(std::vector<std::string> input) {
@@ -77,10 +62,9 @@ void	WebServ::init(void) {
 	pollfd init;
 	t_server_iterator it, end = this->_servers.end();
 
-	// Add each server socket ("listeners")
 	for (it = this->_servers.begin(); it != end; ++it) {
 		init.fd = it->first;
-		init.events = POLLIN; // Report ready to read on incoming connection
+		init.events = POLLIN;
 		init.revents = POLLNOEVENT;
 		this->_pfds.push_back(init);
 		this->_serverSockets.push_back(init.fd);
@@ -93,36 +77,32 @@ void	WebServ::run(void) {
 
 	Logger::info("Running webserv...");
 	while(true) {
-		// &(*this->_pfds.begin()
 		poll_count = poll(this->_pfds.data(), this->_pfds.size(), -1);
 
 		if (poll_count == -1) {
 			perror("poll");
-			exit(1);  // precisamos dar um raise aqui talvez
+			throw PollErrorException();
 		}
-
-		// Run through the existing connections looking for data to read
-		for(int i = 0; i < this->_total_fds; i++) {
+		for (int i = 0; i < this->_total_fds; i++) {
 			fd = this->_pfds[i].fd;
 
-			// Check if someone's ready to read
 			if (this->_pfds[i].revents & POLLIN) {
 				Logger::debug("POLLIN event");
 				if (_is_server_socket(fd)) {
-					Logger::debug("creating connection...");
+					Logger::debug("Creating connection...");
 					_create_connection(fd);
 				} else {
 					_receive(fd);
 				}
 			}
-			if (this->_pfds[i].revents & POLLOUT) {  // can send
-				if (_is_ready_to_respond(fd)) {  // when request parsing ends
+			if (this->_pfds[i].revents & POLLOUT) {
+				if (_is_ready_to_respond(fd)) {
 					Logger::debug("POLLOUT event and request parsing ended");
 					_respond(this->_requestBuilderMap[fd]->build());
-					delete this->_requestBuilderMap[fd]; // deletes the Request also
+					delete this->_requestBuilderMap[fd];
 					this->_requestBuilderMap.erase(fd);
 					// if (!_keep_connection)
-					_end_connection(fd); // vai dar problema se a response for mandada quebrada...
+					_end_connection(fd);
 				}
 			}
 		}
@@ -152,47 +132,40 @@ bool	WebServ::_is_server_socket(int fd) {
 	return false;
 }
 
-// provavelmente vai ser uma função auxiliar para podermos colocar infos de log
-// get sockaddr, IPv4 or IPv6:
 void	*get_in_addr(struct sockaddr *sa)
 {
 	if (sa->sa_family == AF_INET) {
 		return &(((struct sockaddr_in*)sa)->sin_addr);
 	}
-
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
 void	WebServ::_create_connection(int server_fd) {
-	struct sockaddr_storage remoteaddr; // client address
-	char remoteIP[INET6_ADDRSTRLEN];
-	socklen_t addrlen;
-	struct pollfd a;
-	int newfd;
+	struct		sockaddr_storage remoteaddr;
+	char		remoteIP[INET6_ADDRSTRLEN];
+	socklen_t	addrlen;
+	struct		pollfd a;
+	int			newfd;
 
 	addrlen = sizeof remoteaddr;
 	newfd = accept(server_fd, (struct sockaddr *)&remoteaddr, &addrlen);
-	if (newfd == -1) {
+	if (newfd == -1)
 		Logger::strerror("accept", errno);
-	} else {
+	else {
 		a.fd = newfd;
-		a.events = POLLIN | POLLOUT; // Check ready-to-read + write
+		a.events = POLLIN | POLLOUT;
 		a.revents = POLLNOEVENT;
 		this->_pfds.push_back(a);
-		// ensures we keep the relation between the connection and it's server
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
 		this->_total_fds++;
 
 		Logger::info("New connection requested and created.");
-		// >>>>>>>>>>>>>>>>>>>>>>> remove this
-		printf("poll server: new connection from %s on socket %d\n",
-			inet_ntop(
+		Logger::debug("poll server: new connection from", inet_ntop(
 				remoteaddr.ss_family,
 				get_in_addr((struct sockaddr*)&remoteaddr),
 				remoteIP, INET6_ADDRSTRLEN
-			),
-			newfd);
-		std::cout << this->_pfds << std::endl;
+			));
+		Logger::debug("poll server: new connection on socket", newfd);
 	}
 }
 
@@ -254,15 +227,6 @@ void WebServ::clean(void) {
 	}
 	for(int i = 0; i < _total_fds; i++)
 		close(_pfds[i].fd);
-
-	// precisa verificar se isso gera leak
-	this->_pfds.clear();
-	this->_fds_map.clear();
-	this->_serverSockets.clear();
-	// this->_requests.clear();
-	// this->_responses.clear();
-	this->_requestBuilderMap.clear();
-
 	this->_total_fds = 0;
 }
 
@@ -327,4 +291,8 @@ std::ostream& operator<<(std::ostream& o, t_pollfd_vector const& _pfds) {
 
 const char* WebServ::ServerPortAlreadySetted::what() const throw() {
 	return ("Port already setted to other server.");
+}
+
+const char* WebServ::PollErrorException::what() const throw() {
+	return ("Poll error in the main loop.");
 }

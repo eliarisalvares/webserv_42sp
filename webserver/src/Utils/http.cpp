@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:14:39 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:30:54 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 namespace http {
 
-// methods implemented in webserv
 std::set<std::string> _fill_methods(void) {
 	std::string methods_names[] = {
 		"GET",
@@ -84,6 +83,7 @@ std::map<std::string, MediaType> _fill_map_media_type_str_to_enum(void) {
 	std::map<std::string, MediaType> str_to_enum;
 
 	str_to_enum.insert(std::make_pair("text/plain", TEXT_PLAIN));
+	str_to_enum.insert(std::make_pair("text/html", TEXT_HTML));
 	str_to_enum.insert(std::make_pair("image/png", IMAGE_PNG));
 	str_to_enum.insert(std::make_pair("image/jpeg", IMAGE_JPEG));
 	str_to_enum.insert(std::make_pair("image/gif", IMAGE_GIF));
@@ -96,6 +96,7 @@ std::map<MediaType, std::string> _fill_map_media_type_enum_to_str(void) {
 	std::map<MediaType, std::string> enum_to_str;
 
 	enum_to_str.insert(std::make_pair(TEXT_PLAIN, "text/plain"));
+	enum_to_str.insert(std::make_pair(TEXT_HTML, "text/html"));
 	enum_to_str.insert(std::make_pair(IMAGE_PNG, "image/png"));
 	enum_to_str.insert(std::make_pair(IMAGE_JPEG, "image/jpeg"));
 	enum_to_str.insert(std::make_pair(IMAGE_GIF, "image/gif"));

@@ -20,7 +20,7 @@ SRCS =			main.cpp $(WEBSERV) $(SERVER) $(REQUEST) $(LOGGER) $(RESPONSE) \
 				$(UTILS)
 WEBSERV =		WebServ.cpp
 SERVER =		Server.cpp ServerParser.cpp server_builder.cpp server_getters.cpp \
-				server_setters.cpp location_builder.cpp
+				server_setters.cpp location_builder.cpp server_exceptions.cpp
 REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp \
 				request_parser_getters.cpp parse_control_data.cpp \
 				parse_headers.cpp parse_body.cpp parse_utils.cpp

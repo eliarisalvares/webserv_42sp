@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server_getters.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/10 11:17:39 by feralves          #+#    #+#             */
+/*   Updated: 2023/12/10 11:17:40 by feralves         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 int	Server::getSocket(void) const {
@@ -64,15 +76,9 @@ bool Server::getAutoindex(void) const {
 	return this->_permit.autoindex;
 }
 
-//---------------------------------------------------/
-std::string	Server::getServerName(void) {
-	return (SERVER_NAME);
-}
+std::string	Server::getCurrentPort(void) const {
+	std::string		port;
 
-std::string	Server::getCurrentPort(void) {
-	return (SERVER_PORT);
-}
-
-std::string	Server::getAllowedMethods(void) {
-	return (METHODS);
+	port = ftstring::itostr(_port);
+	return port;
 }

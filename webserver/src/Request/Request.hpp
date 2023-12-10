@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 01:24:44 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:21:36 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ public:
 	t_location*				location(void) const;
 	bool					has_error(void) const;
 	size_t					content_length(void) const;
+	http::MediaType			media_type(void) const;
 	bool					has_image(void) const;
 	std::vector<char>*		image(void) const;
 	std::string				image_type(void) const;
@@ -55,6 +56,7 @@ public:
 	void					setHost(std::string const host);
 	void					setError(bool has_error);
 	void					setContentLength(size_t length);
+	void					setMediaType(http::MediaType type);
 	void					setHasImage(bool has_image);
 	void					setImageType(std::string const& type);
 	void					setImage(std::vector<char>* image);
@@ -79,12 +81,12 @@ private:
 	std::string				_host;
 	size_t					_content_length;
 
+	http::MediaType			_media_type;
 	// image
 	bool					_has_image;
 	std::string				_image_type;
 	std::string				_image_file_name;
 	std::vector<char>*		_image;
-
 	// form
 	std::map<std::string, std::string> _post_data;
 };

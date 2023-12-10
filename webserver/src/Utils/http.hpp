@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 02:05:59 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 13:30:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ namespace http {
 		GET,
 		POST,
 		DELETE,
-		NOT_ALLOWED,
 	};
 
 	enum HttpStatus {
@@ -50,7 +49,7 @@ namespace http {
 		CONTENT_TOO_LARGE = 413,
 		URI_TOO_LONG = 414,
 		UNSUPPORTED_MEDIA_TYPE = 415,
-		UNPROCESSABLE_CONTENT = 422, // erro de código em python (cgi gera automático?)
+		UNPROCESSABLE_CONTENT = 422,
 		INTERNAL_SERVER_ERROR = 500,
 		NOT_IMPLEMENTED = 501,
 		HTTP_VERSION_NOT_SUPPORTED = 505,
@@ -103,7 +102,7 @@ namespace http {
 	class InvalidErrorCode;
 
 	void	bad_request(std::string const description);
-}
+} // end namespace http
 
 class http::InvalidRequest: public std::exception {
 	http::HttpStatus _error;

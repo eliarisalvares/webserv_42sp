@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 13:51:05 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 12:46:32 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void interrupt(int sig)
 }
 
 int	main(int argc, char *argv[]) {
+	bool	first_init = true;
 	struct sigaction interruptHandler;
 	interruptHandler.sa_handler = interrupt;
 	sigemptyset(&interruptHandler.sa_mask);
@@ -32,7 +33,6 @@ int	main(int argc, char *argv[]) {
 
 	if (!checkArgs(argc, argv))
 		return 1;
-
 	try {
 		ServerParser	port;
 		port.setConf(argv[1]);
@@ -43,27 +43,18 @@ int	main(int argc, char *argv[]) {
 		Logger::error(e.what());
 		return 1;
 	}
-
-	bool	first_init = true;
-
-	// o servidor deve sempre restartar em caso de algum erro na execução
 	while (true) {
 		try {
-			// create servers and sockets for each server
-			if (first_init) {
-				// webserv.create_servers(port.getServersConf()); //send port.servers
+			if (first_init)
 				first_init = false;
-			}
 			else
-				webserv.restart_socket_servers(); // criar os sockets novamente
+				webserv.restart_socket_servers();
 			webserv.init();
-
-			// main loop
 			webserv.run();
 
 		} catch (std::exception & e) {
 			Logger::error(e.what());
-			webserv.clean(); // para limparmos tudo que precisará ser limpo
+			webserv.stop();
 		}
 	}
 
