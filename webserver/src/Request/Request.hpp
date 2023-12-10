@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:19:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:27:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ public:
 	bool					is_chuncked(void) const;
 	// http::MediaType		content_type(void) const;
 	size_t					content_length(void) const;
+	std::vector<char>*		getImageData(void) const;
+	std::string				getImageType(void) const;
 
 	// setters
 	void					setMethod(http::RequestMethod method);
@@ -55,6 +57,8 @@ public:
 	void					setChuncked(bool is_chuncked);
 	// void					setContentType(http::MediaType type);
 	void					setContentLength(size_t length);
+	void					setImageType(std::string const& type);
+	void					setImage(std::vector<char>* image);
 
 private:
 
@@ -66,6 +70,8 @@ private:
 	std::string				_path;
 	std::string				_uri;
 	t_location*				_location;
+	std::string				_image_type;
+	std::vector<char>*		_image;
 
 	// headers data
 	std::string				_host;
