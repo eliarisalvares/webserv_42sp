@@ -210,7 +210,7 @@ void RequestParser::parse_body(void) {
 		_parse_form_data();
 	else if (_multipart_type == http::FORM_URLENCODED)
 		_parse_form_data();
-	_print_body();
+	//_print_body();
 }
 
 void RequestParser::_parse_form_data(void) {
@@ -349,6 +349,12 @@ void RequestParser::_check_boundary(char c) {
 		_multipart_tmp.push_back(c);
 		return ;
 	}
+	std::transform(
+		_multipart_tmp.begin(),
+		_multipart_tmp.end(),
+		_multipart_tmp.begin(),
+		&utils::c_tolower
+	);
 	if (_multipart_tmp != _boundary)
 			_bad_request("Different boundary than specified");
 	_multipart_step = CRLF_BOUNDARY;

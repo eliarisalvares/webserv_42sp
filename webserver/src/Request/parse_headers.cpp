@@ -281,6 +281,12 @@ void RequestParser::_check_content_type(void) {
 					bdry[0].erase(0, i);
 				if(bdry[0] == "boundary") {
 					_boundary = bdry[1];
+					std::transform(
+						_boundary.begin(),
+						_boundary.end(),
+						_boundary.begin(),
+						&utils::c_tolower
+					);
 					_boundary_size = _boundary.size();
 					Logger::warning("Found boundary", _boundary);
 				}
