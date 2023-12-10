@@ -205,7 +205,7 @@ private:
 	std::string					_chunk_size_str;
 	std::vector<char>			_body;
 	std::vector<char>::iterator	_body_iterator_first;
-	std::vector<char>::iterator	_body_iterator_final;
+	std::vector<char>::iterator	_body_iterator;
 	std::vector<char>::iterator	_body_iterator_end;
 	bool						_has_content_type;
 	std::string					_content_type;
