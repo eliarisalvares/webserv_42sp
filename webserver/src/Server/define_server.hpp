@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:18:04 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:18:05 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 16:43:19 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define ROOT "content"
 # define SERVER_NAME "WebWizards"
 # define SERVER_PORT "8080"
-# define TIMEOUT 5000
+# define TIMEOUT 60
 # define DEFAULT_UPLOAD "content/upload"
 
 #endif

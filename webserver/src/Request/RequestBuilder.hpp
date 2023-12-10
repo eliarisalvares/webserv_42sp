@@ -33,6 +33,7 @@ public:
 	void			parse(void);
 	Request*		build(void);
 
+
 	// getters
 	bool			is_ready(void) const;
 	int				getServerFd(void) const;

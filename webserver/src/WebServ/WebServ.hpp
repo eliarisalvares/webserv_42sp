@@ -6,13 +6,12 @@
 # include <map>
 # include <vector>
 # include <fstream> // using files
+# include <ctime>
 
 // for server logic
 # include <poll.h>
 // # include <netdb.h>
 # include <unistd.h> // close()
-
-#include <arpa/inet.h>  // inet_ntop ->>>>>> remove, function not permited!!
 
 # include "Server.hpp"
 # include "Request.hpp"
@@ -68,10 +67,11 @@ private:
 	RequestBuilder*		_create_request_builder(int fd);
 	bool				_is_ready_to_respond(int fd);
 
-	int					_total_fds;
-	t_pollfd_vector		_pfds;
-	std::vector<int>	_serverSockets;
-	std::map<int, int>	_fds_map;
+	int						_total_fds;
+	t_pollfd_vector			_pfds;
+	std::vector<int>		_serverSockets;
+	std::map<int, int>		_fds_map;
+	std::map<int, clock_t>	_fds_time;
 	bool	_is_server_socket(int fd);
 	void	_create_connection(int newfd);
 	void	_end_connection(int fd);

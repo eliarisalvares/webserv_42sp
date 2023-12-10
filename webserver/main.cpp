@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 12:46:32 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 16:39:14 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void interrupt(int sig)
 
 int	main(int argc, char *argv[]) {
 	bool	first_init = true;
+
 	struct sigaction interruptHandler;
 	interruptHandler.sa_handler = interrupt;
 	sigemptyset(&interruptHandler.sa_mask);
@@ -51,10 +52,9 @@ int	main(int argc, char *argv[]) {
 				webserv.restart_socket_servers();
 			webserv.init();
 			webserv.run();
-
 		} catch (std::exception & e) {
 			Logger::error(e.what());
-			webserv.stop();
+			webserv.clean();
 		}
 	}
 

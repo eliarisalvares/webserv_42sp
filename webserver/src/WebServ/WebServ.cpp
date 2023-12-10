@@ -8,9 +8,7 @@ WebServ::WebServ(void): _total_fds(0) {
 	this->_requestBuilderMap.clear();
 }
 
-WebServ::~WebServ(void) {
-	this->stop();
-}
+WebServ::~WebServ(void) { }
 
 WebServ::WebServ(WebServ const& copy) {
 	*this = copy;
@@ -74,6 +72,7 @@ void	WebServ::init(void) {
 
 void	WebServ::run(void) {
 	int poll_count, fd;
+	clock_t	current;
 
 	Logger::info("Running webserv...");
 	while(true) {
@@ -101,11 +100,23 @@ void	WebServ::run(void) {
 					_respond(this->_requestBuilderMap[fd]->build());
 					delete this->_requestBuilderMap[fd];
 					this->_requestBuilderMap.erase(fd);
-					// if (!_keep_connection)
 					_end_connection(fd);
 				}
 			}
+			if (!_is_server_socket(fd)) {
+				current = std::clock();
+				double	duration = double(current - _fds_time[fd]) / CLOCKS_PER_SEC;
+				if (duration > TIMEOUT) {
+					delete this->_requestBuilderMap[fd];
+					this->_requestBuilderMap.erase(fd);
+					_end_connection(fd);
+					_fds_time.erase(fd);
+					Logger::warning("Connection innactive, closing conection on fd", fd);
+				}
+			}
+
 		}
+		//iteração no requestBuilderMap
 	}
 }
 
@@ -120,6 +131,7 @@ void	WebServ::stop(void) {
 	for (t_server_iterator it = _servers.begin(); it!= _servers.end(); ++it) {
 		delete it->second;
 	}
+	_servers.clear();
 }
 
 bool	WebServ::_is_server_socket(int fd) {
@@ -142,7 +154,6 @@ void	*get_in_addr(struct sockaddr *sa)
 
 void	WebServ::_create_connection(int server_fd) {
 	struct		sockaddr_storage remoteaddr;
-	char		remoteIP[INET6_ADDRSTRLEN];
 	socklen_t	addrlen;
 	struct		pollfd a;
 	int			newfd;
@@ -158,13 +169,9 @@ void	WebServ::_create_connection(int server_fd) {
 		this->_pfds.push_back(a);
 		this->_fds_map.insert(std::make_pair(newfd, server_fd));
 		this->_total_fds++;
+		_fds_time.insert(std::make_pair(newfd, std::clock()));
 
 		Logger::info("New connection requested and created.");
-		Logger::debug("poll server: new connection from", inet_ntop(
-				remoteaddr.ss_family,
-				get_in_addr((struct sockaddr*)&remoteaddr),
-				remoteIP, INET6_ADDRSTRLEN
-			));
 		Logger::debug("poll server: new connection on socket", newfd);
 	}
 }
