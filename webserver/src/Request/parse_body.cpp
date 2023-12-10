@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:25:54 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:49:10 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,8 +219,11 @@ void RequestParser::_parse_multipart(void) {
 	_check_data_content_type();
 	_check_multipart_crfl();
 	_separate_data();
-	_request->setImage(&_body);
-	_request->setImageType("png");
+	if (_body.size()) {
+		_request->setHasImage(true);
+		_request->setImage(&_body);
+		_request->setImageType("png");
+	}
 	// _check_multipart_crfl();
 	// _check_boundary_delimiter();
 	// _check_boundary();
