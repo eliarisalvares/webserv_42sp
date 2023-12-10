@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:15:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/09 23:31:19 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,15 @@ size_t Request::content_length(void) const {
 	return this->_content_length;
 }
 
+std::vector<char>* Request::getImageData(void) const {
+	return this->_image;
+}
+
+std::string Request::getImageType(void) const {
+	return this->_image_type;
+}
+
+
 
 /********************************** SETTERS **********************************/
 
@@ -160,5 +169,13 @@ void Request::setChuncked(bool is_chuncked) {
 
 void Request::setContentLength(size_t length) {
 	this->_content_length = length;
+}
+
+void Request::setImageType(std::string const& type) {
+	this->_image_type = type;
+}
+
+void Request::setImage(std::vector<char>* image) {
+	this->_image = image;
 }
 
