@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 12:45:47 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 18:47:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,7 @@ void RequestParser::uri(char c) {
 		_uri.push_back(c);
 	}
 	else if (c == SP) {
-		// Logger::debug("uri", _uri);
-		Logger::warning("uri", _uri);
+		Logger::debug("uri", _uri);
 		_step = PROTOCOL;
 		init_uri = true;
 	}
@@ -81,7 +80,6 @@ void RequestParser::uri(char c) {
 // The HTTP version always takes the form "HTTP/x.x", uppercase
 void RequestParser::protocol(char c) {
 	static bool init_protocol = true;
-	// static std::string protocol; // testar se dá pra usar
 
 	if (c == SP && init_protocol)
 		return ;
@@ -93,7 +91,6 @@ void RequestParser::protocol(char c) {
 	else if (c == SLASH) {
 		if (_protocol.compare(_right_protocol) != 0)
 			_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
-			// throw http::InvalidRequest(http::NOT_FOUND); // nginx
 		_step = VERSION;
 		Logger::debug("protocol", _protocol);
 		init_protocol = true;
@@ -161,14 +158,6 @@ void RequestParser::version(char c) {
 		_invalid_request(HTTP_VERSION, http::BAD_REQUEST);
 }
 
-void RequestParser::_check_uri(void) {
-	// check if the path exists and set it; get location
-	// uri
-	// not found here
-	// partes da uri:
-	// scheme: não vem
-	// authority: não vem
-
 // 	The generic syntax uses the slash ("/"), question mark ("?"), and
 //    number sign ("#") characters to delimit components that are
 //    significant to the generic parser's hierarchical interpretation of an
@@ -191,46 +180,38 @@ void RequestParser::_check_uri(void) {
 
 //  Unreserved Characters: Characters that are allowed in a URI but do not have a reserved purpose:
 // ALPHA / DIGIT / "-" / "." / "_" / "~"
-
-	// se não começa com / mandar um erro -> por hora não vou verificar scheme e authority
-	if (_uri[0] != SLASH) // localhost:8080/data
+void RequestParser::_check_uri(void) {
+	Logger::debug("******************* Checking URI *******************");
+	if (_uri[0] != SLASH)
 		_invalid_request(
 			"URI different from expected. Check it",
 			_uri,
 			http::INTERNAL_SERVER_ERROR
-		); // ver se pode vir sem / no início
+		);
 
-	std::vector<t_location>* locations = _request->server()->getLocations();
+	Server* server = _request->server();
+	std::vector<t_location>* locations = server->getLocations();
 	std::string::iterator it = _uri.begin(), end = _uri.end();
 	int i, location_pos = -1, locations_size = locations->size();
-	// std::cout << RED << locations[0].root << RESET << "\n";
-	// bool use_server_config = locations->size() ? false : true;
 	bool use_server_config = true;
-	if (locations_size)
-		use_server_config = false;
-	std::cout << "Locations size: " << locations_size << "\n";
 	std::string path;
 	std::string location;
 	location.clear();
-
-	std::cout << BLUE << "Checking URI:\n" << _uri << "\n" << GREY;
 	path.clear();
 	path.push_back(*it);
-	// /data -> content/html/index.html -> passar pelos locations do server, compara com o location
-	// /data/index2.html -> content/html/data/index2.html
+
+	if (locations_size)
+		use_server_config = false;
+
 	bool increment = true;
 	while (++it != end && !http::uri_path_end(*it)) {
 		if (*it == SLASH || (it + 1) == end) {
-			std::cout << "Entrou pra procurar um novo location: " << *it << std::endl;
 			if ((it + 1) == end && *it != SLASH) {
 				increment = false;
 				path.push_back(*it);
 			}
-			if (!use_server_config) { // procura a location se tem locations
+			if (!use_server_config) {
 				for (i = 0; i < locations_size; ++i) {
-					std::cout << RED << "path procurado na location: " << path
-						<< "- location: " << (*locations)[i].location
-						<< std::endl;
 					if (path.compare((*locations)[i].location) == 0) {
 						Logger::debug("location found", (*locations)[i].location);
 						location_pos = i;
@@ -243,43 +224,34 @@ void RequestParser::_check_uri(void) {
 		if (increment)
 			path.push_back(*it);
 	}
-	if (location_pos == -1)
-		use_server_config = true;
-
-	// se é diretório
-
 	Logger::debug("Path from URI", path);
 
-	// substitui o location na path pelo root do location
+	std::string root;
+	if (location_pos == -1) {
+		use_server_config = true;
+		root = server->getRoot();
+	}
 	if (location_pos > -1) {
 		location = (*locations)[location_pos].location;
-		Logger::debug("Has a defined location", location);
+		root = (*locations)[location_pos].root;
 	}
-	std::string root;
-	std::cout << "Usa a config do server? " << use_server_config << "\n";
-	root = use_server_config ? _request->server()->getRoot() : (*locations)[location_pos].root;
 	Logger::debug("root", root);
+
 	if (location_pos > -1 && location.size() > 0)
 		path.erase(0, location.size());
-	Logger::debug("Final path", path);
 	path.insert(path.begin(), root.begin(), root.end());
-	Logger::debug("Final path", path);
+	Logger::debug("Path with changing root", path);
 
-	// se não tiver ponto => é um diretório => verificar se existe; => not found
-	//                                 => se autoindex -> cgi?
-	//                                    else index?
-	if (!http::is_path_to_file(path)) { // não tem ponto na path?
-		DIR *dr;
-
-		dr = opendir(path.c_str());
-		if (dr == NULL) // talvez verificar se é um arquivo tb...
+	if (!http::is_path_to_file(path)) {
+		DIR *dr = opendir(path.c_str());
+		if (dr == NULL)
 			_invalid_request("Directory not found", path, http::NOT_FOUND);
 		closedir(dr);
 		Logger::debug("Found directory", path);
 		if (use_server_config) {
-			if (!_request->server()->getAutoindex()) {
-				path = *(_request->server()->getIndex().begin());
-				Logger::warning("Index file", path);
+			if (!server->getAutoindex()) {
+				path = *(server->getIndex().begin());
+				Logger::debug("Index file", path);
 			} else {
 				path.push_back(SLASH);
 			}
@@ -287,15 +259,14 @@ void RequestParser::_check_uri(void) {
 		else {
 			if (!(*locations)[location_pos].permit.autoindex) {
 				path = *((*locations)[location_pos].index.begin());
-				Logger::warning("Index file", path);
+				Logger::debug("Index file", path);
 			}
 			else
 				path.push_back(SLASH);
 		}
 	}
-	else { // => é um arquivo => verificar se arquivo existe => not found
+	else {
 		std::ifstream file;
-
 		file.open(path.c_str());
 		if (file.fail())
 			_invalid_request("Directory not found", path, http::NOT_FOUND);
@@ -303,7 +274,7 @@ void RequestParser::_check_uri(void) {
 	}
 
 	_request->setPath(path);
-	_request->setUri(_uri); // precisa tirar a parte final se receber parâmetros?
+	_request->setUri(_uri);
 }
 
 void RequestParser::_check_method(void) {
