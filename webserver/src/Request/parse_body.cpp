@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:49:10 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 00:31:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,47 @@ void RequestParser::parse_body(void) {
 }
 
 void RequestParser::_parse_form_data(void) {
+	FormData step = FIELD_NAME;
 
+	_body_iterator_first = _body.begin();
+	_body_iterator_end = _body.end();
+	_body_iterator = _body_iterator_first;
+	_field_name.clear();
+	_field_value.clear();
+	if (DEBUG)
+		Logger::info("Parsing form url encoded data:");
+	while (_body_iterator != _body_iterator_end) {
+		switch (step)
+		{
+		case FIELD_NAME:
+			if (*_body_iterator == EQUAL) {
+				step = FIELD_VALUE;
+				Logger::debug("field name", _field_name);
+				// save it
+				_field_name.clear();
+			}
+			else
+				_field_name.push_back(*_body_iterator);
+				// check % (hexadecimal 3 caracters - contando %)
+				// is_uri_char
+			break;
+		case FIELD_VALUE:
+			if (*_body_iterator == AMPERSEND) {
+				step = FIELD_NAME;
+				Logger::debug("field value", _field_value);
+				// save it
+				_field_value.clear();
+			}
+			else
+				_field_value.push_back(*_body_iterator);
+				// check % (hexadecimal 3 caracters - contando %)
+			break;
+
+		default:
+			break;
+		}
+		++_body_iterator;
+	}
 }
 
 void RequestParser::_parse_multipart(void) {
