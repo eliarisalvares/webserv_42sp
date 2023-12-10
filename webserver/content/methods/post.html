@@ -74,14 +74,14 @@
     </div>
 
     <script>
-        // JavaScript to handle form submission
+        const currentPort = window.location.port;
         window.onload = function() {
             document.getElementById("uploadForm").onsubmit = function(event) {
                 event.preventDefault();
 
                 var formData = new FormData(this);
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "http://localhost:8080/upload", true);
+                xhr.open("POST", `http://localhost:${currentPort}/upload`, true);
 
                 xhr.onload = function() {
                     if (xhr.status === 201) {
