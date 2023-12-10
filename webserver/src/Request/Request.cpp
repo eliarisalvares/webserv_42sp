@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:31:19 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 00:06:30 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,9 @@ Request::Request(void):
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
-	_host(""),
-	// _media_type(),
-	_content_length(0),
-	_is_chuncked(false) { }
+	_has_image(false),
+	_host("") { }
+
 
 Request::Request(int fd, Server* server):
 	_server(server),
@@ -35,10 +34,9 @@ Request::Request(int fd, Server* server):
 	_path("content/"),
 	_uri("/"),
 	_location(NULL),
+	_has_image(false),
 	_host(""),
-	// _media_type(),
-	_content_length(0),
-	_is_chuncked(false) { }
+	_content_length(0) { }
 
 Request::~Request(void) { }
 
@@ -57,8 +55,10 @@ Request const& Request::operator=(Request const & copy) {
 		this->_host = copy.host();
 		this->_location = copy.location();
 		this->_error = copy.has_error();
-		this->_is_chuncked = copy.is_chuncked();
 		this->_content_length = copy.content_length();
+		this->_has_image = copy.has_image();
+		this->_image = copy.image();
+		this->_image_type = copy.image_type();
 		// this->_media_type = copy.content_type();
 	}
 	return *this;
@@ -106,23 +106,19 @@ bool Request::has_error(void) const {
 	return this->_error;
 }
 
-bool Request::is_chuncked(void) const {
-	return this->_is_chuncked;
-}
-
-// http::MediaType Request::content_type(void) const {
-// 	return this->_media_type;
-// }
-
 size_t Request::content_length(void) const {
 	return this->_content_length;
 }
 
-std::vector<char>* Request::getImageData(void) const {
+bool Request::has_image(void) const {
+	return this->_has_image;
+}
+
+std::vector<char>* Request::image(void) const {
 	return this->_image;
 }
 
-std::string Request::getImageType(void) const {
+std::string Request::image_type(void) const {
 	return this->_image_type;
 }
 
@@ -159,16 +155,13 @@ void Request::setError(bool has_error) {
 	this->_error = has_error;
 }
 
-void Request::setChuncked(bool is_chuncked) {
-	this->_is_chuncked = is_chuncked;
-}
-
-// void Request::setContentType(http::MediaType type) {
-// 	this->_media_type = type;
-// }
-
 void Request::setContentLength(size_t length) {
 	this->_content_length = length;
+}
+
+
+void Request::setHasImage(bool has_image) {
+	this->_has_image = has_image;
 }
 
 void Request::setImageType(std::string const& type) {

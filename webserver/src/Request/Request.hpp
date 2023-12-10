@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:27:43 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 00:05:06 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,10 @@ public:
 	std::string				host(void) const;
 	t_location*				location(void) const;
 	bool					has_error(void) const;
-	bool					is_chuncked(void) const;
-	// http::MediaType		content_type(void) const;
 	size_t					content_length(void) const;
-	std::vector<char>*		getImageData(void) const;
-	std::string				getImageType(void) const;
+	bool					has_image(void) const;
+	std::vector<char>*		image(void) const;
+	std::string				image_type(void) const;
 
 	// setters
 	void					setMethod(http::RequestMethod method);
@@ -54,9 +53,8 @@ public:
 	void					setLocation(t_location* location);
 	void					setHost(std::string const host);
 	void					setError(bool has_error);
-	void					setChuncked(bool is_chuncked);
-	// void					setContentType(http::MediaType type);
 	void					setContentLength(size_t length);
+	void					setHasImage(bool has_image);
 	void					setImageType(std::string const& type);
 	void					setImage(std::vector<char>* image);
 
@@ -70,14 +68,15 @@ private:
 	std::string				_path;
 	std::string				_uri;
 	t_location*				_location;
+
+	// image
+	bool					_has_image;
 	std::string				_image_type;
 	std::vector<char>*		_image;
 
 	// headers data
 	std::string				_host;
-	// http::MediaType			_media_type;
 	size_t					_content_length;
-	bool					_is_chuncked;
 
 };
 
