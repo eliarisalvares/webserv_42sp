@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 16:22:04 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 17:12:25 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -477,7 +477,7 @@ void RequestParser::_check_data_content_type(char c) {
 		i++;
 	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
 	Logger::debug("Content-Type type", _multipart_tmp);
-	_request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
+	// _request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
 	Logger::debug("Content-Type OK");
 	_multipart_tmp.clear();
 }
@@ -491,6 +491,12 @@ void RequestParser::_remove_boundary(void) {
 	_body_iterator_first = _body_iterator_end - 8 - _boundary.size();
 	_body.erase(_body_iterator_first, _body_iterator_end);
 	_multipart_type = _request->media_type();
+
+	if (_body.size()) {
+		_request->setHasImage(true);
+		_request->setImage(&_body);
+		_request->setImageType("png");
+	}
 }
 
 // --------------------------f069bd9492f6146e
