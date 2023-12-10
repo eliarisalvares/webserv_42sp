@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:09:07 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/08 13:51:05 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 11:23:59 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,11 @@ int	main(int argc, char *argv[]) {
 
 	bool	first_init = true;
 
-	// o servidor deve sempre restartar em caso de algum erro na execução
 	while (true) {
 		try {
 			// create servers and sockets for each server
-			if (first_init) {
-				// webserv.create_servers(port.getServersConf()); //send port.servers
+			if (first_init)
 				first_init = false;
-			}
 			else
 				webserv.restart_socket_servers(); // criar os sockets novamente
 			webserv.init();

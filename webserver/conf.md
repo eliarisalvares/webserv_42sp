@@ -34,10 +34,15 @@ server {
 		root /html
 		index about.html
 	}
+
+	location /autoindex {
+		root /var/www/html/autoindex
+		autoindex true			# habilita listagem de diretórios
+	}
 }```
 
 
-Definições ainda em processo de parseamento
+
 ```
 	# Configuração para rota que redireciona  (opcional)
 	location /redirect {
@@ -45,31 +50,7 @@ Definições ainda em processo de parseamento
 		redirect /about		# Redireciona para a rota /about
 	}
 
-	# Configuração para rota que aceita uploads de arquivos  (opcional)
-	location /upload {
-		root /var/www/html
-		index upload.html
-		allowed_methods GET POST		# informa quais métodos são permitidos nessa rota (opcional)
-		max_body_size 300000			# Tamanho permitido do arquivo em bytes (opcional)
-	}
 
-	# Configuração para rota que executa um CGI  (opcional)
-	location /delete {
-		root /var/www/html/delete
-		index delete.html
-		allowed_methods GET DELETE		
-	}
-
-	# Configuração para rota que executa um CGI  (opcional)
-	location /cgi {
-		root /var/www/cgi
-		index game.py				# arquivo do programa a ser executado
-	}
-
-	location /autoindex {
-		root /var/www/html/autoindex
-		autoindex true			# habilita listagem de diretórios
-	}
 ```
 
 Definições:
