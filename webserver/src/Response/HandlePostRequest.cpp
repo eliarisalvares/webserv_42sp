@@ -50,9 +50,14 @@ Response processFileUpload(Request* request) {
     statusCode = 201;
     file.close();
 
+    std::string responseBody = name;
+    size_t contentLength = responseBody.length();
     Response response(request->fd(), statusCode);
     response.setMessage(getStatusMessage(statusCode));
-    setResponseHeaders(response, "", "0", request);
+    response.setBody(responseBody);
+    std::stringstream ss;
+    ss << contentLength;
+    setResponseHeaders(response, "text/plain", ss.str(), request);
     return response;
 }
 

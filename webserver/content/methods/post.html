@@ -62,17 +62,41 @@
 <body>
     <h1>Suba um arquivo para nosso servidor</h1>
     <h2>Vamos usar o método POST para subir um arquivo para o servidor.</h2>
-    <form enctype="multipart/form-data" method="POST">
+    <form id="uploadForm" enctype="multipart/form-data">
         <label for="file">Arquivo: </label>
         <input type="file" name="file" id="file"><br>
         <input type="submit" value="Upload">
     </form>
     <div id="content">
         <p>Would you like to go back to the <a href="/" style="color:#777777FF;">homepage</a>?</p>
-        <p>Or maybe learn more about HTTP <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404" style="color:#777777FF;">status codes</a>?</p>
         <p>------------------------------------------------</p>
         <p>Você gostaria de voltar para o <a href="/" style="color:#777777FF;">início</a>?</p>
-        <p>Ou talvez aprender um pouco mais sobre os <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404" style="color:#777777FF;">códigos HTTP</a>?</p>
     </div>
+
+    <script>
+        // JavaScript to handle form submission
+        window.onload = function() {
+            document.getElementById("uploadForm").onsubmit = function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "http://localhost:8080/upload", true);
+
+                xhr.onload = function() {
+                    if (xhr.status === 201) {
+                        var img = document.createElement("img");
+                        img.src = `../upload/${xhr.responseText.split("/")[2]}`;
+                        document.body.appendChild(img);
+                    } else {
+                        alert("Something went wrong!");
+                    }
+                };
+
+                xhr.send(formData);
+            };
+        };
+
+    </script>
 </body>
 </html>
