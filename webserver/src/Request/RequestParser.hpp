@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 23:19:31 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 00:20:03 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 # define EQUAL '='
 # define DASH '-'
 # define SEMICOLON ';'
+# define AMPERSEND '&'
 
 // error messages
 # define REQPARSER_ERROR "request parser error: "
@@ -82,6 +83,11 @@ public:
 		CR_CHUNK_END,
 		SECOND_CR_CHUNK_END,
 		END,
+	};
+
+	enum FormData {
+		FIELD_NAME,
+		FIELD_VALUE,
 	};
 
 	// enum ParseBody {
