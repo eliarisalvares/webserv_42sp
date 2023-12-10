@@ -46,4 +46,4 @@ std::vector<std::string> split(std::string const &str, char delimiter)
 	return (substrings);
 }
 
-} //end namespace
+} //end namespace ftstring
