@@ -33,9 +33,6 @@ char** setEnvironment(Request* request) {
         content_body += it->first + "=" + it->second + "&";
     }
 
-    std::cout << "setEnvironment - content_length_env: " << content_length_env << std::endl;
-    std::cout << "setEnvironment - content_body: " << content_body << std::endl;
-
     char **envp = new char*[15];
     envp[0] = strdup(gateway_interface.c_str());
     envp[1] = strdup(path_info.c_str());
