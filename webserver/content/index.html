@@ -116,8 +116,8 @@
         <div class="picture-selection" style="align-items: center;" required>
             <label for="picture1">
                 <input type="radio" id="picture1" name="newImageUrl"
-                    value="https://storage.googleapis.com/pai-images/b96b0bbed3a74ab0a9436be772706c1f.jpeg" required>
-                <img src="https://storage.googleapis.com/pai-images/b96b0bbed3a74ab0a9436be772706c1f.jpeg" alt="Picture 1" width="200px"
+                    value="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" required>
+                <img src="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" alt="Picture 1" width="200px"
                     height="auto">
             </label>
             <label for="picture2">
@@ -138,11 +138,6 @@
                 <img src="https://storage.googleapis.com/pai-images/b162c70c5b224030b1dd4753b6fa317a.jpeg"
                     alt="Picture 4" width="200px" height="auto">
             </label>
-            <label for="picture5">
-                <input type="radio" id="picture5" name="newImageUrl"
-                    value="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" required>
-                <img src="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" alt="Picture 5"
-                    width="200px" height="auto">
         </div>
 
         <input type="submit" value="Criar!" style="margin-top: 10px;">
@@ -196,6 +191,26 @@
         }
 
         window.onload = function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", `http://localhost:${location.port}/database/characters.html`, true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var container = document.querySelector('.container');
+                    var responseHTML = xhr.responseText;
+                    var newCards = responseHTML.split('<div class=\'card\'>');
+                    newCards.shift();
+                    newCards.forEach(function (card) {
+                        addNewCard('<div class="card">' + card);
+                    });
+                } else {
+                    alert(`Erro ${xhr.status}: ${xhr.statusText}`);
+                }
+            };
+            xhr.onerror = function () {
+                console.error("Request failed");
+            };
+            xhr.send();
+
             var form = document.getElementById("newCharacterForm");
             form.onsubmit = function (event) {
                 event.preventDefault();
@@ -214,7 +229,7 @@
                     if (xhr.status === 200) {
                         addNewCard(xhr.responseText);
                     } else {
-                        console.error("Error:", xhr.statusText);
+                        alert(`Erro ${xhr.status}: ${xhr.statusText}`);
                     }
                 };
 

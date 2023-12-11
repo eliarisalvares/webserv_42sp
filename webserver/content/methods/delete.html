@@ -104,7 +104,7 @@
                                 alert('File deleted successfully!');
                                 location.reload();
                             } else {
-                                alert('Something went wrong!');
+                                alert(`Erro: ${deleteRequest.status}:  ${deleteRequest.statusText}`);
                             }
                         };
                     });
