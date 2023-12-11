@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:54 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:17:55 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:46:06 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,25 +140,6 @@ bool	obtainAutoIndex(std::vector<std::string> input, int index) {
 	return valid;
 }
 
-bool	obtainDirList(std::vector<std::string> input, int index) {
-	std::vector<std::string>	dirList;
-	bool						valid = false;
-
-	if (input[index].substr(0, 18) == "directory_listing ") {
-		dirList = ftstring::split(input[index].substr(18), ' ');
-		if (dirList.size() != 1)
-			throw DirListWrongArgumentException();
-		if (dirList[0] == "true")
-			valid = true;
-		else if (dirList[0] == "false")
-			valid = false;
-		else
-			throw DirListInvalidException();
-		Logger::debug("Directory Listing setted as ", dirList[0]);
-	}
-	return valid;
-}
-
 std::vector<std::string>	obtainName(std::vector<std::string> input, int index) {
 	std::string					name;
 	std::vector<std::string>	serverName;
@@ -252,5 +233,16 @@ std::set<std::string>	obtainIndex(std::vector<std::string> input, int index, std
 		}
 		Logger::debug("Index setted", page);
 	}
+	return value;
+}
+
+std::set<std::string>	getRootIndex(std::string root) {
+	std::set<std::string>		value;
+	std::string					page;
+
+	page = root + "/index.html";
+	if (!checkFileWorks(page))
+		page = "content/index.html";
+	value.insert(page);
 	return value;
 }

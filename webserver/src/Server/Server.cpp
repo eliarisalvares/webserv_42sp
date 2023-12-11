@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 17:02:16 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:48:20 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Server::Server(int port): _port(port) {
 
 Server::Server(std::vector<std::string> input, size_t index) {
 	int		extraBrackets = 0;
+	bool	gotIndex = false;
 
 	setBasics();
 	setPort(input, index);
@@ -54,14 +55,14 @@ Server::Server(std::vector<std::string> input, size_t index) {
 			setCGI(obtainCGI(input, i));
 		if (input[i].substr(0, 11) == "error_page ")
 			addErrorPages(obtainErrorPages(input, i));
-		if (input[i].substr(0, 6) == "index ")
+		if (input[i].substr(0, 6) == "index ") {
+			gotIndex = true;
 			setIndex(obtainIndex(input, i, getRoot()));
+		}
 		if (input[i].substr(0, 12) == "buffer_size ")
 			setBufferSize(obtainBufferSize(input, i));
 		if (input[i].substr(0, 10) == "autoindex ")
 			_permit.autoindex = obtainAutoIndex(input, i);
-		if (input[i].substr(0, 18) == "directory_listing ")
-			_permit.directory_listing = obtainDirList(input, i);
 		if (input[i].substr(0, 9) == "redirect ")
 			setRedirect(obtainRedirect(input, i));
 		if (input[i].substr() == "}" && extraBrackets == 0)
@@ -69,6 +70,8 @@ Server::Server(std::vector<std::string> input, size_t index) {
 		else if (input[i].substr() == "}")
 			extraBrackets--;
 	}
+	if (!gotIndex)
+		setIndex(getRootIndex(getRoot()));
 }
 
 Server::~Server(void) {
@@ -91,7 +94,6 @@ void	Server::setBasics() {
 	t_permissions				permit;
 
 	permit.autoindex = false;
-	permit.directory_listing = false;
 	permit.has_redir = false;
 	permit.redirExternal = false;
 	serverName.push_back(SERVER_NAME);

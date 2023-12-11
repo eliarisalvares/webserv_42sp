@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:50 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:17:51 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:46:19 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@
 typedef struct	s_permissions
 {
 	bool	autoindex;
-	bool	directory_listing;
 	bool	has_redir;
 	bool	redirExternal;
 }				t_permissions;
@@ -48,7 +47,6 @@ typedef struct	s_location
 }				t_location;
 
 bool						obtainAutoIndex(std::vector<std::string> input, int index);
-bool						obtainDirList(std::vector<std::string> input, int index);
 bool						obtainCGI(std::vector<std::string> input, int index);
 int							obtainPort(std::vector<std::string> input, int index);
 int							obtainBodySize(std::vector<std::string> input, int index);
@@ -61,6 +59,7 @@ std::set<std::string>		obtainMethod(std::vector<std::string> input, int index);
 std::pair<int, std::string>	obtainErrorPages(std::vector<std::string> input, int index);
 std::set<std::string>		obtainIndex(std::vector<std::string> input, int index);
 std::set<std::string>		obtainIndex(std::vector<std::string> input, int index, std::string root);
+std::set<std::string>		getRootIndex(std::string root);
 
 t_location					initLocation(void);
 
@@ -119,14 +118,6 @@ class AutoIndexWrongArgumentException : public std::exception {
 };
 
 class AutoIndexInvalidException : public std::exception {
-	virtual const char* what(void) const throw();
-};
-
-class DirListWrongArgumentException : public std::exception {
-	virtual const char* what(void) const throw();
-};
-
-class DirListInvalidException : public std::exception {
 	virtual const char* what(void) const throw();
 };
 

@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:18:00 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:18:01 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:47:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,18 @@ t_location	initLocation(void) {
 	location.root = ROOT;
 	location.index.insert("content/index.html");
 	location.permit.autoindex = false;
-	location.permit.directory_listing = false;
 	location.permit.has_redir = false;
 	location.permit.redirExternal = false;
 	return (location);
 }
 
+
+
 t_location	obtainLoc(std::vector<std::string> input, int index) {
 	t_location					location;
 	std::vector<std::string>	locName;
 	bool						gotRoot = false;
+	bool						gotIndex = false;
 
 	location = initLocation();
 	for (size_t i = index; i < input.size(); i++) {
@@ -54,12 +56,12 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		}
 		if (input[i].substr(0, 16) == "allowed_methods ")
 			location.allowed_methods = obtainMethod(input, i);
-		if (input[i].substr(0, 6) == "index ")
+		if (input[i].substr(0, 6) == "index ") {
+			gotIndex = true;
 			location.index = obtainIndex(input, i, location.root);
+		}
 		if (input[i].substr(0, 10) == "autoindex ")
 			location.permit.autoindex = obtainAutoIndex(input, i);
-		if (input[i].substr(0, 18) == "directory_listing ")
-			location.permit.directory_listing = obtainDirList(input, i);
 		if (input[i].substr(0, 4) == "cgi ")
 			location.cgi = obtainCGI(input, i);
 		if (input[i].substr(0, 11) == "error_page ") {
@@ -78,6 +80,8 @@ t_location	obtainLoc(std::vector<std::string> input, int index) {
 		if (input[i] == "}")
 			break ;
 	}
+	if (!gotIndex)
+		location.index = getRootIndex(location.root);
 	Logger::debug("Location saved", location.location);
 	return (location);
 }
