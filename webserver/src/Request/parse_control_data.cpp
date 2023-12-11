@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 18:47:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 03:17:27 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,9 +194,9 @@ void RequestParser::_check_uri(void) {
 	std::string::iterator it = _uri.begin(), end = _uri.end();
 	int i, location_pos = -1, locations_size = locations->size();
 	bool use_server_config = true;
-	std::string path;
-	std::string location;
-	location.clear();
+	std::string path, location_str;
+	t_location *location;
+	location_str.clear();
 	path.clear();
 	path.push_back(*it);
 
@@ -204,7 +204,7 @@ void RequestParser::_check_uri(void) {
 		use_server_config = false;
 
 	bool increment = true;
-	while (++it != end && !http::uri_path_end(*it)) {
+	while (++it != end && !http::uri_path_end(*it)) { // arrumar o path
 		if (*it == SLASH || (it + 1) == end) {
 			if ((it + 1) == end && *it != SLASH) {
 				increment = false;
@@ -215,7 +215,8 @@ void RequestParser::_check_uri(void) {
 					if (path.compare((*locations)[i].location) == 0) {
 						Logger::debug("location found", (*locations)[i].location);
 						location_pos = i;
-						_request->setLocation(&(*locations)[i]);
+						location = &(*locations)[i];
+						_request->setLocation(location);
 						break;
 					}
 				}
@@ -227,20 +228,48 @@ void RequestParser::_check_uri(void) {
 	Logger::debug("Path from URI", path);
 
 	std::string root;
+	bool is_redirect = false, is_external_redirection = false;
 	if (location_pos == -1) {
 		use_server_config = true;
-		root = server->getRoot();
+		is_redirect = server->getPermit().has_redir;
+		is_external_redirection = server->getPermit().redirExternal;
+		if (is_redirect)
+			root = server->getRedirect();
+		else
+			root = server->getRoot();
 	}
 	if (location_pos > -1) {
-		location = (*locations)[location_pos].location;
-		root = (*locations)[location_pos].root;
+		location_str = location->location;
+		is_redirect = location->permit.has_redir;
+		is_external_redirection = location->permit.redirExternal;
+		if (is_redirect)
+			root = location->redirection;
+		else
+			root = location->root;
+		if (is_external_redirection)
+			path = location->redirection;
 	}
-	Logger::debug("root", root);
-
-	if (location_pos > -1 && location.size() > 0)
-		path.erase(0, location.size());
-	path.insert(path.begin(), root.begin(), root.end());
+	if (is_redirect)
+		Logger::debug("redirect", root);
+	else
+		Logger::debug("root", root);
+	if (is_external_redirection)
+		path = root;
+	else {
+		if (location && location_str.size() > 0)
+			path.erase(0, location_str.size());
+		path.insert(path.begin(), root.begin(), root.end());
+	}
 	Logger::debug("Path with changing root", path);
+
+	if (is_redirect) {
+		// se external, só salva o externo
+		Logger::debug("Redirection", path);
+		_request->setStatusCode(http::MOVED_PERMANENTLY);
+		_request->setPath(path);
+		_request->setUri(_uri);
+		return ;
+	}
 
 	if (!http::is_path_to_file(path)) {
 		DIR *dr = opendir(path.c_str());
@@ -257,8 +286,8 @@ void RequestParser::_check_uri(void) {
 			}
 		}
 		else {
-			if (!(*locations)[location_pos].permit.autoindex) {
-				path = *((*locations)[location_pos].index.begin());
+			if (!location->permit.autoindex) {
+				path = *(location->index.begin());
 				Logger::debug("Index file", path);
 			}
 			else
@@ -276,6 +305,43 @@ void RequestParser::_check_uri(void) {
 	_request->setPath(path);
 	_request->setUri(_uri);
 }
+
+// std::string RequestParser::_get_root_redirect(std::string const& redirect) {
+// 	Logger::warning("Enter redirection", redirect);
+// 	std::vector<t_location>* locations = _request->server()->getLocations();
+// 	std::string::const_iterator it = redirect.begin(), end = redirect.end();
+// 	int i, locations_size = locations->size();
+// 	bool use_server_config = locations_size ? false : true;
+// 	std::string path, location_str;
+// 	t_location *location;
+// 	location_str.clear();
+// 	path.clear();
+
+// 	bool increment = true;
+// 	while (it != end) {
+// 		if (*it == SLASH || (it + 1) == end) {
+// 			if ((it + 1) == end && *it != SLASH) {
+// 				increment = false;
+// 				path.push_back(*it);
+// 			}
+// 			if (!use_server_config) {
+// 				for (i = 0; i < locations_size; ++i) {
+// 					if (path.compare((*locations)[i].location) == 0) {
+// 						Logger::debug("location found", (*locations)[i].location);
+// 						location = &(*locations)[i];
+// 						_request->setLocation(location);
+// 						break;
+// 					}
+// 				}
+// 			}
+// 		}
+// 		if (increment)
+// 			path.push_back(*it);
+// 		++it;
+// 	}
+// 	Logger::debug("Path from redirect", path);
+// 	return path;
+// }
 
 void RequestParser::_check_method(void) {
 	std::set<std::string> allowed_methods;
