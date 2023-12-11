@@ -1,16 +1,31 @@
 #include "Response.hpp"
 
+/**
+ * @brief Checks if the request has a multipart/form-data media type.
+ * If it does, it means that the request is a file upload.
+ * 
+ * @param request the request object holding the request data that originated the response
+ * @return true if the request is a file upload
+ * @return false if the request is not a file upload
+ */
 bool isFileUpload(Request* request) {
     std::string mediaType = http::enum_to_str_media_type(request->media_type());
 
     if (mediaType == "multipart/form-data") {
-        std::cout << "isFileUpload: true" << std::endl;
         return true;
     }
 
     return false;
 }
 
+/**
+ * @brief The chosen folder to save the uploaded file is the content/upload folder.
+ * This function sets the file name to be saved in this folder and adds a number
+ * to the file name if it already exists.
+ * 
+ * @param request the request object holding the request data that originated the response
+ * @return std::string the file name to be saved
+ */
 std::string setFileName(Request* request) {
     std::string imageType = request->image_type();
 
@@ -32,6 +47,16 @@ std::string setFileName(Request* request) {
     return fileName;
 }
 
+/**
+ * @brief Processes the file upload request. It saves the file in the content/upload folder.
+ * and set a 201 status code if the file was successfully saved. If the file was not saved,
+ * it sets a 500 status code. If there is no image in the request, it sets a 404 status code.
+ * The response body is the file name so the client can access the correct file that was uploaded.
+ * 
+ * @param request the request object holding the request data that originated the response
+ * @return Response the response object to be sent to the client containing the response data
+ * (status code, message and headers)
+ */
 Response processFileUpload(Request* request) {
     int statusCode = request->status_code();
     std::vector<char> *image = request->image();
@@ -61,13 +86,21 @@ Response processFileUpload(Request* request) {
     return response;
 }
 
+/**
+ * @brief Main function to handle POST requests. It checks if the request is a file upload
+ * or not and calls the respective function to process the request.
+ * 
+ * @param request the request object holding the request data that originated the response
+ * @return Response the response object to be sent to the client containing the response data
+ * (status code, message and headers)
+ */
 Response handlePostRequest(Request* request) {
     if (isFileUpload(request)) {
         return processFileUpload(request);
     } else {
         std::string filePath = request->uri();
         Logger::debug("handlePostRequest - filePath: " + filePath);
-        
+
         std::string contentType = getContentType(filePath);
         contentType = setFlagsContent(contentType);
 
@@ -81,7 +114,7 @@ Response handlePostRequest(Request* request) {
         std::stringstream ss;
         ss << body.length();
         setResponseHeaders(response, contentType, ss.str(), request);
-    
+
         return response;
     }
 }
