@@ -2,7 +2,7 @@
 import json
 import os
 
-content = os.environ.get("CONTENT_BODY", None)
+content = os.environ.get("QUERY_STRING", None)
 if not content:
     with open("content/error_pages/400.html", "r") as f:
         print(f.read())

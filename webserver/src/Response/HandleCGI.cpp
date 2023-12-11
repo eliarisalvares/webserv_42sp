@@ -23,17 +23,16 @@ char** setEnvironment(Request* request) {
     std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
     std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
     std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
-    std::string query_string = "QUERY_STRING=" + request->query_string();
     std::string delete_path_info = "DELETE_PATH=" + server->getRoot() + "/upload";
     std::string content_type = "CONTENT_TYPE=" + http::enum_to_str_media_type(request->media_type());
     std::string content_length_env = "CONTENT_LENGTH=" + content_length_str;
     std::map<std::string, std::string> post_data = request->post_data();
-    std::string content_body = "CONTENT_BODY=";
+    std::string content_body = "QUERY_STRING=";
     for (std::map<std::string, std::string>::iterator it = post_data.begin(); it != post_data.end(); it++) {
         content_body += it->first + "=" + it->second + "&";
     }
 
-    char **envp = new char*[15];
+    char **envp = new char*[14];
     envp[0] = strdup(gateway_interface.c_str());
     envp[1] = strdup(path_info.c_str());
     envp[2] = strdup(path_translated.c_str());
@@ -43,12 +42,11 @@ char** setEnvironment(Request* request) {
     envp[6] = strdup(final_content_length.c_str());
     envp[7] = strdup(protocol.c_str());
     envp[8] = strdup(request_method.c_str());
-    envp[9] = strdup(query_string.c_str());
+    envp[9] = strdup(content_body.c_str());
     envp[10] = strdup(delete_path_info.c_str());
     envp[11] = strdup(content_type.c_str());
     envp[12] = strdup(content_length_env.c_str());
-    envp[13] = strdup(content_body.c_str());
-    envp[14] = NULL;
+    envp[13] = NULL;
 
     return envp;
 }
