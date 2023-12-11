@@ -1,247 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <link rel="icon" href="/assets/favicon.ico">
-    <title>WebWizards</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>42 - Webserv</title>
     <style>
         body {
-            background-color: #1a1a1a;
-            color: white;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 50px;
-        }
-
-        .card {
-            position: relative;
-            background-color: #333;
-            border-radius: 8px;
+            font-family: 'Helvetica', sans-serif;
+            margin: 20px;
             padding: 20px;
-            width: 30%;
+            background-color: #333333FF;
+            color: #bdbdbd;
         }
 
-        .card img {
-            max-width: 100%;
-            border-radius: 5px;
+        header {
+            text-align: center;
+            background-color: #000000;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
         }
 
-        .card-title {
-            font-size: 24px;
-            margin-top: 15px;
+        section {
+            margin-bottom: 20px;
         }
 
-        .card-info {
-            font-size: 16px;
-            margin-top: 10px;
+		h1 {
+			color: #333333FF;
+			font-size: 5rem;
+		}
+        h2 {
+            color: #6d5b8f;
         }
 
-        .icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
+        p {
+            line-height: 1.6;
         }
 
-        #newCharacterForm {
-            display: none;
+        a {
+            color: #007BFF;
+        }
+
+        footer {
+            text-align: center;
             margin-top: 20px;
-        }
-
-        .form-field {
-            margin-bottom: 10px;
-        }
-
-        .form-label {
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .icon-selection label {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .icon-selection label img {
-            width: 50px;
-            height: 50px;
-            border: 2px solid transparent;
-        }
-
-        .icon-selection input[type="radio"]:checked+img {
-            border-color: #4CAF50;
-        }
-
-        .picture-selection label img {
-            height: 200px;
-            width: auto;
-            border: 2px solid transparent;
-            cursor: pointer;
-            margin: 10px;
+            padding: 10px;
+            background-color: #333;
+            color: #bdbdbd;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>WebWizards</h1>
-    <button onclick="showForm()">Crie um novo personagem!</button>
+    <header>
+        <h1>42 - Webserv</h1>
+    </header>
 
-    <!-- New Character Form -->
-    <form id="newCharacterForm" enctype="application/x-www-form-urlencoded">
-        <input type="text" name="newName" placeholder="Nome" required style="margin-bottom: 10px;">
+    <section><br>
+        <h2>Introduction</h2>
+        <p>
+			We like to call ourselves WebWizards, as it's the name of our group in the 42 intra.<br>
+            This project is about writing your own HTTP server. A much simplified version of NGINX or Apache.<br>
+			In it, you can configure your server(s) with port, server_name, routes, and much more
+        </p><br>
+    </section>
 
-        <!-- Icon Selection -->
-        <div class="icon-selection">
-            <label for="icon1">
-                <input type="radio" id="icon1" name="newIconUrl" value="/assets/ball.png" required>
-                <img src="/assets/ball.png" alt="Icon 1">
-            </label>
-            <label for="icon2">
-                <input type="radio" id="icon2" name="newIconUrl" value="/assets/potion.png" required>
-                <img src="/assets/potion.png" alt="Icon 2">
-            </label>
-            <label for="icon3">
-                <input type="radio" id="icon3" name="newIconUrl" value="/assets/spell.png" required>
-                <img src="/assets/spell.png" alt="Icon 3">
-            </label>
-        </div>
+    <section>
+        <h2>Who are we?</h2>
+        <p>
+            We're a trio of magical girls that joined in this quest to finish the project in the time that would be possible with the 42 São Paulo's game.
+			<br>
+			<p style="color: #c64dd1;">elraira- | Eliaris</p>
+			<p style="color: #ebccee;">feralves | Fernanda</p>
+			<p style="color: #c767cf;">sguilher | Sheela</p>
+        </p><br>
+    </section>
 
-        <div class="picture-selection" style="align-items: center;" required>
-            <label for="picture1">
-                <input type="radio" id="picture1" name="newImageUrl"
-                    value="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" required>
-                <img src="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" alt="Picture 1" width="200px"
-                    height="auto">
-            </label>
-            <label for="picture2">
-                <input type="radio" id="picture2" name="newImageUrl"
-                    value="https://storage.googleapis.com/pod_public/1300/180941.jpg" required>
-                <img src="https://storage.googleapis.com/pod_public/1300/180941.jpg" alt="Picture 2" width="200px"
-                    height="auto">
-            </label>
-            <label for="picture3">
-                <input type="radio" id="picture3" name="newImageUrl"
-                    value="https://storage.googleapis.com/pod_public/1300/180935.jpg" required>
-                <img src="https://storage.googleapis.com/pod_public/1300/180935.jpg" alt="Picture 3" width="200px"
-                    height="auto">
-            </label>
-            <label for="picture4">
-                <input type="radio" id="picture4" name="newImageUrl"
-                    value="https://storage.googleapis.com/pai-images/b162c70c5b224030b1dd4753b6fa317a.jpeg" required>
-                <img src="https://storage.googleapis.com/pai-images/b162c70c5b224030b1dd4753b6fa317a.jpeg"
-                    alt="Picture 4" width="200px" height="auto">
-            </label>
-        </div>
+    <section>
+        <h2>Contact</h2>
+        <p>
+            Feel free to contact us if you'd like to get in touch.<br><br>
+			elraira- | Eliaris <a href="https://github.com/eliarisalvares">GitHub</a><br>
+			feralves | Fernanda <a href="https://github.com/ferfahl">GitHub</a><br>
+			sguilher | Sheela <a href="https://github.com/sgkhusal">GitHub</a>
+        </p>
+    </section>
 
-        <input type="submit" value="Criar!" style="margin-top: 10px;">
-    </form>
-
-    <div class="container">
-        <!-- Card 1 -->
-        <div class="card">
-            <img src="https://storage.googleapis.com/pod_public/1300/181028.jpg" alt="Character 1">
-            <img src="/assets/broom.png" class="icon" alt="Icon">
-            <div class="card-title">Fern</div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="card">
-            <img src="https://storage.googleapis.com/pod_public/1300/180955.jpg" alt="Character 2">
-            <img src="/assets/hat.png" class="icon" alt="Icon">
-            <div class="card-title">Lili</div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="card">
-            <img src="https://storage.googleapis.com/pod_public/1300/180931.jpg" alt="Character 3">
-            <img src="/assets/serum.png" class="icon" alt="Icon">
-            <div class="card-title">Sheela</div>
-        </div>
-
-        <!-- newCard -->
-    </div>
-
-    <script>
-        function showForm() {
-            var form = document.getElementById("newCharacterForm");
-            form.style.display = form.style.display === "none" ? "block" : "none";
-        }
-
-        function addNewCard(responseHTML) {
-            var container = document.querySelector('.container');
-            container.innerHTML += responseHTML
-        }
-
-        function encodeForUrl(form) {
-            var elements = form.elements;
-            var pairs = [];
-            for (var i = 0; i < elements.length; i++) {
-                if (elements[i].name) {
-                    pairs.push(encodeURIComponent(elements[i].name) + "=" + encodeURIComponent(elements[i].value));
-                }
-            }
-            return pairs.join("&");
-        }
-
-        window.onload = function () {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", `http://localhost:${location.port}/database/characters.html`, true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    var container = document.querySelector('.container');
-                    var responseHTML = xhr.responseText;
-                    var newCards = responseHTML.split('<div class=\'card\'>');
-                    newCards.shift();
-                    newCards.forEach(function (card) {
-                        addNewCard('<div class="card">' + card);
-                    });
-                } else {
-                    alert(`Erro ${xhr.status}: ${xhr.statusText}`);
-                }
-            };
-            xhr.onerror = function () {
-                console.error("Request failed");
-            };
-            xhr.send();
-
-            var form = document.getElementById("newCharacterForm");
-            form.onsubmit = function (event) {
-                event.preventDefault();
-
-                var selectedIcon = document.querySelector('input[name="newImageUrl"]:checked').value;
-                var selectedPicture = document.querySelector('input[name="newIconUrl"]:checked').value;
-                var data =
-                    encodeForUrl(form) +
-                    "&newIconUrl=" + encodeURIComponent(selectedIcon) +
-                    "&newImageUrl=" + encodeURIComponent(selectedPicture);
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", `http://localhost:${location.port}/cgi/form.py`, true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        addNewCard(xhr.responseText);
-                    } else {
-                        alert(`Erro ${xhr.status}: ${xhr.statusText}`);
-                    }
-                };
-
-                xhr.onerror = function () {
-                    console.error("Request failed");
-                };
-
-                xhr.send(data);
-            };
-        };
-    </script>
-
+    <footer>
+        &copy; 2023 WebWizards
+    </footer>
 
 </body>
 
