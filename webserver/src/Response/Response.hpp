@@ -75,12 +75,12 @@ bool 		isFileUpload(const std::string& body);
 std::string getFileName(const std::string& body);
 std::string getFilePath(const std::string& fileName);
 Response 	processFileUpload(Request* request);
-std::string getDefaultFilePath(std::string directoryPath);
+std::string getDefaultFilePath(std::string directoryPath, Request* request);
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request);
 std::string setFlagsContent(std::string contentType);
 
 std::string getJsonContent();
-std::string getDirectoryListing(const std::string& directoryPath);
+std::string getDirectoryListing(const std::string& directoryPath, Request* request);
 std::string getHtmlContent(const std::string& filePath);
 
 std::string handleCGI(Request* request);
