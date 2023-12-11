@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <!-- TODO: nossas fotos, formatação do botão(, escolha um ícone??) -->
+    <link rel="icon" href="/assets/favicon.ico">
     <title>WebWizards</title>
     <style>
         body {
@@ -10,11 +11,13 @@
             font-family: 'Arial', sans-serif;
             text-align: center;
         }
+
         .container {
             display: flex;
             justify-content: space-around;
             margin-top: 50px;
         }
+
         .card {
             position: relative;
             background-color: #333;
@@ -22,18 +25,22 @@
             padding: 20px;
             width: 30%;
         }
+
         .card img {
             max-width: 100%;
             border-radius: 5px;
         }
+
         .card-title {
             font-size: 24px;
             margin-top: 15px;
         }
+
         .card-info {
             font-size: 16px;
             margin-top: 10px;
         }
+
         .icon {
             position: absolute;
             top: 10px;
@@ -41,54 +48,121 @@
             width: 30px;
             height: 30px;
         }
+
         #newCharacterForm {
             display: none;
             margin-top: 20px;
         }
+
         .form-field {
             margin-bottom: 10px;
         }
+
         .form-label {
             margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .icon-selection label {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .icon-selection label img {
+            width: 50px;
+            height: 50px;
+            border: 2px solid transparent;
+        }
+
+        .icon-selection input[type="radio"]:checked+img {
+            border-color: #4CAF50;
+        }
+
+        .picture-selection label img {
+            height: 200px;
+            width: auto;
+            border: 2px solid transparent;
+            cursor: pointer;
+            margin: 10px;
         }
     </style>
 </head>
+
 <body>
 
     <h1>WebWizards</h1>
-    <button onclick="showForm()">Crie seu personagem!</button>
+    <button onclick="showForm()">Crie um novo personagem!</button>
 
     <!-- New Character Form -->
-    <form id="newCharacterForm" action="cgi/form.py" method="post" style="display: none;">
-        <input type="text" name="newName" placeholder="Name">
-        <input type="text" name="newInfo" placeholder="Information">
-        <input type="text" name="newImageUrl" placeholder="Image URL">
-        <input type="submit" value="Create" onclick="submitForm()">
+    <form id="newCharacterForm" enctype="application/x-www-form-urlencoded">
+        <input type="text" name="newName" placeholder="Nome" required style="margin-bottom: 10px;">
+
+        <!-- Icon Selection -->
+        <div class="icon-selection">
+            <label for="icon1">
+                <input type="radio" id="icon1" name="newIconUrl" value="/assets/ball.png" required>
+                <img src="/assets/ball.png" alt="Icon 1">
+            </label>
+            <label for="icon2">
+                <input type="radio" id="icon2" name="newIconUrl" value="/assets/potion.png" required>
+                <img src="/assets/potion.png" alt="Icon 2">
+            </label>
+            <label for="icon3">
+                <input type="radio" id="icon3" name="newIconUrl" value="/assets/spell.png" required>
+                <img src="/assets/spell.png" alt="Icon 3">
+            </label>
+        </div>
+
+        <div class="picture-selection" style="align-items: center;" required>
+            <label for="picture1">
+                <input type="radio" id="picture1" name="newImageUrl"
+                    value="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" required>
+                <img src="https://storage.googleapis.com/pai-images/41345478f518418aac43a85e2156f2b6.jpeg" alt="Picture 1" width="200px"
+                    height="auto">
+            </label>
+            <label for="picture2">
+                <input type="radio" id="picture2" name="newImageUrl"
+                    value="https://storage.googleapis.com/pod_public/1300/180941.jpg" required>
+                <img src="https://storage.googleapis.com/pod_public/1300/180941.jpg" alt="Picture 2" width="200px"
+                    height="auto">
+            </label>
+            <label for="picture3">
+                <input type="radio" id="picture3" name="newImageUrl"
+                    value="https://storage.googleapis.com/pod_public/1300/180935.jpg" required>
+                <img src="https://storage.googleapis.com/pod_public/1300/180935.jpg" alt="Picture 3" width="200px"
+                    height="auto">
+            </label>
+            <label for="picture4">
+                <input type="radio" id="picture4" name="newImageUrl"
+                    value="https://storage.googleapis.com/pai-images/b162c70c5b224030b1dd4753b6fa317a.jpeg" required>
+                <img src="https://storage.googleapis.com/pai-images/b162c70c5b224030b1dd4753b6fa317a.jpeg"
+                    alt="Picture 4" width="200px" height="auto">
+            </label>
+        </div>
+
+        <input type="submit" value="Criar!" style="margin-top: 10px;">
     </form>
 
     <div class="container">
         <!-- Card 1 -->
         <div class="card">
             <img src="https://storage.googleapis.com/pod_public/1300/181028.jpg" alt="Character 1">
-            <img src="./magic-broom_3479815.png" class="icon" alt="Icon">
+            <img src="/assets/broom.png" class="icon" alt="Icon">
             <div class="card-title">Fern</div>
-            <div class="card-info">informações</div>
         </div>
 
         <!-- Card 2 -->
         <div class="card">
             <img src="https://storage.googleapis.com/pod_public/1300/180955.jpg" alt="Character 2">
-            <img src="./magic-hat_3449972.png" class="icon" alt="Icon">
+            <img src="/assets/hat.png" class="icon" alt="Icon">
             <div class="card-title">Lili</div>
-            <div class="card-info">informações</div>
         </div>
 
         <!-- Card 3 -->
         <div class="card">
             <img src="https://storage.googleapis.com/pod_public/1300/180931.jpg" alt="Character 3">
-            <img src="./serum_3504702.png" class="icon" alt="Icon">
+            <img src="/assets/serum.png" class="icon" alt="Icon">
             <div class="card-title">Sheela</div>
-            <div class="card-info">informações</div>
         </div>
 
         <!-- newCard -->
@@ -96,33 +170,79 @@
 
     <script>
         function showForm() {
-            document.getElementById("newCharacterForm").style.display = "block";
+            var form = document.getElementById("newCharacterForm");
+            form.style.display = form.style.display === "none" ? "block" : "none";
         }
 
-        function hideForm() {
-            document.getElementById("newCharacterForm").style.display = "none";
+        function addNewCard(responseHTML) {
+            var container = document.querySelector('.container');
+            container.innerHTML += responseHTML
         }
 
-        function submitForm() {
-            console.log("Submitting form...");
-            document.getElementById("newCharacterForm").submit();
+        function encodeForUrl(form) {
+            var elements = form.elements;
+            var pairs = [];
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].name) {
+                    pairs.push(encodeURIComponent(elements[i].name) + "=" + encodeURIComponent(elements[i].value));
+                }
+            }
+            return pairs.join("&");
         }
 
-        function resetForm() {
-            document.getElementById("newCharacterForm").reset();
-        }
+        window.onload = function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", `http://localhost:${location.port}/database/characters.html`, true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var container = document.querySelector('.container');
+                    var responseHTML = xhr.responseText;
+                    var newCards = responseHTML.split('<div class=\'card\'>');
+                    newCards.shift();
+                    newCards.forEach(function (card) {
+                        addNewCard('<div class="card">' + card);
+                    });
+                } else {
+                    alert(`Erro ${xhr.status}: ${xhr.statusText}`);
+                }
+            };
+            xhr.onerror = function () {
+                console.error("Request failed");
+            };
+            xhr.send();
 
-        function createCharacter() {
-            submitForm();
-            hideForm();
-            resetForm();
-        }
+            var form = document.getElementById("newCharacterForm");
+            form.onsubmit = function (event) {
+                event.preventDefault();
 
-        function cancel() {
-            hideForm();
-            resetForm();
-        }
+                var selectedIcon = document.querySelector('input[name="newImageUrl"]:checked').value;
+                var selectedPicture = document.querySelector('input[name="newIconUrl"]:checked').value;
+                var data =
+                    encodeForUrl(form) +
+                    "&newIconUrl=" + encodeURIComponent(selectedIcon) +
+                    "&newImageUrl=" + encodeURIComponent(selectedPicture);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", `http://localhost:${location.port}/cgi/form.py`, true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        addNewCard(xhr.responseText);
+                    } else {
+                        alert(`Erro ${xhr.status}: ${xhr.statusText}`);
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.error("Request failed");
+                };
+
+                xhr.send(data);
+            };
+        };
     </script>
 
+
 </body>
+
 </html>

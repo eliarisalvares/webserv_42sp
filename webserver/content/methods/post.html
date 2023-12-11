@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post File</title>
-    <link rel="icon" href="./favicon.ico">
+    <title>POST</title>
+    <link rel="icon" href="/assets/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
     <style>
         body {
@@ -64,7 +64,7 @@
     <h2>Vamos usar o método POST para subir um arquivo para o servidor.</h2>
     <form id="uploadForm" enctype="multipart/form-data">
         <label for="file">Arquivo: </label>
-        <input type="file" name="file" id="file" accept=".png, .jpg, .jpeg, .gif"><br>
+        <input type="file" name="file" id="file" accept=".png, .jpg, .jpeg,"><br>
         <input type="submit" value="Upload">
     </form>
     <div id="content">
@@ -94,7 +94,7 @@
                             document.body.appendChild(img);
                         }, 500);
                     } else {
-                        alert("Something went wrong!");
+                        alert(`Erro ${xhr.status}: ${xhr.statusText}`);
                     }
                 };
 

@@ -18,7 +18,7 @@ def generate_directory_listing(dir_path):
             full_path = os.path.join(dir_path, item)
             if os.path.isdir(full_path):
                 item += '/'
-            print("<li><a href='{}'>{}</a></li>".format(full_path, item))
+            print("<li><a href='{}'>{}</a></li>".format(item, item))
     except Exception as e:
         print("<p>Error: {}</p>".format(e))
 

@@ -1,38 +1,33 @@
 #!/usr/bin/env python3
-import cgi
-import html
 import json
+import os
 
-form = cgi.FieldStorage()
+content = os.environ.get("QUERY_STRING", None)
+if not content:
+    with open("content/error_pages/400.html", "r") as f:
+        print(f.read())
 
-with open("form.txt", "w") as f:
-    f.write("form: " + str(form) + "\n")
+try:
+    new_image_url_key = content.split("&")[0]
+    new_image_url = new_image_url_key.split("=")[1]
+    new_icon_key = content.split("&")[1]
+    new_icon = new_icon_key.split("=")[1]
+    new_name_key = content.split("&")[2]
+    new_name = new_name_key.split("=")[1]
 
-new_name = html.escape(form.getvalue('newName', ''))
-new_info = html.escape(form.getvalue('newInfo', ''))
-new_image_url = html.escape(form.getvalue('newImageUrl', ''))
+    html_content = "<div class='card'>"
+    html_content += f"<img src='{new_image_url}' alt='Character 4'>"
+    html_content += f"<img src='{new_icon}' class='icon' alt='Icon'>"
+    html_content += f"<div class='card-title'>{new_name}</div>"
+    html_content += "</div>"
+    print(html_content)
 
-with open("form.txt", "a") as f:
-     f.write("newName: " + new_name + "\n")
-     f.write("newInfo: " + new_info + "\n")
-     f.write("newImageUrl: " + new_image_url + "\n")
+    file = open("content/database/characters.html", "a")
+    file.write(html_content)
+    file.close()
 
-response = {}
-if new_name and new_info and new_image_url:
-    response["success"] = True
-    response["name"] = new_name
-    response["info"] = new_info
-    response["imageUrl"] = new_image_url
-    # Add any additional processing here
-    with open("form.txt", "a") as f:
-        f.write("success: " + str(response["success"]) + "\n")
-        f.write("name: " + response["name"] + "\n")
-        f.write("info: " + response["info"] + "\n")
-        f.write("imageUrl: " + response["imageUrl"] + "\n")
-else:
-    response["success"] = False
-    response["error"] = "Please provide all the details."
+except:
+    with open("content/error_pages/400.html", "r") as f:
+        print(f.read())
 
-print("Content-Type: application/json")
-print()
-print(json.dumps(response))
+
