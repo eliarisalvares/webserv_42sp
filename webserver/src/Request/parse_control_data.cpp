@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 14:39:20 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:18:18 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,8 +284,10 @@ void RequestParser::_check_uri(void) {
 			if (!server->getAutoindex()) {
 				path = *(server->getIndex().begin());
 				Logger::debug("Index file", path);
-			} else {
-				path.push_back(SLASH);
+			}
+			else {
+				if (path[path.size() - 1] != SLASH)
+					path.push_back(SLASH);
 			}
 		}
 		else {
@@ -293,8 +295,10 @@ void RequestParser::_check_uri(void) {
 				path = *(location->index.begin());
 				Logger::debug("Index file", path);
 			}
-			else
-				path.push_back(SLASH);
+			else {
+				if (path[path.size() - 1] != SLASH)
+					path.push_back(SLASH);
+			}
 		}
 	}
 	else {

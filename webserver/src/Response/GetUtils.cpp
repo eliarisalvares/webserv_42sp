@@ -6,13 +6,16 @@
  * @param folderPath folder path to get the listing for.
  * @return std::string html string with the directory listing.
  */
-std::string getDirectoryListing(const std::string& folderPath) {
+std::string getDirectoryListing(const std::string& folderPath, Request* request) {
     std::string directoryListing = "<html><head><title>Index of /</title></head><body><h1>Index of /</h1><hr><pre>";
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir (folderPath.c_str())) != NULL) {
+		std::string base_dir = request->uri();
+		if (base_dir[base_dir.size() - 1] != '/')
+			base_dir += "/";
         while ((ent = readdir (dir)) != NULL) {
-            directoryListing += "<a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n";
+            directoryListing += "<a href=\"" + base_dir + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n";
         }
         closedir (dir);
     } else {
@@ -25,7 +28,7 @@ std::string getDirectoryListing(const std::string& folderPath) {
 /**
  * @brief Auxiliary function to get the directory listing as a json string.
  * Will be used to list the files in the delete request.
- * 
+ *
  * @return std::string the directory listing as a json string.
  */
 std::string getJsonContent() {
@@ -54,7 +57,7 @@ std::string getJsonContent() {
 /**
  * @brief Auxiliary function to get the content of a html file
  * as a string.
- * 
+ *
  * @param filePath path to the file.
  * @return std::string the content of the file.
  */
