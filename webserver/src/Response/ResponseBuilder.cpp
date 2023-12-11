@@ -2,15 +2,15 @@
 
 /**
  * @brief Sets the response headers for the response.
- * 
+ *
  * @param response the response to set the headers to
  * @param contentType the content type of the response
  * @param contentLength the content length of the response
  * @param request the request object holding the request data that originated the response
  */
-void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength, Request* request) {    
-
+void setResponseHeaders(Response& response, const std::string& contentType, const std::string& contentLength, Request* request) {
     Server *server = request->server();
+	int statusCode = request->status_code();
 
     std::string serverName = server->getName(0);
     std::set<std::string> serverMethods = server->getMethods();
@@ -20,9 +20,14 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
         if (it != --serverMethods.end())
             methodsStr += ", ";
     }
- 
-    response.addHeader("Content-Type", contentType);
-    response.addHeader("Content-Length", contentLength);
+
+	if (statusCode == http::MOVED_PERMANENTLY) {
+		response.addHeader("Location", request->path());
+	}
+	else {
+		response.addHeader("Content-Type", contentType);
+		response.addHeader("Content-Length", contentLength);
+	}
     response.addHeader("Date", getCurrentDate());
     response.addHeader("Host", request->host());
     response.addHeader("Server", serverName);
@@ -46,6 +51,7 @@ Response responseBuilder(Request* request) {
         return handleDeleteRequest(request);
     } else if (methodStr == "POST") {
         return handlePostRequest(request);
-    }
+    } else if (request->status_code() == http::MOVED_PERMANENTLY)
+		return handleRedirect(request);
     return handleGetRequest(request);
 }

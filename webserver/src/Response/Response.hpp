@@ -68,6 +68,7 @@ Response	responseBuilder(Request* request);
 Response	handleGetRequest(Request* request);
 Response	handlePostRequest(Request* request);
 Response	handleDeleteRequest(Request* request);
+Response	handleRedirect(Request* request);
 Response	handleMethodNotImplemented(Request* request);
 
 bool 		isFileUpload(const std::string& body);
