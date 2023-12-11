@@ -65,18 +65,23 @@ Response handlePostRequest(Request* request) {
     if (isFileUpload(request)) {
         return processFileUpload(request);
     } else {
-        std::string filePath = request->path();
+        std::string filePath = request->uri();
         Logger::debug("handlePostRequest - filePath: " + filePath);
+        
         std::string contentType = getContentType(filePath);
+        contentType = setFlagsContent(contentType);
+
         std::string body = getResponseBody(filePath, contentType, request);
-        int statusCode = body.empty() ? 404 : 200;
-        std::string message = getStatusMessage(statusCode);
-        Response response(request->fd(), statusCode);
+        std::string message = getStatusMessage(request->status_code());
+
+        Response response(request->fd(), 201);
         response.setMessage(message);
         response.setBody(body);
+
         std::stringstream ss;
         ss << body.length();
         setResponseHeaders(response, contentType, ss.str(), request);
+    
         return response;
     }
 }

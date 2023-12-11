@@ -1,38 +1,25 @@
 #!/usr/bin/env python3
-import cgi
-import html
 import json
+import os
+import uuid
 
-form = cgi.FieldStorage()
+content = os.environ.get("CONTENT_BODY", None)
+if not content:
+    print("Content-Type: application/json")
+    print()
+    print(json.dumps({"success": False, "error": "No content provided."}))
+    exit(0)
 
-with open("form.txt", "w") as f:
-    f.write("form: " + str(form) + "\n")
+new_image_url_key = content.split("&")[0]
+new_image_url = new_image_url_key.split("=")[1]
+new_icon_key = content.split("&")[1]
+new_icon = new_icon_key.split("=")[1]
+new_name_key = content.split("&")[2]
+new_name = new_name_key.split("=")[1]
 
-new_name = html.escape(form.getvalue('newName', ''))
-new_info = html.escape(form.getvalue('newInfo', ''))
-new_image_url = html.escape(form.getvalue('newImageUrl', ''))
+print("<div class='card'>")
+print(f"<img src='{new_image_url}' alt='Character 4'>")
+print(f"<img src='{new_icon}' class='icon' alt='Icon'>")
+print(f"<div class='card-title'>{new_name}</div>")
+print("</div>")
 
-with open("form.txt", "a") as f:
-     f.write("newName: " + new_name + "\n")
-     f.write("newInfo: " + new_info + "\n")
-     f.write("newImageUrl: " + new_image_url + "\n")
-
-response = {}
-if new_name and new_info and new_image_url:
-    response["success"] = True
-    response["name"] = new_name
-    response["info"] = new_info
-    response["imageUrl"] = new_image_url
-    # Add any additional processing here
-    with open("form.txt", "a") as f:
-        f.write("success: " + str(response["success"]) + "\n")
-        f.write("name: " + response["name"] + "\n")
-        f.write("info: " + response["info"] + "\n")
-        f.write("imageUrl: " + response["imageUrl"] + "\n")
-else:
-    response["success"] = False
-    response["error"] = "Please provide all the details."
-
-print("Content-Type: application/json")
-print()
-print(json.dumps(response))
