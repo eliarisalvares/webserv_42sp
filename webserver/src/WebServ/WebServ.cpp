@@ -97,10 +97,12 @@ void	WebServ::run(void) {
 			if (this->_pfds[i].revents & POLLOUT) {
 				if (_is_ready_to_respond(fd)) {
 					Logger::debug("POLLOUT event and request parsing ended");
-					_respond(this->_requestBuilderMap[fd]->build());
+					RequestBuilder* builder = this->_requestBuilderMap[fd];
+					_respond(builder->build());
+					if (builder->getRequest()->status_code() != http::MOVED_PERMANENTLY)
+						_end_connection(fd);
 					delete this->_requestBuilderMap[fd];
 					this->_requestBuilderMap.erase(fd);
-					_end_connection(fd);
 				}
 			}
 			if (!_is_server_socket(fd)) {
@@ -179,12 +181,9 @@ void WebServ::_receive(int fd) {
 	RequestBuilder* request_builder;
 
 	request_builder = _get_request_builder(fd);
-	if (request_builder->read()) {
+	if (request_builder->read())
 		request_builder->parse();
-		// if (request_builder->is_ready())
-		// 	request_builder->build();
-	}
-	else // verificar se é a tratativa certa
+	else
 		_end_connection(fd);
 }
 
@@ -236,33 +235,17 @@ void WebServ::clean(void) {
 	this->_total_fds = 0;
 }
 
-// for server we need to create other function
 void WebServ::_end_connection(int fd) {
 	t_pollfd_iterator it, end = this->_pfds.end();
-	// t_request_iterator request;
-	// t_response_iterator response;
 	t_req_builder_iterator builder;
 	std::map<int, int>::iterator fds_map;
 
-	// fazer um template pra esses deletes - std::map<int, T*>
-	// clean structures data
 	builder = this->_requestBuilderMap.find(fd);
 	if (builder != this->_requestBuilderMap.end()) {
 		delete builder->second;
 		this->_requestBuilderMap.erase(fd);
 	}
-	// request = this->_requests.find(fd);
-	// if (request != this->_requests.end()) {
-	// 	delete request->second;
-	// 	this->_requests.erase(fd);
-	// }
-	// response = this->_responses.find(fd);
-	// if (response != this->_responses.end()) {
-	// 	delete response->second;
-	// 	this->_responses.erase(fd);
-	// }
 
-	// clean fds structures
 	for (it = this->_pfds.begin(); it != end; ++it) {
 		if ((*it).fd == fd) {
 			this->_pfds.erase(it);
