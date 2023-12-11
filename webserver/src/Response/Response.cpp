@@ -95,5 +95,6 @@ void Response::sendResponse(void) {
 	Logger::debug("sending response...");
 
 	std::string response_string = this->toString();
+	// std::cout << "===================== RESPONSE\n" <<  response_string << "\n======================" << std::endl;
 	send(this->_fd, response_string.c_str(), response_string.length(), 0);
 }

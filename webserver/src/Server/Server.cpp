@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:04:24 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/10 17:02:16 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void	Server::setBasics() {
 	permit.has_redir = false;
 	permit.redirExternal = false;
 	serverName.push_back(SERVER_NAME);
-	index.insert("index.html");
+	index.insert("content/index.html");
 	setBufferSize(BUFFSIZE);
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);

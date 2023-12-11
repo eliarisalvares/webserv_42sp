@@ -116,7 +116,6 @@ void	WebServ::run(void) {
 			}
 
 		}
-		//iteração no requestBuilderMap
 	}
 }
 
