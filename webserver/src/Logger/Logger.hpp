@@ -19,7 +19,7 @@ Class to log error, warning or debug messages
 # define RESET	"\033[0m"
 
 # ifndef DEBUG
-    #define DEBUG true
+    #define DEBUG false
 # endif
 
 # define DEBUG_LOG "[ DEBUG ] "
