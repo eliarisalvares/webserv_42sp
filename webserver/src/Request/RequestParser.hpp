@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 15:07:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 21:01:25 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,15 +106,6 @@ public:
 		CRLF_CONTENT,
 	};
 
-	// enum Error {
-	// 	NONE,
-	// 	LF_WITHOUT_CR,
-	// 	CR_WITHOUT_LF,
-	// 	INVALID_METHOD_TOKEN,
-	// 	INVALID_URI,
-	// 	INVALID_PROTOCOL,
-	// 	INVALID_HTTP_VERSION,
-	// };
 
 	// tirar esse enum; deixando por hora só por referência
 	typedef enum e_abnf_rules {
@@ -217,9 +208,6 @@ private:
 	size_t						_chunk_bytes_readed;
 	std::string					_chunk_size_str;
 	std::vector<char>			_body;
-	std::vector<char>::iterator	_body_iterator_first;
-	std::vector<char>::iterator	_body_iterator;
-	std::vector<char>::iterator	_body_iterator_end;
 	bool						_has_content_type;
 	std::string					_content_type;
 	std::string					_media_type_str;
@@ -228,10 +216,7 @@ private:
 	http::MediaType				_media_type;
 	MultipartFormData			_multipart_step;
 	std::string					_multipart_tmp;
-	std::map<std::string, std::map<std::string, std::string> > _multipart_data;
 	http::MediaType				_multipart_type;
-	std::string					_multipart_name;
-	int							_multipart_content_crfl;
 
 	void						_print_body(void);
 	void						_body_chunked(char c);
@@ -246,13 +231,6 @@ private:
 	void						_check_multipart_crfl(char c);
 	void						_get_multipart_data(char c);
 	void						_remove_boundary(void);
-	// void						_check_boundary_delimiter(size_t pos);
-	// void						_check_boundary(void);
-	// void						_check_content_disposition(void);
-	// void						_check_data_content_type(void);
-	// void						_check_multipart_crfl(void);
-	// void						_separate_data(void);
-	// bool						_check_end_boundary(std::vector<char>::iterator initial);
 
 	// throw exceptions
 	void	_bad_request(std::string const description);

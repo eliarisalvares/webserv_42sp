@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 17:12:25 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 21:18:00 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,70 +214,69 @@ void RequestParser::parse_body(void) {
 }
 
 void RequestParser::_parse_form_data(void) {
+	std::vector<char>::iterator it, first = _body.begin(), end = _body.end();
 	FormData step = FIELD_NAME;
 	std::string hexadecimal;
 	bool is_hexadecimal = false;
 
-	_body_iterator_first = _body.begin();
-	_body_iterator_end = _body.end();
-	_body_iterator = _body_iterator_first;
+	it = first;
 	_field_name.clear();
 	_field_value.clear();
 	hexadecimal.clear();
 	if (DEBUG)
 		Logger::info("Parsing form url encoded data:");
-	while (_body_iterator != _body_iterator_end) {
+	while (it != end) {
 		switch (step)
 		{
 		case FIELD_NAME:
-			if (*_body_iterator == EQUAL)
+			if (*it == EQUAL)
 				step = FIELD_VALUE;
-			else if (!http::is_uri_char(*_body_iterator))
+			else if (!http::is_uri_char(*it))
 				_bad_request("Field name in POST with invalid character");
 			else if (is_hexadecimal) {
 				if (hexadecimal.size() == 1) {
-					hexadecimal.push_back(*_body_iterator);
+					hexadecimal.push_back(*it);
 					_field_name.push_back(utils::xtod(hexadecimal));
 					is_hexadecimal = false;
 					hexadecimal.clear();
 				}
 				else
-					hexadecimal.push_back(*_body_iterator);
+					hexadecimal.push_back(*it);
 			}
-			else if (*_body_iterator == PERCENT)
+			else if (*it == PERCENT)
 				is_hexadecimal = true;
 			else
-				_field_name.push_back(*_body_iterator);
+				_field_name.push_back(*it);
 			break;
 		case FIELD_VALUE:
-			if (*_body_iterator == AMPERSEND) {
+			if (*it == AMPERSEND) {
 				step = FIELD_NAME;
 				_request->addPostData(_field_name, _field_value);
 				_field_name.clear();
 				_field_value.clear();
 			}
-			else if (!http::is_uri_char(*_body_iterator))
+			else if (!http::is_uri_char(*it))
 				_bad_request("Field value in POST with invalida character");
 			else if (is_hexadecimal) {
 				if (hexadecimal.size() == 1) {
-					hexadecimal.push_back(*_body_iterator);
+					hexadecimal.push_back(*it);
 					_field_value.push_back(utils::xtod(hexadecimal));
 					is_hexadecimal = false;
 					hexadecimal.clear();
 				}
 				else
-					hexadecimal.push_back(*_body_iterator);
+					hexadecimal.push_back(*it);
 			}
-			else if (*_body_iterator == PERCENT)
+			else if (*it == PERCENT)
 				is_hexadecimal = true;
 			else
-				_field_value.push_back(*_body_iterator);
+				_field_value.push_back(*it);
 			break;
 
 		default:
 			break;
 		}
-		++_body_iterator;
+		++it;
 	}
 	_request->addPostData(_field_name, _field_value);
 	_request->printPostData();
@@ -314,19 +313,6 @@ void RequestParser::_parse_multipart(char c) {
 	default:
 		break;
 	}
-
-	// _check_boundary_delimiter(0);
-	// _check_boundary();
-	// _check_content_disposition();
-	// _check_data_content_type();
-	// _check_multipart_crfl();
-	// _separate_data();
-	// if (_body.size()) {
-	// 	_request->setHasImage(true);
-	// 	_request->setImage(&_body);
-	// 	_request->setImageType("png");
-	// }
-
 }
 
 void RequestParser::_check_boundary_delimiter(char c) {
@@ -483,7 +469,6 @@ void RequestParser::_check_data_content_type(char c) {
 		i++;
 	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
 	Logger::debug("Content-Type type", _multipart_tmp);
-	// _request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
 	Logger::debug("Content-Type OK");
 	_multipart_tmp.clear();
 }
@@ -493,9 +478,10 @@ void RequestParser::_get_multipart_data(char c) {
 }
 
 void RequestParser::_remove_boundary(void) {
-	_body_iterator_end = _body.end();
-	_body_iterator_first = _body_iterator_end - 8 - _boundary.size();
-	_body.erase(_body_iterator_first, _body_iterator_end);
+	std::vector<char>::iterator first, end = _body.end();
+
+	first = end - 8 - _boundary.size();
+	_body.erase(first, end);
 	_multipart_type = _request->media_type();
 
 	if (_body.size()) {

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 14:56:13 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/10 20:54:41 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ RequestParser::RequestParser(void): _step(INIT) {
 	_boundary_size = 0;
 	_media_type = http::NONE;
 	_multipart_step = INITIAL_BOUNDARY;
-	_multipart_content_crfl = false;
 }
 
 RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
@@ -42,7 +41,6 @@ RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_boundary_size = 0;
 	_media_type = http::NONE;
 	_multipart_step = INITIAL_BOUNDARY;
-	_multipart_content_crfl = false;
 }
 
 RequestParser::RequestParser(RequestParser const& copy) {
@@ -118,7 +116,6 @@ void RequestParser::init(char c) {
 	_media_type = http::NONE;
 	_multipart_step = INITIAL_BOUNDARY;
 	_multipart_tmp.clear();
-	_multipart_content_crfl = false;
 
 	_step = METHOD;
 	method(c);
