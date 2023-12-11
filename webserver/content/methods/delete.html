@@ -13,6 +13,7 @@
             color: #9435d3; /* Cute purple color */
             margin: 0;
             padding: 20px;
+            padding-bottom: 80px;
         }
         h1 {
             margin: 0 0 20px 0;
@@ -33,6 +34,9 @@
             list-style: none;
             padding: 0;
             align-items: center;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            margin-bottom: 20px;
         }
         li {
             margin-bottom: 1rem;
@@ -63,7 +67,7 @@
             text-align: center;
             padding: 20px;
             width: 100%;
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
 }
