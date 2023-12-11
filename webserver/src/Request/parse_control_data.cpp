@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 03:17:27 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 14:39:20 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,8 +203,8 @@ void RequestParser::_check_uri(void) {
 	if (locations_size)
 		use_server_config = false;
 
-	bool increment = true;
-	while (++it != end && !http::uri_path_end(*it)) { // arrumar o path
+	bool increment = true, is_first_iteration = true;
+	while (it != end && !http::uri_path_end(*it)) { // arrumar o path
 		if (*it == SLASH || (it + 1) == end) {
 			if ((it + 1) == end && *it != SLASH) {
 				increment = false;
@@ -222,8 +222,11 @@ void RequestParser::_check_uri(void) {
 				}
 			}
 		}
-		if (increment)
+		if (increment && !is_first_iteration)
 			path.push_back(*it);
+		if (is_first_iteration)
+			is_first_iteration = false;
+		++it;
 	}
 	Logger::debug("Path from URI", path);
 
@@ -298,7 +301,7 @@ void RequestParser::_check_uri(void) {
 		std::ifstream file;
 		file.open(path.c_str());
 		if (file.fail())
-			_invalid_request("Directory not found", path, http::NOT_FOUND);
+			_invalid_request("File not found", path, http::NOT_FOUND);
 		file.close();
 	}
 
