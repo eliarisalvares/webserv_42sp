@@ -3,7 +3,7 @@
 /**
  * @brief Checks if the request has a multipart/form-data media type.
  * If it does, it means that the request is a file upload.
- * 
+ *
  * @param request the request object holding the request data that originated the response
  * @return true if the request is a file upload
  * @return false if the request is not a file upload
@@ -22,7 +22,7 @@ bool isFileUpload(Request* request) {
  * @brief The chosen folder to save the uploaded file is the content/upload folder.
  * This function sets the file name to be saved in this folder and adds a number
  * to the file name if it already exists.
- * 
+ *
  * @param request the request object holding the request data that originated the response
  * @return std::string the file name to be saved
  */
@@ -52,7 +52,7 @@ std::string setFileName(Request* request) {
  * and set a 201 status code if the file was successfully saved. If the file was not saved,
  * it sets a 500 status code. If there is no image in the request, it sets a 404 status code.
  * The response body is the file name so the client can access the correct file that was uploaded.
- * 
+ *
  * @param request the request object holding the request data that originated the response
  * @return Response the response object to be sent to the client containing the response data
  * (status code, message and headers)
@@ -89,12 +89,16 @@ Response processFileUpload(Request* request) {
 /**
  * @brief Main function to handle POST requests. It checks if the request is a file upload
  * or not and calls the respective function to process the request.
- * 
+ *
  * @param request the request object holding the request data that originated the response
  * @return Response the response object to be sent to the client containing the response data
  * (status code, message and headers)
  */
 Response handlePostRequest(Request* request) {
+	// TODO: criar uma resposta não de acordo o media type da request:
+	// if (request->media_type() == http::TEXT_PLAIN) // texto
+	// if (request->media_type() == http::FORM_URLENCODED) // form -> é o CGI do webwizerds
+	// if (request->media_type() == http::MULTIPART_FORM_DATA) // é a imagem
     if (isFileUpload(request)) {
         return processFileUpload(request);
     } else {

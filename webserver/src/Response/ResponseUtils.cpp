@@ -21,22 +21,29 @@ static const std::map<std::string, std::string> contentTypeMap = initializeConte
 
 /**
  * @brief Checks for the file extension and returns the content type of it.
- * 
+ *
  * @param filePath path to the file.
  * @return std::string the content type of the file.
  */
 std::string getContentType(const std::string& filePath) {
-    std::string extension = filePath.substr(filePath.find_last_of('.'));
-    std::map<std::string, std::string>::const_iterator it = contentTypeMap.find(extension);
-    if (it == contentTypeMap.end())
-        return "text/plain";
-    return it->second;
+	// TODO: ver a melhor forma de tratar o erro; isso é só paleativo, mas ainda
+	// não resolve a questão; talvez a tratativa dos outros pontos vai influenciar aqui
+	try {
+    	std::string extension = filePath.substr(filePath.find_last_of('.'));
+    	std::map<std::string, std::string>::const_iterator it = contentTypeMap.find(extension);
+		if (it == contentTypeMap.end())
+			return "text/plain";
+    	return it->second;
+	} catch (std::exception& e) {
+		Logger::warning("Deu pau aqui");
+	}
+	return "text/plain";
 }
 
 /**
- * @brief Auxiliary function to get the current date and time 
+ * @brief Auxiliary function to get the current date and time
  * to be used in the response headers.
- * 
+ *
  * @return std::string the current date and time string
  */
 std::string getCurrentDate() {
