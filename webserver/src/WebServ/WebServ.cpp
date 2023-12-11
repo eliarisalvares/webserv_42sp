@@ -99,8 +99,7 @@ void	WebServ::run(void) {
 					Logger::debug("POLLOUT event and request parsing ended");
 					RequestBuilder* builder = this->_requestBuilderMap[fd];
 					_respond(builder->build());
-					if (builder->getRequest()->status_code() != http::MOVED_PERMANENTLY)
-						_end_connection(fd);
+					_end_connection(fd);
 					delete this->_requestBuilderMap[fd];
 					this->_requestBuilderMap.erase(fd);
 				}
