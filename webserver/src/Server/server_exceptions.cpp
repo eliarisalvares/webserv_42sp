@@ -6,7 +6,7 @@
 /*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:44 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 11:17:45 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:36:06 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,14 +62,6 @@ const char* AutoIndexWrongArgumentException::what() const throw() {
 
 const char* AutoIndexInvalidException::what() const throw() {
 	return ("Not a valid argument for autoindex.");
-}
-
-const char* DirListWrongArgumentException::what() const throw() {
-	return ("Wrong number of arguments for directory_listing.");
-}
-
-const char* DirListInvalidException::what() const throw() {
-	return ("Not a valid argument for directory_listing.");
 }
 
 const char* PortAlreadyInUseException::what() const throw() {

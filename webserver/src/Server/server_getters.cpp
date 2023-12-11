@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_getters.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/10 19:32:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 18:35:11 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ std::string	Server::getErrorPages(int value) const {
 	return this->_error_pages.at(value);
 }
 
-bool Server::getAutoindex(void) const {
+bool	Server::getAutoindex(void) const {
 	return this->_permit.autoindex;
 }
 
