@@ -47,11 +47,12 @@ Response responseBuilder(Request* request) {
 
     std::string methodStr = http::enum_to_str_method(method);
 
-    if (methodStr == "DELETE") {
+    if (request->status_code() == http::MOVED_PERMANENTLY)
+		return handleRedirect(request);
+	if (methodStr == "DELETE") {
         return handleDeleteRequest(request);
     } else if (methodStr == "POST") {
         return handlePostRequest(request);
-    } else if (request->status_code() == http::MOVED_PERMANENTLY)
-		return handleRedirect(request);
+    }
     return handleGetRequest(request);
 }
