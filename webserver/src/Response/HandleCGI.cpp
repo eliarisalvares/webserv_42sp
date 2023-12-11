@@ -23,6 +23,7 @@ char** setEnvironment(Request* request) {
     std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
     std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
     std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
+    std::string query_string = "QUERY_STRING=" + request->query_string();
     std::string delete_path_info = "DELETE_PATH=" + server->getRoot() + "/upload";
     std::string content_type = "CONTENT_TYPE=" + http::enum_to_str_media_type(request->media_type());
     std::string content_length_env = "CONTENT_LENGTH=" + content_length_str;
