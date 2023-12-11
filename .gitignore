@@ -21,3 +21,9 @@ server.
 client
 poll
 pollserver
+
+# autoindex
+autoindex.html
+
+# python - tests
+*.pyc
