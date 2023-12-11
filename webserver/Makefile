@@ -50,7 +50,9 @@ all: $(NAME)
 #needed to run the project if python not installed
 update-env:
 	sudo apt-get update
-	sudo apt-get python3
+	sudo apt-get install python3
+	sudo apt install python3-pip
+	pip3 install requests
 
 # Folder for temporary objects
 $(OBJPATH)/%.o:	%.cpp
