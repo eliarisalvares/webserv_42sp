@@ -23,7 +23,6 @@ char** setEnvironment(Request* request) {
     std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
     std::string protocol = "SERVER_PROTOCOL=HTTP/1.1";
     std::string request_method = "REQUEST_METHOD=" + http::enum_to_str_method(request->method());
-    std::string query_string = "QUERY_STRING=""";
     std::string delete_path_info = "DELETE_PATH=" + server->getRoot() + "/upload";
     std::string content_type = "CONTENT_TYPE=" + http::enum_to_str_media_type(request->media_type());
     std::string content_length_env = "CONTENT_LENGTH=" + content_length_str;
@@ -131,7 +130,7 @@ std::string handleCGI(Request* request) {
             throw std::runtime_error("CGI script execution failed");
         }
 
-        std::string contentType = "text/plain";
+        std::string contentType = "text/html";
         std::string flagsContent = setFlagsContent(contentType);
         std::stringstream ss;
         ss << result.length();
