@@ -19,7 +19,7 @@ def get_params(URL, params):
 
 def post(URL, body):
     try:
-        response = requests.post(URL, data=body)
+        response = requests.post(URL, data=body, headers={"Content-Type": "text/plain"})
         return response
     except:
         print("Error requests.post: " + URL)
@@ -27,7 +27,11 @@ def post(URL, body):
 
 def post_chunked(URL, body):
     try:
-        response = requests.post(URL, data=body, headers={"Transfer-Encoding": "chunked"})
+        response = requests.post(
+            URL,
+            data=body,
+            headers={"Transfer-Encoding": "chunked", "Content-Type": "text/plain"}
+        )
         return response
     except:
         print("Error requests.post: " + URL)
