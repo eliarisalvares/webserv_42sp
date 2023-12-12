@@ -61,21 +61,50 @@ Response processFileUpload(Request* request) {
     int statusCode = request->status_code();
     std::vector<char> *image = request->image();
     if (image == NULL) {
-        statusCode = 404;
+        statusCode = http::BAD_REQUEST;
     }
 
     std::string name = setFileName(request);
     std::ofstream file(name.c_str(), std::ios::binary);
 
     if (!file.is_open()) {
-        statusCode = 500;
+        statusCode = http::INTERNAL_SERVER_ERROR;
     }
 
     file.write(&(*image)[0], image->size());
-    statusCode = 201;
+    statusCode = http::CREATED;
     file.close();
 
     std::string responseBody = name;
+    size_t contentLength = responseBody.length();
+    Response response(request->fd(), statusCode);
+    response.setMessage(getStatusMessage(statusCode));
+    response.setBody(responseBody);
+    std::stringstream ss;
+    ss << contentLength;
+    setResponseHeaders(response, "text/plain", ss.str(), request);
+    return response;
+}
+
+Response processTextUpload(Request* request) {
+	int statusCode = request->status_code();
+    std::string text = request->text() + "\n";
+    if (text.size() == 0) {
+        statusCode = http::BAD_REQUEST;
+    }
+
+    std::string name = "content/upload/hello.txt";
+    std::ofstream file(name.c_str(), std::ios::app | std::ios::binary);
+
+    if (!file.is_open()) {
+        statusCode = http::INTERNAL_SERVER_ERROR;
+    }
+
+    file.write(text.c_str(), text.size());
+    statusCode = http::OK;
+    file.close();
+
+    std::string responseBody = text;
     size_t contentLength = responseBody.length();
     Response response(request->fd(), statusCode);
     response.setMessage(getStatusMessage(statusCode));
@@ -95,31 +124,34 @@ Response processFileUpload(Request* request) {
  * (status code, message and headers)
  */
 Response handlePostRequest(Request* request) {
-	// TODO: criar uma resposta não de acordo o media type da request:
-	// if (request->media_type() == http::TEXT_PLAIN) // texto
-	// if (request->media_type() == http::FORM_URLENCODED) // form -> é o CGI do webwizerds
-	// if (request->media_type() == http::MULTIPART_FORM_DATA) // é a imagem
-    if (isFileUpload(request)) {
+	http::MediaType media_type = request->media_type();
+	std::string body, filePath, contentType, message;
+
+	if (media_type == http::MULTIPART_FORM_DATA) // é a imagem
         return processFileUpload(request);
-    } else {
-        std::string filePath = request->uri();
-        Logger::debug("handlePostRequest - filePath: " + filePath);
+	else if (media_type == http::TEXT_PLAIN)
+        return processTextUpload(request);
+	else if (media_type != http::FORM_URLENCODED) {
+		// retornar erro
+	}
 
-        std::string contentType = getContentType(filePath);
-        contentType = setFlagsContent(contentType);
+	filePath = request->uri();
+	Logger::debug("handlePostRequest - filePath: " + filePath);
 
-        std::string body = getResponseBody(filePath, contentType, request);
-        std::string message = getStatusMessage(request->status_code());
+	contentType = getContentType(filePath);
+	contentType = setFlagsContent(contentType);
 
-        Response response(request->fd(), 201);
-        response.setMessage(message);
-        response.setBody(body);
+	message = getStatusMessage(request->status_code());
+    body = getResponseBody(filePath, contentType, request);
 
-        std::stringstream ss;
-        ss << body.length();
-        setResponseHeaders(response, contentType, ss.str(), request);
+	Response response(request->fd(), 201);
+	response.setMessage(message);
+	response.setBody(body);
 
-        Logger::info("Response created");
-        return response;
-    }
+	std::stringstream ss;
+	ss << body.length();
+	setResponseHeaders(response, contentType, ss.str(), request);
+
+	Logger::info("POST response created");
+	return response;
 }

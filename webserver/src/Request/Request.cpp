@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 15:24:07 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 22:08:12 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,10 @@ http::MediaType	Request::media_type(void) const {
 	return this->_media_type;
 }
 
+std::string Request::text(void) const {
+	return this->_text;
+}
+
 
 /********************************** SETTERS **********************************/
 
@@ -206,4 +210,8 @@ void Request::addPostData(std::string const& name, std::string const& value) {
 
 void Request::setMediaType(http::MediaType type) {
 	this->_media_type = type;
+}
+
+void Request::setText(std::string const& text) {
+	this->_text = text;
 }
