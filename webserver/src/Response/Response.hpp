@@ -69,7 +69,7 @@ Response	handleGetRequest(Request* request);
 Response	handlePostRequest(Request* request);
 Response	handleDeleteRequest(Request* request);
 Response	handleRedirect(Request* request);
-Response	handleMethodNotImplemented(Request* request);
+Response	handleErrorPages(Request* request);
 
 bool 		isFileUpload(const std::string& body);
 std::string getFileName(const std::string& body);

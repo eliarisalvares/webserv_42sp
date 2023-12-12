@@ -42,9 +42,12 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
  * handler function for it.
  */
 Response responseBuilder(Request* request) {
-    http::RequestMethod method = request->method();
     Logger::debug("Creating response...");
 
+    if (request->has_error())
+		return handleErrorPages(request);
+
+    http::RequestMethod method = request->method();
     std::string methodStr = http::enum_to_str_method(method);
 
     if (request->status_code() == http::MOVED_PERMANENTLY)

@@ -119,6 +119,7 @@ Response handlePostRequest(Request* request) {
         ss << body.length();
         setResponseHeaders(response, contentType, ss.str(), request);
 
+        Logger::info("Response created");
         return response;
     }
 }

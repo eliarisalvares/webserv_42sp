@@ -71,27 +71,6 @@ Response handleGetRequest(Request* request) {
     Logger::debug("handleGetRequest - filePath: " + filePath);
     int statusCode = request->status_code();
 
-    if (request->has_error()) {
-		// TODO: página de erro customizada de acordo com a location
-		// filePath.clear();
-		// if (request->location())
-		// 	if (request->location()->error_pages.size())
-		// 		// verificar se tem a página do erro específica e usar o caminho
-		// 		// it = request->location()->error_pages.find(statusCode);
-		// 		// if (it != request->location()->error_pages.end())
-		// 			// filePath =...
-		// else if (request->server()->getErrorPages().size())
-		// 	// lógica de cima
-		// if filePath.size() == 0 -> usar as páginas default
-		filePath = (
-			std::string("content/error_pages/")
-			+ ftstring::itostr(statusCode)
-			+ std::string(".html")
-		);
-		// verificar se tem de fato o arquivo nesse último caso, se não acho que
-		// pode dar um segFault
-	}
-
     if (filePath[filePath.length() - 1] == '/') {
         filePath = getDefaultFilePath(filePath, request);
     }
@@ -110,6 +89,7 @@ Response handleGetRequest(Request* request) {
     ss << body.length();
     setResponseHeaders(response, contentType, ss.str(), request);
 
+	Logger::info("Response created");
     return response;
 }
 
