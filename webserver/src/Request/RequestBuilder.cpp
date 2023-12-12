@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestBuilder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 19:29:43 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 14:10:40 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,9 @@ void RequestBuilder::parse(void) {
 				case RequestParser::SECOND_CR_CHUNK_END:
 					_parser.check_crlf(c);
 					break;
+				case RequestParser::KEEP:
+					_parser.wait_to_answer();
+					break;
 				default:
 					break;
 			}
@@ -176,7 +179,13 @@ void RequestBuilder::_setRequestError(http::InvalidRequest& e) {
 	Logger::warning(e.what());
 	_request->setStatusCode(e.get_error_code());
 	_request->setError(true);
-	_parser.setStep(RequestParser::END);
+	Logger::warning("set request error?");
+	if (e.get_error_code() == http::CONTENT_TOO_LARGE) {
+		Logger::warning("oi conteudo grande");
+		_parser.setStep(RequestParser::KEEP);
+	}
+	else
+		_parser.setStep(RequestParser::END);
 }
 
 void RequestBuilder::_setRequestError(std::exception& e) {

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tudo tem limite!</title>
+  <style>
+    * {
+      overflow: hidden;
+      margin: 0;
+    }
+
+    body {
+      background: #000;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: justify;
+      color: #fff;
+      font-family: "Lucida Console", monospace;
+      position: relative;
+      z-index: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 50px;
+      border-radius: 15px;
+    }
+
+    .text-box {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .image {
+      flex: 1;
+      text-align: center;
+      max-width: 40vw;
+      max-height: 80vh;
+      margin: 5vh;
+    }
+
+    .image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    p {
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: rgb(0, 104, 136);
+      color: #fff;
+      font-size: 20px;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .button:hover {
+      background-color: rgb(0, 186, 188);
+    }
+  </style>
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      var form = document.querySelector("form");
+
+      form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var formData = new FormData(form);
+
+        fetch("http://localhost:3009/methods/image.jpg", {
+          method: "POST",
+          body: formData
+        })
+        .then(function(response) {
+          window.location.href = "http://localhost:3009/methods/too_large.html";
+        })
+        .catch(function(error) {
+          console.log("Error:", error);
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="content">
+    <div class="image">
+      <img src="image.jpg" alt="Image">
+    </div>
+    <div class="text-box">
+      <h1>Tudo tem limite!</h1>
+      <p>
+        Na página anterior, podíamos enviar qualquer arquivo com o formato .jpg para o nosso Webserv.
+        Mas o que podemos fazer para impedir que um usuário entupa o nosso servidor com arquivos gigantescos?
+        Afinal, nada te impede de mandar uma imagem com a resolução de um outdoor em 600dpi.
+      </p>
+      <p>
+        Para isso, usamos a diretiva <i>client max body size</i>, que, nesse caso, impede que imagems de tamanho
+        acima de 200 kilobytes sejam enviadas para o nosso server. Faça o experimento!
+      </p>
+      <br>
+      <form action="http://localhost:3009/methods/image.jpg" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/jpeg">
+        <input type="submit" value="Enviar 🖼️" class="button">
+      </form>
+      <p>
+        <br>
+        <a href="http://localhost:3008/methods/delete.html" class="button">Próxima página! ➡️</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

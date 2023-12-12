@@ -1,0 +1,128 @@
+[ INFO ] New connection requested and created.
+[ DEBUG ] poll server: new connection on socket: |5|
+[ DEBUG ] POLLIN event
+[ DEBUG ] creating RequestBuilder...
+[ DEBUG ] reading received data...
+[ DEBUG ] method: |POST|
+[ DEBUG ] uri: |/|
+[ DEBUG ] protocol: |HTTP|
+[ DEBUG ] version: |1.1|
+[ DEBUG ] CRLF first line
+[ DEBUG ] key: |Host|
+[ DEBUG ] value: |localhost:9076|
+[ DEBUG ] CRLF header
+[ DEBUG ] key: |User-Agent|
+[ DEBUG ] value: |curl/7.81.0|
+[ DEBUG ] CRLF header
+[ DEBUG ] key: |Accept|
+[ DEBUG ] value: |/|
+[ DEBUG ] CRLF header
+[ DEBUG ] key: |Content-Length|
+[ DEBUG ] value: |3004109|
+[ DEBUG ] CRLF header
+[ DEBUG ] key: |Content-Type|
+[ DEBUG ] value: |multipart/form-data; boundary=------------------------f4393e506d559b24|
+[ DEBUG ] CRLF header
+[ DEBUG ] key: |Expect|
+[ DEBUG ] value: |100-continue|
+[ DEBUG ] CRLF header
+[ DEBUG ] CRLF end header
+[ DEBUG ] Checking request
+------------------------------------------------------
+Headers saved:
+accept: /
+content-length: 3004109
+content-type: multipart/form-data; boundary=------------------------f4393e506d559b24
+expect: 100-continue
+host: localhost:9076
+user-agent: curl/7.81.0
+------------------------------------------------------
+[ WARNING ] request parser error: Content-Lenght bigger than max body size
+[ WARNING ] 413 Content Too Large
+[ DEBUG ] POLLOUT event and request parsing ended
+[ DEBUG ] Creating response...
+[ DEBUG ] Default error page
+[ DEBUG ] getStatusMessage - statusCode: 413
+[ INFO ] Response created
+[ DEBUG ] sending response...
+===================== RESPONSE
+HTTP/1.1 413 Content Too Large
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Methods: DELETE, GET, POST
+Content-Length: 2369
+Content-Type: text/html;charset=utf-8
+Date: Tue, 12 Dec 2023 12:53:03 -03
+Host: localhost:9076
+Server: WebWizards
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Google font -->
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
+
+        <title>[413] 42 - Webserv</title>
+        <style>
+            body {
+                background-color: #333333FF;
+                color: #CCCCCCFF;
+                font-family: Montserrat;
+                font-size: 14px;
+                line-height: 1.5;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            #header {
+                background-color: #CCCCCCFF;
+                color: #333333FF;
+                padding: 10px;
+                text-align: center;
+            }
+            h1 {
+                font-size: 10rem;
+                margin: 0;
+            }
+
+            h2 {
+                font-size: 4rem;
+                margin: 0.25em 0;
+            }
+
+            h3 {
+                font-size: 2.5rem;
+                color: #777777FF;
+                margin: 0;
+            }
+            #content {
+                padding: 10px;
+            }
+            #image {
+                                background-color: #000000;
+                        }
+        </style>
+    </head>
+
+    <body>
+        <div id="image" style="text-align: center;">
+            <img src="https://httpcats.com/413.jpg" alt="413 Content Too Large" width="700" height="500">
+        </div>
+        <div id="header">
+            <h1>413</h1>
+            <h2>Content Too Large</h2>
+            <h3>Conteúdo Muito Grande</h3>
+        </div>
+        <div id="content">
+            <p>The request entity is larger than limits defined by server.</p>
+            <p>Would you like to go back to the <a href="/" style="color:#777777FF;">homepage</a>?</p>
+            <p>Or maybe learn more about HTTP <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413" style="color:#777777FF;">status codes</a>?</p>
+            <p>------------------------------------------------</p>
+            <p>A carga da requisição é mais larga que os limites estabelecidos pelo servidor.</p>
+            <p>Você gostaria de voltar para o <a href="/" style="color:#777777FF;">início</a>?</p>
+            <p>Ou talvez aprender um pouco mais sobre os <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/413" style="color:#777777FF;">códigos HTTP</a>?</p>
+    </body>
+</html>
+======================
+[ DEBUG ] Deleting RequestBuilder
+[ DEBUG ] Close connection on socket: |5|

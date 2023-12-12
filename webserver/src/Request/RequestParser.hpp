@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 02:58:20 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 13:59:07 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ public:
 		CR_CHUNK_END,
 		SECOND_CR_CHUNK_END,
 		END,
+		KEEP,
 	};
 
 	enum FormData {
@@ -131,6 +132,7 @@ public:
 	void						body(char c);
 	void						end_body(char c);
 	void						parse_body(void);
+	void						wait_to_answer(void);
 
 	void						check_crlf(char c);
 	void						check_request(void);

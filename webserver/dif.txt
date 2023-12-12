@@ -1,0 +1,78 @@
+7c7
+< [ DEBUG ] uri: |/upload|
+---
+> [ DEBUG ] uri: |/|
+15c15
+< [ DEBUG ] value: |Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0|
+---
+> [ DEBUG ] value: |curl/7.81.0|
+18,29c18
+< [ DEBUG ] value: |*/*|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Accept-Language|
+< [ DEBUG ] value: |pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Accept-Encoding|
+< [ DEBUG ] value: |gzip, deflate, br|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Content-Type|
+< [ DEBUG ] POLLIN event
+< [ DEBUG ] reading received data...
+< [ DEBUG ] value: |multipart/form-data; boundary=---------------------------36341408845575545452266259187|
+---
+> [ DEBUG ] value: |/|
+32,35c21
+< [ DEBUG ] value: |3004141|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Origin|
+< [ DEBUG ] value: |http://localhost:9076|
+---
+> [ DEBUG ] value: |3004109|
+37,49c23,24
+< [ DEBUG ] key: |Connection|
+< [ DEBUG ] value: |keep-alive|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Referer|
+< [ DEBUG ] value: |http://localhost:9076/methods/post.html|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Sec-Fetch-Dest|
+< [ DEBUG ] value: |empty|
+< [ DEBUG ] CRLF header
+< [ DEBUG ] key: |Sec-Fetch-Mode|
+< [ DEBUG ] POLLIN event
+< [ DEBUG ] reading received data...
+< [ DEBUG ] value: |cors|
+---
+> [ DEBUG ] key: |Content-Type|
+> [ DEBUG ] value: |multipart/form-data; boundary=------------------------f4393e506d559b24|
+51,52c26,27
+< [ DEBUG ] key: |Sec-Fetch-Site|
+< [ DEBUG ] value: |same-origin|
+---
+> [ DEBUG ] key: |Expect|
+> [ DEBUG ] value: |100-continue|
+58,63c33,36
+< accept: */*
+< accept-encoding: gzip, deflate, br
+< accept-language: pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3
+< connection: keep-alive
+< content-length: 3004141
+< content-type: multipart/form-data; boundary=---------------------------36341408845575545452266259187
+---
+> accept: /
+> content-length: 3004109
+> content-type: multipart/form-data; boundary=------------------------f4393e506d559b24
+> expect: 100-continue
+65,70c38
+< origin: http://localhost:9076
+< referer: http://localhost:9076/methods/post.html
+< sec-fetch-dest: empty
+< sec-fetch-mode: cors
+< sec-fetch-site: same-origin
+< user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0
+---
+> user-agent: curl/7.81.0
+87c55
+< Date: Tue, 12 Dec 2023 12:55:21 -03
+---
+> Date: Tue, 12 Dec 2023 12:53:03 -03

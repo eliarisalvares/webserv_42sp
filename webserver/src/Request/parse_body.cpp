@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_body.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 22:33:35 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 14:22:36 by feralves         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -512,6 +512,13 @@ void RequestParser::_remove_boundary(void) {
 		_request->setImage(&_body);
 		_request->setImageType("png");
 	}
+}
+
+void RequestParser::wait_to_answer(void) {
+	_body_bytes_readed++;
+	// Logger::warning("Size of body", _body_bytes_readed);
+	if (_body_bytes_readed == _request->content_length())
+		_step = END;
 }
 
 // --------------------------f069bd9492f6146e
