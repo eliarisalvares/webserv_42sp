@@ -8,8 +8,8 @@ response = integration.get(URL)
 
 assert response.status_code == 200
 
-assert '<a href="..">..</a>' in response.text
-assert '<a href=".">.</a>' in response.text
-assert '<a href="hello">hello</a>' in response.text
-assert '<a href="hello.html">hello.html</a>' in response.text
-assert '<a href="images">images</a>' in response.text
+assert '<a href="/examples/..">..</a>' in response.text
+assert '<a href="/examples/.">.</a>' in response.text
+assert '<a href="/examples/hello">hello</a>' in response.text
+assert '<a href="/examples/hello.html">hello.html</a>' in response.text
+assert '<a href="/examples/images">images</a>' in response.text
