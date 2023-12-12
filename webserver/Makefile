@@ -26,7 +26,7 @@ REQUEST =		Request.cpp RequestBuilder.cpp RequestParser.cpp \
 				parse_headers.cpp parse_body.cpp parse_utils.cpp
 RESPONSE =		Response.cpp ResponseBuilder.cpp StatusMessage.cpp HandleCGI.cpp \
 				HandleGetRequest.cpp HandlePostRequest.cpp HandleDeleteRequest.cpp \
-				HandleRedirect.cpp ResponseUtils.cpp GetUtils.cpp
+				HandleRedirect.cpp HandleErrorPages.cpp ResponseUtils.cpp GetUtils.cpp
 LOGGER =		Logger.cpp
 UTILS =			openFile.cpp ftstring.cpp http.cpp utils.cpp
 
