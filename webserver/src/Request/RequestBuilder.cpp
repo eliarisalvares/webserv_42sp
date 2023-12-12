@@ -6,13 +6,12 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 19:29:43 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 16:55:42 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestBuilder.hpp"
 
-// private constructor
 RequestBuilder::RequestBuilder(void):
 	_fd(0), _ready(false), _server(NULL), _request(NULL), _bytes_readed(0),
 	_buffer(NULL) {
@@ -37,7 +36,6 @@ RequestBuilder::RequestBuilder(RequestBuilder const& copy) {
 	*this = copy;
 }
 
-// private operator
 RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 	if (this != &copy) {
 		_fd = copy.getServerFd();
@@ -60,12 +58,12 @@ bool RequestBuilder::read(void) {
 
 	Logger::debug("reading received data...");
 	_bytes_readed = recv(_fd, _buffer, _server->getBufferSize(), 0);
-	error = errno;  // checkar se podemos usar assim
+	error = errno;
 
 	if (_bytes_readed <= 0) {
 		if (_bytes_readed == 0) {
 			Logger::warning_no_lf("client connection closed: ");
-			printf(GREY "socket %d hung up\n" RESET, this->_fd); // podemos usar a printf (por ser cpp)?
+			printf(GREY "socket %d hung up\n" RESET, this->_fd);
 		} else
 			Logger::strerror("recv", error);
 		close(this->_fd);
@@ -155,7 +153,7 @@ void RequestBuilder::parse(void) {
 	if (_parser.step() == RequestParser::BODY_LENGTH_END) {
 		_parser.setStep(RequestParser::END);
 		_ready = true;
-	} // this is not the best solution...
+	}
 	memset(_buffer, 0, _bytes_readed);
 }
 

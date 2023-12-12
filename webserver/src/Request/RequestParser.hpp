@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 16:34:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 02:58:20 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 17:06:26 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@
 # include "http.hpp"
 # include "Request.hpp"
 
-// Special chars - ABNF Rules
+/* Special chars - ABNF Rules */
 # define CR '\r'
 # define LF '\n'
 # define SP ' '
 # define HTAB '\t'
 
-// others
+/* others */
 # define COLON ':'
 # define COMMA ','
 # define POINT '.'
@@ -41,7 +41,7 @@
 # define AMPERSEND '&'
 # define PERCENT '%'
 
-// error messages
+/* error messages */
 # define REQPARSER_ERROR "request parser error: "
 # define HTTP_VERSION "invalid HTTP version"
 
@@ -105,22 +105,6 @@ public:
 		CONTENT,
 		CRLF_CONTENT,
 	};
-
-	// tirar esse enum; deixando por hora só por referência
-	typedef enum e_abnf_rules {
-		ALPHA, // (letters)
-		// CR, // (carriage return)
-		CRLF, // (CR LF)
-		CTL, // (controls)
-		DIGIT, // (decimal 0-9)
-		DQUOTE, // (double quote)
-		HEXDIG, // (hexadecimal 0-9/A-F/a-f)
-		// HTAB, // (horizontal tab)
-		// LF, // (line feed)
-		OCTET, // (any 8-bit sequence of data)
-		// SP, // (space)
-		VCHAR, //(any visible US-ASCII character)
-	}           t_abnf_rules;
 
 	void						init(char c);
 	void						method(char c);

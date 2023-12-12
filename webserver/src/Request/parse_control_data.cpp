@@ -6,28 +6,12 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 18:18:18 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 17:14:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
 
-// general:
-// Parts of request line is separated by a space character.
-// Technically there should be only one space though I've seen badly malformed requests that send multiple spaces.
-// Browsers will never send more than one space
-// nginx aceita vários espaços e nós tb estamos aceitando
-// não aceita espaço no início da primeira linha (não é letra maiúscula)
-
-// The three fields in the initial message line should be separated by a single space, but might instead use several spaces, or tabs. Accept any number of spaces or tabs between these fields.
-
-// Method names are always uppercase
-// The method token is case-sensitive
-// When a request method is received that is unrecognized or not implemented by an origin
-// server, the origin server SHOULD respond with the 501 (Not Implemented) status code.
-// When a request method is received that is known by an origin
-// server but not allowed for the target resource, the origin server
-// SHOULD respond with the 405 (Method Not Allowed) status code.
 void RequestParser::method(char c) {
 	if (utils::is_ualpha(c))
 		_method.push_back(c);
@@ -47,13 +31,6 @@ void RequestParser::method(char c) {
 		_bad_request("invalid character at request first line");
 }
 
-// URI enconding (tb serve pra POST) - não entendi se posso receber https
-// URI normalization:
-// normalizing the scheme and host to lowercase
-// normalizing the port to remove any leading zeros.
-// If port is elided from the URI, the default port for that scheme is used
-// o host pode ser um IP, que pode estar em ipv4 ou ipv6...
-// It is RECOMMENDED that all senders and recipients support, at a minimum, URIs with lengths of 8000 octets in protocol elements.
 void RequestParser::uri(char c) {
 	static bool init_uri = true;
 
@@ -77,7 +54,6 @@ void RequestParser::uri(char c) {
 		_invalid_request("invalid uri character", c, http::BAD_REQUEST);
 }
 
-// The HTTP version always takes the form "HTTP/x.x", uppercase
 void RequestParser::protocol(char c) {
 	static bool init_protocol = true;
 
@@ -102,24 +78,6 @@ void RequestParser::protocol(char c) {
 	else
 		_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 }
-
-// RFC 9110 - item 2.5. Protocol Version:
-// HTTP's version number consists of two decimal digits separated by a "."
-// (period or decimal point)
-// version format: <major-version>.<minor-version>
-
-// RFC 9110 - item 6.2. Control Data:
-// A server can send a 505 (HTTP Version Not Supported) response if it wishes,
-// for any reason, to refuse service of the client's major protocol version.
-// if major-version != 1: refuse -> 505
-
-// RFC 9110 - item 6.2. Control Data:
-// A recipient that receives a message with a major version number that it
-// implements and a minor version number higher than what it implements SHOULD
-// process the message as if it were in the highest minor version within that
-// major version to which the recipient is conformant
-// temos que aceitar 1.2, 1.3, 1.11
-// não precisamos aceitar 1.0?
 
 void RequestParser::version(char c) {
 	int size;
@@ -158,28 +116,6 @@ void RequestParser::version(char c) {
 		_invalid_request(HTTP_VERSION, http::BAD_REQUEST);
 }
 
-// 	The generic syntax uses the slash ("/"), question mark ("?"), and
-//    number sign ("#") characters to delimit components that are
-//    significant to the generic parser's hierarchical interpretation of an
-//    identifier
-
-// se % -> caracter especial com valor em hexadecimal % + 2 caracteres hexadecimais
-// For example, "%20" = SP
-// "%" HEXDIG HEXDIG
-// uppercase e lowercase HEXDIG são iguais
-// For consistency, URI producers and
-//    normalizers should use uppercase hexadecimal digits for all percent-
-//    encodings.
-
-// Reserved Characters:
-// reserved    = gen-delims / sub-delims
-// gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@" -> delimiting
-//    characters that are distinguishable from other data within a URI
-// sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
-//                   / "*" / "+" / "," / ";" / "="
-
-//  Unreserved Characters: Characters that are allowed in a URI but do not have a reserved purpose:
-// ALPHA / DIGIT / "-" / "." / "_" / "~"
 void RequestParser::_check_uri(void) {
 	Logger::debug("******************* Checking URI *******************");
 	if (_uri[0] != SLASH)
@@ -204,7 +140,7 @@ void RequestParser::_check_uri(void) {
 		use_server_config = false;
 
 	bool increment = true, is_first_iteration = true;
-	while (it != end && !http::uri_path_end(*it)) { // arrumar o path
+	while (it != end && !http::uri_path_end(*it)) {
 		if (*it == SLASH || (it + 1) == end) {
 			if ((it + 1) == end && *it != SLASH) {
 				increment = false;
@@ -266,7 +202,6 @@ void RequestParser::_check_uri(void) {
 	Logger::debug("Path with changing root", path);
 
 	if (is_redirect) {
-		// se external, só salva o externo
 		Logger::debug("Redirection", path);
 		_request->setStatusCode(http::MOVED_PERMANENTLY);
 		_request->setPath(path);
@@ -312,43 +247,6 @@ void RequestParser::_check_uri(void) {
 	_request->setPath(path);
 	_request->setUri(_uri);
 }
-
-// std::string RequestParser::_get_root_redirect(std::string const& redirect) {
-// 	Logger::warning("Enter redirection", redirect);
-// 	std::vector<t_location>* locations = _request->server()->getLocations();
-// 	std::string::const_iterator it = redirect.begin(), end = redirect.end();
-// 	int i, locations_size = locations->size();
-// 	bool use_server_config = locations_size ? false : true;
-// 	std::string path, location_str;
-// 	t_location *location;
-// 	location_str.clear();
-// 	path.clear();
-
-// 	bool increment = true;
-// 	while (it != end) {
-// 		if (*it == SLASH || (it + 1) == end) {
-// 			if ((it + 1) == end && *it != SLASH) {
-// 				increment = false;
-// 				path.push_back(*it);
-// 			}
-// 			if (!use_server_config) {
-// 				for (i = 0; i < locations_size; ++i) {
-// 					if (path.compare((*locations)[i].location) == 0) {
-// 						Logger::debug("location found", (*locations)[i].location);
-// 						location = &(*locations)[i];
-// 						_request->setLocation(location);
-// 						break;
-// 					}
-// 				}
-// 			}
-// 		}
-// 		if (increment)
-// 			path.push_back(*it);
-// 		++it;
-// 	}
-// 	Logger::debug("Path from redirect", path);
-// 	return path;
-// }
 
 void RequestParser::_check_method(void) {
 	std::set<std::string> allowed_methods;

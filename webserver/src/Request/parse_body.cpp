@@ -6,33 +6,11 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 22:33:35 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 17:24:32 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestParser.hpp"
-
-// Body
-
-//  Request messages are never close-delimited because they are always explicitly
-//  framed by length or transfer coding, with the absence of both implying the
-//   request ends immediately after the header section
-
-// A server MAY reject a request that contains a message body but not a
-// Content-Length by responding with 411 (Length Required).
-
-// If an HTTP message includes a body, there are usually header lines in the message that describe the body, eg (ver se são obrigatórios):
-// Content-Type: header gives the MIME-type of the data in the body, such as text/html or image/gif.
-// Content-Length: header gives the number of bytes in the body.
-
-// A HTTP request is terminated by two newlines
-// Note: Technically they should be 4 bytes: \r\n\r\n but you are strongly encouraged to also accept 2 byte terminator: \n\n.
-
-// If a valid Content-Length header field is present without Transfer-Encoding,
-// its decimal value defines the expected message body length in octets. If the
-// sender closes the connection or the recipient times out before the indicated
-// number of octets are received, the recipient MUST consider the message to be
-// incomplete and close the connection.
 
 void RequestParser::body(char c) {
 	if (_is_chunked)
@@ -59,44 +37,12 @@ void RequestParser::end_body(char c) {
 		_invalid_request("Body larger than specified", http::CONTENT_TOO_LARGE);
 }
 
-// RFC 9112 - 6.3.4
-// If a Transfer-Encoding header field is present in a request and the chunked
-// transfer coding is not the final encoding (0), the message body length cannot
-// be determined reliably; the server MUST respond with the 400 (Bad Request)
-//  status code and then close the connection.
-
-// depois de ler cada chunck, devolve uma resposta com status code = 202 pra
-// indicar pro cliente que foi aceito
-// quando finalizar, retorna 200 ou 201 (CREATED)
-
-// Example:
-// 4␍␊            (chunk size is four octets)
-// Wiki           (four octets of data)
-// ␍␊             (end of chunk)
-
-// 7␍␊            (chunk size is seven octets)
-// pedia i        (seven octets of data)
-// ␍␊             (end of chunk)
-
-// B␍␊            (chunk size is eleven octets)
-// n ␍␊chunks.    (eleven octets of data)
-// ␍␊             (end of chunk)
-
-// 0␍␊            (chunk size is zero octets, no more chunks)
-// ␍␊             (end of final chunk with zero data octets)
-
-// Result string: "Wikipedia in ␍␊chunks."
-// Result print:
-// "Wikipedia in
-// chunks."
-
 void RequestParser::_body_chunked(char c) {
 	switch (_step) {
 		case CHUNK_SIZE:
 			_parse_chunk_size(c);
 			break;
 		case CHUNK_PARAMETERS:
-			// por hora não vou fazer nada com os parametros
 			if (c == CR)
 				_step = CR_CHUNK_SIZE;
 			if (c == LF)
@@ -111,7 +57,7 @@ void RequestParser::_body_chunked(char c) {
 				_step = CR_CHUNK_DATA;
 			else if (c == LF)
 				_step = CHUNK_SIZE;
-			else // verificar o tipo de erro
+			else
 				_invalid_request(
 					"chunk data larger than specified", http::CONTENT_TOO_LARGE
 				);
@@ -121,7 +67,7 @@ void RequestParser::_body_chunked(char c) {
 				_step = SECOND_CR_CHUNK_END;
 			else if (c == LF)
 				_step = END;
-			else // verificar o tipo de erro
+			else
 				_invalid_request(
 					"chunk data larger than specified", http::CONTENT_TOO_LARGE
 				);
@@ -130,7 +76,6 @@ void RequestParser::_body_chunked(char c) {
 		default:
 			break;
 	}
-	// _print_body();
 }
 
 void RequestParser::_parse_chunk_size(char c) {
@@ -176,7 +121,6 @@ void RequestParser::_parse_chunk_data(char c) {
 		++_body_bytes_readed;
 		if (_chunk_bytes_readed == _chunk_size) {
 			_step = CHUNK_DATA_END;
-			// _print_body();
 		}
 	}
 }
@@ -323,19 +267,6 @@ void RequestParser::_parse_multipart(char c) {
 	default:
 		break;
 	}
-
-	// _check_boundary_delimiter(0);
-	// _check_boundary();
-	// _check_content_disposition();
-	// _check_data_content_type();
-	// _check_multipart_crfl();
-	// _separate_data();
-	// if (_body.size()) {
-	// 	_request->setHasImage(true);
-	// 	_request->setImage(&_body);
-	// 	_request->setImageType("png");
-	// }
-
 }
 
 void RequestParser::_check_boundary_delimiter(char c) {
@@ -492,7 +423,6 @@ void RequestParser::_check_data_content_type(char c) {
 		i++;
 	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
 	Logger::debug("Content-Type type", _multipart_tmp);
-	// _request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
 	Logger::debug("Content-Type OK");
 	_multipart_tmp.clear();
 }
@@ -513,21 +443,3 @@ void RequestParser::_remove_boundary(void) {
 		_request->setImageType("png");
 	}
 }
-
-// --------------------------f069bd9492f6146e
-// ------------------------f069bd9492f6146e
-
-// 2 DASHS - BOUNDARY - CRLF
-// BODY_HEADERS:
-// Content-Disposition: form-data; params (name="" pelo menos...) - CRLF
-// Content-Type (opcional) - CRLF
-// CRLF
-// content ... CRLF
-// 2 DASHS - BOUNDARY - CRLF
-
-// --------------------------62774971962833fd
-// Content-Disposition: form-data; name="file"; filename="txt.txt"
-// Content-Type: text/plain
-
-// Hello World
-// --------------------------62774971962833fd--

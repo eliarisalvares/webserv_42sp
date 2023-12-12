@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:26:19 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 22:08:34 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 16:59:52 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ public:
 	Request(Request const& copy);
 	Request const& operator=(Request const& copy);
 
-	// getters
+	/* getters */
 	Server*					server(void) const;
 	http::RequestMethod		method(void) const;
 	int						fd(void) const;
@@ -48,7 +48,7 @@ public:
 	std::string				image_type(void) const;
 	std::map<std::string, std::string> post_data(void) const;
 
-	// setters
+	/* setters */
 	void					setMethod(http::RequestMethod method);
 	void					setStatusCode(http::HttpStatus status);
 	void					setPath(std::string const uri);
@@ -79,19 +79,19 @@ private:
 	std::string				_uri;
 	t_location*				_location;
 
-	// headers data
+	/* headers data */
 	std::string				_host;
 	size_t					_content_length;
 
 	http::MediaType			_media_type;
-	// image
+	/* image */
 	bool					_has_image;
 	std::string				_image_type;
 	std::string				_image_file_name;
 	std::vector<char>*		_image;
-	// form
+	/* form */
 	std::map<std::string, std::string> _post_data;
-	// text
+	/* text */
 	std::string				_text;
 };
 
