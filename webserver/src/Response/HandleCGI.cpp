@@ -16,7 +16,7 @@ char** setEnvironment(Request* request) {
 
     std::string path_info = "PATH_INFO=" + request->uri();
     std::string path_translated = "PATH_TRANSLATED=" + server->getRoot() + request->uri();
-    std::string script_name = "SCRIPT_NAME=" + request->uri();
+    std::string script_name = "SCRIPT_NAME=" +  request->uri().substr(request->uri().find_last_of("/") + 1, request->uri().length());
     std::string server_name = "SERVER_NAME=" + server->getName(0);
     std::string server_port = "SERVER_PORT=" + server->getCurrentPort();
     std::string final_content_length = "CONTENT_LENGTH=" + content_length_str;
@@ -91,6 +91,13 @@ std::string handleCGI(Request* request) {
 
     if (pid == 0) {
         char **envp = setEnvironment(request);
+
+        std::string cgiDir =  "content/cgi";
+        filePath = filePath.substr(cgiDir.length(), filePath.length() - cgiDir.length());
+        filePath = filePath.substr(1, filePath.length() - 1);
+        if (chdir(cgiDir.c_str()) == -1) {
+            throw std::runtime_error("chdir failed: " + std::string(strerror(errno)));
+        }
 
         close(pipefd[0]);
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
