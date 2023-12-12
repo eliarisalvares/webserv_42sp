@@ -27,3 +27,7 @@ autoindex.html
 
 # python - tests
 *.pyc
+
+# upload
+image*
+hello.txt

@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 17:12:25 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/11 22:33:35 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,6 +210,15 @@ void RequestParser::parse_body(void) {
 		_parse_form_data();
 	else if (_multipart_type == http::FORM_URLENCODED)
 		_parse_form_data();
+	if (_media_type == http::TEXT_PLAIN) {
+		_body_iterator = _body.begin();
+		_body_iterator_end = _body.end();
+
+		std::string text;
+		for (_body_iterator = _body.begin(); _body_iterator != _body_iterator_end; ++_body_iterator)
+			text.push_back(*_body_iterator);
+		_request->setText(text);
+	}
 	//_print_body();
 }
 
