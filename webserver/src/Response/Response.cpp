@@ -78,8 +78,8 @@ const std::map<std::string, std::string>& Response::getHeaders(void) const {
 
 /**
  * @brief Method to convert the response object to a string to be sent to the client.
- * 
- * @return std::string 
+ *
+ * @return std::string
  */
 std::string Response::toString() const {
     std::ostringstream response_stream;
@@ -96,12 +96,11 @@ std::string Response::toString() const {
 
 /**
  * @brief Method to send the response to the client.
- * 
+ *
  */
 void Response::sendResponse(void) {
 	Logger::debug("sending response...");
-
 	std::string response_string = this->toString();
-	// std::cout << "===================== RESPONSE\n" <<  response_string << "\n======================" << std::endl;
+
 	send(this->_fd, response_string.c_str(), response_string.length(), 0);
 }

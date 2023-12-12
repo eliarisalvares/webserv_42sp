@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:21:52 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 17:20:10 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:18:22 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void RequestParser::header(char c) {
 			return ;
 		}
 		else if (c == LF) {
-			Logger::debug("LF end header");
 			_step = END;
 			return ;
 		}
@@ -52,7 +51,6 @@ void RequestParser::_parse_field_name(char c) {
 	if (c != COLON && !utils::is_ctl(c) && c != SP)
 		_field_name.push_back(c);
 	else if (c == COLON) {
-		Logger::debug("key", _field_name);
 		_step = HEADER_VALUE_INIT;
 	}
 	else if (c == CR) {
@@ -65,11 +63,9 @@ void RequestParser::_parse_field_name(char c) {
 
 void RequestParser::_parse_field_value(char c) {
 	if (c == CR || c == LF) {
-		Logger::debug("value", _field_value);
 		if (c == CR)
 			_step = CR_HEADER;
 		else if (c == LF) {
-			Logger::debug("LF header");
 			_step = HEADER;
 		}
 		_add_header();
@@ -160,8 +156,6 @@ void RequestParser::_check_transfer_encoding(void) {
 	Logger::debug("found Transfer-Encoding: chunked");
 }
 
-// content-type is singleton and the last value passed is its final value
-// (if it is not an empty value)
 void RequestParser::_set_content_type(void) {
 	t_header_iterator it_header;
 	std::string ct_raw;
@@ -216,7 +210,6 @@ void RequestParser::_check_content_type(void) {
 	std::set<std::string>::const_iterator it;
 	std::string::iterator it_str, end_str;
 
-	Logger::debug("_content_type", _content_type);
 	end_str = _content_type.end();
 	for (it_str = _content_type.begin(); it_str != end_str; ++it_str)
 		*it_str = utils::c_tolower(*it_str);
@@ -225,7 +218,6 @@ void RequestParser::_check_content_type(void) {
 		_content_type, SEMICOLON
 	);
 	_media_type_str = ct_split[0];
-	Logger::debug("_media_type_str", _media_type_str);
 	_media_type = http::str_to_enum_media_type(_media_type_str);
 
 	if (_media_type == http::MULTIPART_FORM_DATA) {
@@ -235,7 +227,6 @@ void RequestParser::_check_content_type(void) {
 			);
 		std::vector<std::string>::iterator it_v, end_v = ct_split.end();
 		for (it_v = ct_split.begin() + 1; it_v != end_v; ++it_v) {
-			Logger::debug("ct_split", *it_v);
 			std::vector<std::string> bdry = ftstring::split(*it_v, EQUAL);
 			if (bdry.size() == 2) {
 				size_t i = 0;
@@ -252,7 +243,7 @@ void RequestParser::_check_content_type(void) {
 						&utils::c_tolower
 					);
 					_boundary_size = _boundary.size();
-					Logger::warning("Found boundary", _boundary);
+					Logger::debug("Found boundary", _boundary);
 				}
 			}
 		}

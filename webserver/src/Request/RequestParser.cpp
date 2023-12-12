@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/04 21:21:48 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 17:09:09 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:16:13 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,6 @@ void RequestParser::check_crlf(char c) {
 			_step = HEADER;
 			break;
 		case CR_HEADER:
-			Logger::debug("CRLF header");
 			_step = HEADER;
 			break;
 		case SECOND_CR_HEADER:
@@ -167,7 +166,7 @@ void RequestParser::check_crlf(char c) {
 }
 
 void RequestParser::check_request(void) {
-	Logger::debug("Checking request");
+	Logger::debug("Checking request...");
 
 	_print_headers();
 	_check_host();
@@ -175,7 +174,6 @@ void RequestParser::check_request(void) {
 	_check_transfer_encoding();
 	_set_content_type();
 	_headers.clear();
-
 
 	_check_uri();
 	_check_method();
