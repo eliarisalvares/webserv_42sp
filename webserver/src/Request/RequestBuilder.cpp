@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 23:00:04 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 16:55:42 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:08:43 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,12 @@ RequestBuilder& RequestBuilder::operator=(RequestBuilder const& copy) {
 bool RequestBuilder::read(void) {
 	int error;
 
-	Logger::debug("reading received data...");
 	_bytes_readed = recv(_fd, _buffer, _server->getBufferSize(), 0);
 	error = errno;
 
 	if (_bytes_readed <= 0) {
 		if (_bytes_readed == 0) {
-			Logger::warning_no_lf("client connection closed: ");
+			Logger::warning_no_lf("client connection is closed: ");
 			printf(GREY "socket %d hung up\n" RESET, this->_fd);
 		} else
 			Logger::strerror("recv", error);

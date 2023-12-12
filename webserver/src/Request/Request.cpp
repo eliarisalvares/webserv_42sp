@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 17:01:09 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:12:20 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,12 @@ http::HttpStatus Request::status_code(void) const {
 }
 
 std::string Request::path(void) const {
-	Logger::info("path", this->_path);
+	Logger::debug("path", this->_path);
 	return this->_path;
 }
 
 std::string Request::uri(void) const {
-	Logger::info("uri", this->_uri);
+	Logger::debug("uri", this->_uri);
 	return this->_uri;
 }
 

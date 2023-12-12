@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 17:24:32 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:27:50 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void RequestParser::end_body(char c) {
 	if (c == CR)
 		_step = CR_BODY;
 	else if (c == LF) {
-		Logger::debug("LF end Body");
 		_step = END;
 	}
 	else
@@ -47,7 +46,6 @@ void RequestParser::_body_chunked(char c) {
 				_step = CR_CHUNK_SIZE;
 			if (c == LF)
 				_step = CHUNK_DATA;
-			Logger::debug("chunk parameter: ", c);
 			break;
 		case CHUNK_DATA:
 			_parse_chunk_data(c);
@@ -88,15 +86,11 @@ void RequestParser::_parse_chunk_size(char c) {
 			_step = CHUNK_PARAMETERS;
 		_chunk_size = utils::xtod(_chunk_size_str);
 		_chunk_bytes_readed = 0;
-		Logger::debug("chunk size hex:", _chunk_size_str);
-		Logger::debug("chunk size decimal:", _chunk_size);
 		if (_chunk_size == 0) {
 			if (c == CR)
 				_step = CR_CHUNK_END;
-			if (c == LF) {
-				Logger::debug("first LF chunk end");
+			if (c == LF)
 				_step = CHUNK_END;
-			}
 		}
 		_chunk_size_str.clear();
 	}
@@ -356,14 +350,12 @@ void RequestParser::_check_content_disposition(char c) {
 	std::vector<std::string> ctd = ftstring::split(_multipart_tmp, SEMICOLON);
 	if (ctd.size() < 2)
 		_bad_request("missing data for Content-Disposition on multipart data");
-	Logger::debug("Content-Disposition name", ctd[0]);
 	if (ctd[0] != "content-disposition: form-data")
 		_bad_request("bad Content-Disposition on multipart data");
 
 	size_t i = 0;
 	while (ctd[1][i] == SP)
 		i++;
-	Logger::debug("Content-Disposition name parameter", ctd[1]);
 	if (ctd[1].substr(i, 5) != "name=")
 		_bad_request("missing Content-Disposition name parameter");
 
@@ -386,11 +378,7 @@ void RequestParser::_check_content_disposition(char c) {
 				"filename", (*it).substr(aux + 2, (*it).size() - aux - 2)
 			);
 	}
-	if (DEBUG)
-		Logger::info("Verify if parameters were saved");
 	_request->post_data();
-
-	Logger::debug("Content-Disposition OK");
 	_multipart_tmp.clear();
 	_multipart_step = CRLF_DISPOSITION;
 }
@@ -416,14 +404,11 @@ void RequestParser::_check_data_content_type(char c) {
 	);
 	size_t i = _multipart_tmp.find(COLON);
 	++i;
-	Logger::debug("Content-Type name", _multipart_tmp.substr(0, i));
 	if (_multipart_tmp.substr(0, i) != "content-type:")
 		_bad_request("bad Content-Type header on multipart/form-data");
 	while (_multipart_tmp[i] == SP)
 		i++;
 	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
-	Logger::debug("Content-Type type", _multipart_tmp);
-	Logger::debug("Content-Type OK");
 	_multipart_tmp.clear();
 }
 

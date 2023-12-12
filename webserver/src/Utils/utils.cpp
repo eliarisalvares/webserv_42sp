@@ -6,12 +6,11 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:23 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/08 00:38:55 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:55:56 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.hpp"
-
 
 namespace utils {
 

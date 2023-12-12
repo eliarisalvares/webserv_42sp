@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 17:14:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 20:29:24 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ void RequestParser::protocol(char c) {
 		if (_protocol.compare(_right_protocol) != 0)
 			_invalid_request("invalid protocol", _protocol, http::BAD_REQUEST);
 		_step = VERSION;
-		Logger::debug("protocol", _protocol);
 		init_protocol = true;
 	}
 	else if (c == SP)
@@ -90,11 +89,9 @@ void RequestParser::version(char c) {
 		size = _version.size();
 		if (size == 3) {
 			if (_version[0] == '1' && _version[1] == POINT && _version[2] == '1') {
-				Logger::debug("version", _version);
 				if (c == CR)
 					_step = CR_FIRST_LINE;
 				if (c == LF) {
-					Logger::debug("LF first line");
 					_step = HEADER;
 				}
 			}
@@ -189,7 +186,7 @@ void RequestParser::_check_uri(void) {
 			path = location->redirection;
 	}
 	if (is_redirect)
-		Logger::debug("redirect", root);
+		Logger::debug("will be redirect to", root);
 	else
 		Logger::debug("root", root);
 	if (is_external_redirection)
@@ -199,10 +196,9 @@ void RequestParser::_check_uri(void) {
 			path.erase(0, location_str.size());
 		path.insert(path.begin(), root.begin(), root.end());
 	}
-	Logger::debug("Path with changing root", path);
+	Logger::debug("Path translated", path);
 
 	if (is_redirect) {
-		Logger::debug("Redirection", path);
 		_request->setStatusCode(http::MOVED_PERMANENTLY);
 		_request->setPath(path);
 		_request->setUri(_uri);
@@ -212,13 +208,13 @@ void RequestParser::_check_uri(void) {
 	if (!http::is_path_to_file(path)) {
 		DIR *dr = opendir(path.c_str());
 		if (dr == NULL)
-			_invalid_request("Directory not found", path, http::NOT_FOUND);
+			_invalid_request("Path not found", path, http::NOT_FOUND);
 		closedir(dr);
 		Logger::debug("Found directory", path);
 		if (use_server_config) {
 			if (!server->getAutoindex()) {
 				path = *(server->getIndex().begin());
-				Logger::debug("Index file", path);
+				Logger::debug("is a directory, get index file from server", path);
 			}
 			else {
 				if (path[path.size() - 1] != SLASH)
@@ -228,7 +224,7 @@ void RequestParser::_check_uri(void) {
 		else {
 			if (!location->permit.autoindex) {
 				path = *(location->index.begin());
-				Logger::debug("Index file", path);
+				Logger::debug("is a directory, get index file from location", path);
 			}
 			else {
 				if (path[path.size() - 1] != SLASH)
@@ -240,7 +236,7 @@ void RequestParser::_check_uri(void) {
 		std::ifstream file;
 		file.open(path.c_str());
 		if (file.fail())
-			_invalid_request("File not found", path, http::NOT_FOUND);
+			_invalid_request("Path not found", path, http::NOT_FOUND);
 		file.close();
 	}
 

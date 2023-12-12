@@ -157,6 +157,7 @@ void	WebServ::_create_connection(int server_fd) {
 	socklen_t	addrlen;
 	struct		pollfd a;
 	int			newfd;
+	std::string	error_str;
 
 	addrlen = sizeof remoteaddr;
 	newfd = accept(server_fd, (struct sockaddr *)&remoteaddr, &addrlen);
@@ -221,6 +222,7 @@ void WebServ::_respond(Request* request) {
 	Response response = responseBuilder(request);
 
 	response.sendResponse();
+	Logger::info("Response sent");
 }
 
 void WebServ::clean(void) {
@@ -257,12 +259,13 @@ void WebServ::_end_connection(int fd) {
 
 	--this->_total_fds;
 	close(fd);
-	Logger::debug("Close connection on socket", fd);
+	Logger::info("Close connection on socket", fd);
 }
 
 void WebServ::restart_socket_servers(void) {
 	t_server_iterator it, end = this->_servers.end();
 
+	Logger::info("Restarting servers");
 	for (it = this->_servers.begin(); it != end; ++it)
 		it->second->configSocket(it->second->getPort());
 }

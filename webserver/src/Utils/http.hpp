@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:13:58 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/10 13:30:30 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 20:26:42 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ namespace http {
 		METHOD_NOT_ALLOWED = 405,
 		NOT_ACCEPTABLE = 406,
 		REQUEST_TIMEOUT = 408,
-		CONFLICT = 409,  // checar se vamos usar
+		CONFLICT = 409,
 		LENGTH_REQUIRED = 411,
 		CONTENT_TOO_LARGE = 413,
 		URI_TOO_LONG = 414,

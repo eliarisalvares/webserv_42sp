@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 00:44:35 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/09 13:41:26 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:56:48 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define UTILS_HPP
 
 # include <string>
-# include <unistd.h> // close()
+# include <exception>
 
 namespace utils {
 
