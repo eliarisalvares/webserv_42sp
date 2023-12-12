@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestBuilder.hpp                                   :+:      :+:    :+:   */
+/*   RequestBuilder.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 22:16:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/11/06 22:30:45 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 16:57:31 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,7 @@ public:
 	void			parse(void);
 	Request*		build(void);
 
-
-	// getters
+	/* getters */
 	bool			is_ready(void) const;
 	int				getServerFd(void) const;
 	Server*			getServer(void) const;
@@ -48,10 +47,10 @@ private:
 
 	int				_fd;
 	bool			_ready;
-	Server*			_server; // talvez não seja necessário
+	Server*			_server;
 	Request*		_request;
 
-	// parse data
+	/* parse data */
 	size_t			_bytes_readed;
 	char*			_buffer;
 	RequestParser	_parser;

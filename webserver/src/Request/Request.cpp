@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:30:54 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 22:08:12 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 17:01:09 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ Request::Request(void):
 	_has_image(false) {
 		_post_data.clear();
 	}
-
 
 Request::Request(int fd, Server* server):
 	_server(server),
@@ -79,6 +78,7 @@ void Request::printPostData(void) const {
 	for (it = _post_data.begin(); it != end; ++it)
 		Logger::debug(it->first, it->second);
 }
+
 
 /********************************** GETTERS **********************************/
 
@@ -176,7 +176,6 @@ void Request::setHost(std::string const host) {
 	this->_host = host;
 }
 
-
 void Request::setError(bool has_error) {
 	this->_error = has_error;
 }
@@ -184,7 +183,6 @@ void Request::setError(bool has_error) {
 void Request::setContentLength(size_t length) {
 	this->_content_length = length;
 }
-
 
 void Request::setHasImage(bool has_image) {
 	this->_has_image = has_image;

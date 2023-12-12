@@ -10,7 +10,6 @@
 
 // for server logic
 # include <poll.h>
-// # include <netdb.h>
 # include <unistd.h> // close()
 
 # include "Server.hpp"
@@ -44,7 +43,7 @@ public:
 	void	init(void);
 	void	run(void);
 	void	stop(void);
-	void	clean(void); //check if still needed
+	void	clean(void);
 	void	restart_socket_servers(void);
 	bool	checkPort(int port);
 	class ServerPortAlreadySetted : public std::exception {
