@@ -10,7 +10,7 @@ def generate_directory_listing(dir_path):
     print("<title>Directory Listing</title>")
     print("</head>")
     print("<body>")
-    print("<h1>Directory Listing of {}</h1>".format(dir_path))
+    print("<h1>Directory Listing of /{}</h1>".format(dir_path.split('/')[-1]))
     print("<ul>")
 
     try:
@@ -26,7 +26,5 @@ def generate_directory_listing(dir_path):
     print("</body>")
     print("</html>")
 
-path_translated = os.environ.get("PATH_TRANSLATED", None)
-path_directory = path_translated[:path_translated.rfind('/')]
-directory_to_list = path_directory if path_directory else os.getcwd()
+directory_to_list = os.getcwd()
 generate_directory_listing(directory_to_list)
