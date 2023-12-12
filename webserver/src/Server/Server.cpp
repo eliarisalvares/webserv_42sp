@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:31:39 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/11 18:48:20 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/12 19:53:37 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	Server::setBasics() {
 	setBodySize(CLIENT_MAX_BODY_SIZE);
 	setRoot(ROOT);
 	setCGI(true);
-	addErrorPages(std::pair<int, std::string>(404, "404.html"));
+	_error_pages.clear();
 	_locations.clear();
 	_permit = permit;
 	setUpPath(DEFAULT_UPLOAD);
