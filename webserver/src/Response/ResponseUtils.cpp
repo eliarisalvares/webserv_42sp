@@ -26,18 +26,17 @@ static const std::map<std::string, std::string> contentTypeMap = initializeConte
  * @return std::string the content type of the file.
  */
 std::string getContentType(const std::string& filePath) {
-	// TODO: ver a melhor forma de tratar o erro; isso é só paleativo, mas ainda
-	// não resolve a questão; talvez a tratativa dos outros pontos vai influenciar aqui
-	try {
-    	std::string extension = filePath.substr(filePath.find_last_of('.'));
-    	std::map<std::string, std::string>::const_iterator it = contentTypeMap.find(extension);
-		if (it == contentTypeMap.end())
-			return "text/plain";
-    	return it->second;
-	} catch (std::exception& e) {
-		Logger::warning("Deu pau aqui");
-	}
-	return "text/plain";
+	size_t point_position;
+
+	point_position = filePath.find_last_of('.');
+	if (point_position == std::string::npos)
+		return "text/plain";
+
+	std::string extension = filePath.substr(point_position);
+	std::map<std::string, std::string>::const_iterator it = contentTypeMap.find(extension);
+	if (it == contentTypeMap.end())
+		return "text/plain";
+	return it->second;
 }
 
 /**
