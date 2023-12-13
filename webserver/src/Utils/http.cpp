@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: elraira- <elraira-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 21:14:50 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/11 22:25:42 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/14 00:08:39 by elraira-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,10 +215,7 @@ const char* InvalidRequest::what() const throw() {
 		case HTTP_VERSION_NOT_SUPPORTED:
 			return "505 HTTP Version Not Supported";
 		default:
-			return (
-				std::string("Unknown error code: ")
-				+ ftstring::itostr(int(_error))
-			).c_str();
+			return "Unknown error code";
   }
 }
 

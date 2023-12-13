@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   server_builder.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: feralves <feralves@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: elraira- <elraira-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/10 11:17:54 by feralves          #+#    #+#             */
-/*   Updated: 2023/12/11 18:46:06 by feralves         ###   ########.fr       */
+/*   Updated: 2023/12/14 00:05:05 by elraira-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_builder.hpp"
 
 int	obtainPort(std::vector<std::string> input, int index) {
-	int		port;
+	int		port = -1;
 
 	if (input[index].substr(0, 7) == "listen ") {
 		port = ftstring::strtoi(input[index].substr(7));
@@ -27,7 +27,7 @@ int	obtainPort(std::vector<std::string> input, int index) {
 }
 
 int	obtainBodySize(std::vector<std::string> input, int index) {
-	int							bodySize;
+	int							bodySize = CLIENT_MAX_BODY_SIZE;
 	std::string					bodySizeString;
 	std::vector<std::string>	words;
 
@@ -54,7 +54,7 @@ int	obtainBodySize(std::vector<std::string> input, int index) {
 }
 
 int	obtainBufferSize(std::vector<std::string> input, int index) {
-	int							bufferSize;
+	int							bufferSize = BUFFSIZE;
 
 	if (input[index].substr(0, 12) == "buffer_size ") {
 		bufferSize = ftstring::strtoi(input[index].substr(12));
