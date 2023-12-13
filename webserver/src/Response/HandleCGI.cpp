@@ -79,29 +79,31 @@ std::string handleCGI(Request* request) {
     int pipefd[2];
     pid_t pid;
     std::string filePath = request->path();
+    request->setStatusCode(http::OK);
 
     if (pipe(pipefd) == -1) {
-        throw std::runtime_error("pipe failed: " + std::string(strerror(errno)));
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     }
 
     pid = fork();
     if (pid < 0) {
-        throw std::runtime_error("fork failed: " + std::string(strerror(errno)));
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     }
 
-    if (pid == 0) {
+    if (pid == 0) { // Child process
         char **envp = setEnvironment(request);
 
         std::string cgiDir =  "content/cgi";
         filePath = filePath.substr(cgiDir.length(), filePath.length() - cgiDir.length());
         filePath = filePath.substr(1, filePath.length() - 1);
         if (chdir(cgiDir.c_str()) == -1) {
-            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+            request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+
         }
 
         close(pipefd[0]);
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
-            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+            request->setStatusCode(http::INTERNAL_SERVER_ERROR);
         }
 
         char *const argv[] = {
@@ -111,9 +113,8 @@ std::string handleCGI(Request* request) {
         };
 
         if (execve("/usr/bin/python3", argv, envp) == -1)
-            perror("execve failed");
+            request->setStatusCode(http::INTERNAL_SERVER_ERROR);
 
-        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
         exit(EXIT_FAILURE);
     } else {
         close(pipefd[1]);
@@ -133,7 +134,7 @@ std::string handleCGI(Request* request) {
         waitpid(pid, &status, 0); // Wait for child process to finish
 
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+            request->setStatusCode(http::INTERNAL_SERVER_ERROR);
         }
 
         std::string contentType = "text/html";
@@ -141,9 +142,12 @@ std::string handleCGI(Request* request) {
         std::stringstream ss;
         ss << result.length();
         std::string contentLength = ss.str();
-        Response response(request->fd(), 200);
-        response.setMessage(getStatusMessage(200));
-        response.setBody(result);
+        Response response(request->fd(), request->status_code());
+        response.setMessage(getStatusMessage(request->status_code()));
+        if (request->status_code() == http::INTERNAL_SERVER_ERROR)
+            response.setBody(getHtmlContent("content/error_pages/500.html", request));
+        else
+            response.setBody(result);
         setResponseHeaders(response, flagsContent, contentLength, request);
         response.sendResponse();
         return result;

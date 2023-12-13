@@ -16,7 +16,7 @@ std::string getDefaultFilePath(std::string directoryPath, Request* request) {
     std::string directoryListing = getDirectoryListing(folderPath, request);
     std::ofstream file(wholePath.c_str());
     if (!file.is_open())
-        throw std::runtime_error("Could not open file: " + wholePath);
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     file << directoryListing;
     file.close();
     return wholePath;
@@ -30,13 +30,13 @@ std::string getResponseBody(const std::string& filePath, const std::string& cont
     if (filePath.find(".py") != std::string::npos) {
         return handleCGI(request);
     } else if (contentType == "text/html") {
-        return getHtmlContent(filePath);
+        return getHtmlContent(filePath, request);
     } else if (filePath.find(".json") != std::string::npos) {
-        return getJsonContent();
+        return getJsonContent(request);
     }
     std::ifstream file(filePath.c_str());
     if (!file.is_open())
-        return "";
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     std::stringstream buffer;
     buffer << file.rdbuf();
     file.close();
@@ -83,6 +83,9 @@ Response handleGetRequest(Request* request) {
 
     Response response(request->fd(), statusCode);
     response.setMessage(message);
+    if (statusCode == http::INTERNAL_SERVER_ERROR) {
+        body = getHtmlContent("content/error_pages/500.html", request);
+    }
     response.setBody(body);
 
     std::stringstream ss;
