@@ -127,7 +127,7 @@ Response handlePostRequest(Request* request) {
 	http::MediaType media_type = request->media_type();
 	std::string body, filePath, contentType, message;
 
-	if (media_type == http::MULTIPART_FORM_DATA) // é a imagem
+	if (media_type == http::IMAGE_PNG || media_type == http::IMAGE_JPEG)
         return processFileUpload(request);
 	else if (media_type == http::TEXT_PLAIN)
         return processTextUpload(request);
