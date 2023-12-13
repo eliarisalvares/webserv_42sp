@@ -14,7 +14,7 @@ char** setEnvironment(Request* request) {
     ss << content_length;
     std::string content_length_str = ss.str();
 
-    std::string path_info = "PATH_INFO=" + request->uri();
+    std::string path_info = "PATH_INFO=" + request->path();
     std::string path_translated = "PATH_TRANSLATED=" + server->getRoot() + request->uri();
     std::string script_name = "SCRIPT_NAME=" +  request->uri().substr(request->uri().find_last_of("/") + 1, request->uri().length());
     std::string server_name = "SERVER_NAME=" + server->getName(0);
