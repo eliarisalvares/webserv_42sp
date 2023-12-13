@@ -12,8 +12,6 @@ def check(URL):
 	assert response.status_code == 200
 	assert "main" in response.text
 	response = integration.get(URL + "location/index.html")
-	# assert response.status_code == 200
-	# assert "location" in response.text
 
 check(URL_1)
 check(URL_2)
