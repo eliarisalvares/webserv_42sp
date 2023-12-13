@@ -153,9 +153,10 @@ Response handleCGI(Request* request) {
             request->setStatusCode(http::INTERNAL_SERVER_ERROR);
             return CGIErrorHandler(request);
         } else if (ret == 0) {
-            kill(pid, SIGKILL);
             request->setStatusCode(http::REQUEST_TIMEOUT);
-            return CGIErrorHandler(request);
+            CGIErrorHandler(request);
+            kill(pid, SIGKILL);
+            return response;
         }
 
         while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {

@@ -26,6 +26,7 @@ RequestParser::RequestParser(void): _step(INIT) {
 	_has_content_type = false;
 	_boundary_size = 0;
 	_media_type = http::NONE;
+	_multipart_type = http::NONE;
 	_multipart_step = INITIAL_BOUNDARY;
 	_multipart_content_crfl = false;
 }
@@ -41,6 +42,7 @@ RequestParser::RequestParser(Request* request): _step(INIT), _request(request) {
 	_has_content_type = false;
 	_boundary_size = 0;
 	_media_type = http::NONE;
+	_multipart_type = http::NONE;
 	_multipart_step = INITIAL_BOUNDARY;
 	_multipart_content_crfl = false;
 }
