@@ -128,7 +128,7 @@ void RequestParser::_check_uri(void) {
 	int i, location_pos = -1, locations_size = locations->size();
 	bool use_server_config = true;
 	std::string path, location_str;
-	t_location *location;
+	t_location *location = NULL;
 	location_str.clear();
 	path.clear();
 	path.push_back(*it);
