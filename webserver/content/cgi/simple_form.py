@@ -78,7 +78,7 @@ else:
                 file.write(f"\n{name},{email}")
                 file.close()
         else:
-            print("<p>Infelizmente não recebemos os dados :(</p>")
+            print("<p>Infelizmente não recebemos os dados que precisávamos :(</p>")
 
         print("<div id='content'>")
         print("    <p>Would you like to go back to the <a href='/' style='color:#777777FF;'>homepage</a>?</p>")
