@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:24:26 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 18:27:50 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/12 21:58:50 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void RequestParser::parse_body(void) {
 		_parse_form_data();
 	else if (_multipart_type == http::FORM_URLENCODED)
 		_parse_form_data();
-	if (_media_type == http::TEXT_PLAIN) {
+	if (_media_type == http::TEXT_PLAIN || _multipart_type == http::TEXT_PLAIN) {
 		_body_iterator = _body.begin();
 		_body_iterator_end = _body.end();
 
@@ -409,6 +409,7 @@ void RequestParser::_check_data_content_type(char c) {
 	while (_multipart_tmp[i] == SP)
 		i++;
 	_multipart_tmp = _multipart_tmp.substr(i, _multipart_tmp.size() - i);
+	_request->setMediaType(http::str_to_enum_media_type(_multipart_tmp));
 	_multipart_tmp.clear();
 }
 
@@ -425,6 +426,9 @@ void RequestParser::_remove_boundary(void) {
 	if (_body.size()) {
 		_request->setHasImage(true);
 		_request->setImage(&_body);
-		_request->setImageType("png");
+		if (_multipart_type == http::IMAGE_PNG)
+			_request->setImageType("png");
+		else
+			_request->setImageType("jpg");
 	}
 }
