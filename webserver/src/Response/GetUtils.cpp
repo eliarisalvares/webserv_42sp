@@ -19,7 +19,7 @@ std::string getDirectoryListing(const std::string& folderPath, Request* request)
         }
         closedir (dir);
     } else {
-        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     }
     directoryListing += "</pre><hr></body></html>";
     return directoryListing;
@@ -31,7 +31,7 @@ std::string getDirectoryListing(const std::string& folderPath, Request* request)
  *
  * @return std::string the directory listing as a json string.
  */
-std::string getJsonContent() {
+std::string getJsonContent(Request* request) {
     DIR *dir;
     struct dirent *ent;
     std::string directoryListing = "{\n \"files\": [\n";
@@ -41,14 +41,14 @@ std::string getJsonContent() {
         }
         closedir (dir);
     } else {
-        throw std::runtime_error("Could not open directory: content/upload");
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     }
     directoryListing = directoryListing.substr(0, directoryListing.size() - 2);
     directoryListing += "]\n}";
     std::string jsonPath = "content/upload/listing.json";
     std::ofstream file(jsonPath.c_str());
     if (!file.is_open())
-        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     file << directoryListing;
     file.close();
     return directoryListing;
@@ -61,10 +61,10 @@ std::string getJsonContent() {
  * @param filePath path to the file.
  * @return std::string the content of the file.
  */
-std::string getHtmlContent(const std::string& filePath) {
+std::string getHtmlContent(const std::string& filePath, Request* request) {
     std::ifstream file(filePath.c_str());
     if (!file.is_open())
-        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
+        request->setStatusCode(http::INTERNAL_SERVER_ERROR);
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
