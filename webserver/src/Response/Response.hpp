@@ -20,6 +20,7 @@ Response Class
 # include <unistd.h> /* fork, execve, pipe, dup2, close */
 # include <sys/wait.h> /* waitpid */
 # include <errno.h> /* errno */
+# include <poll.h> /* poll */
 
 # include "Server.hpp"
 # include "Request.hpp"
@@ -84,7 +85,9 @@ std::string getJsonContent(Request* request);
 std::string getDirectoryListing(const std::string& directoryPath, Request* request);
 std::string getHtmlContent(const std::string& filePath, Request* request);
 
-std::string handleCGI(Request* request);
+Response handleCGI(Request* request);
+Response CGIErrorHandler(Request* request);
+
 std::string getContentType(const std::string& filePath);
 std::string getStatusMessage(int statusCode);
 std::string getCurrentDate(void);
