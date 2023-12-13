@@ -36,7 +36,6 @@ void setResponseHeaders(Response& response, const std::string& contentType, cons
     response.addHeader("Access-Control-Allow-Credentials", "true");
 }
 
-
 /**
  * @brief Checks the requested method and calls the appropriate
  * handler function for it.

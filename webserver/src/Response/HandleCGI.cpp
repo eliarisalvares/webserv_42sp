@@ -96,12 +96,12 @@ std::string handleCGI(Request* request) {
         filePath = filePath.substr(cgiDir.length(), filePath.length() - cgiDir.length());
         filePath = filePath.substr(1, filePath.length() - 1);
         if (chdir(cgiDir.c_str()) == -1) {
-            throw std::runtime_error("chdir failed: " + std::string(strerror(errno)));
+            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
         }
 
         close(pipefd[0]);
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
-            throw std::runtime_error("dup2 failed: " + std::string(strerror(errno)));
+            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
         }
 
         char *const argv[] = {
@@ -113,7 +113,7 @@ std::string handleCGI(Request* request) {
         if (execve("/usr/bin/python3", argv, envp) == -1)
             perror("execve failed");
 
-        std::cerr << "execve failed: " << strerror(errno) << std::endl;
+        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
         exit(EXIT_FAILURE);
     } else {
         close(pipefd[1]);
@@ -133,7 +133,7 @@ std::string handleCGI(Request* request) {
         waitpid(pid, &status, 0); // Wait for child process to finish
 
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-            throw std::runtime_error("CGI script execution failed");
+            http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
         }
 
         std::string contentType = "text/html";
