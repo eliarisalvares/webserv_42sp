@@ -19,7 +19,7 @@ std::string getDirectoryListing(const std::string& folderPath, Request* request)
         }
         closedir (dir);
     } else {
-        throw std::runtime_error("Could not open directory: " + folderPath);
+        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
     }
     directoryListing += "</pre><hr></body></html>";
     return directoryListing;
@@ -48,7 +48,7 @@ std::string getJsonContent() {
     std::string jsonPath = "content/upload/listing.json";
     std::ofstream file(jsonPath.c_str());
     if (!file.is_open())
-        throw std::runtime_error("Could not open file: " + jsonPath);
+        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
     file << directoryListing;
     file.close();
     return directoryListing;
@@ -64,7 +64,7 @@ std::string getJsonContent() {
 std::string getHtmlContent(const std::string& filePath) {
     std::ifstream file(filePath.c_str());
     if (!file.is_open())
-        throw std::runtime_error("Could not open file: " + filePath);
+        http::InvalidRequest(http::INTERNAL_SERVER_ERROR);
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
