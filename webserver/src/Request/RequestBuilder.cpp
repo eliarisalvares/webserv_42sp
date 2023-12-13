@@ -159,7 +159,7 @@ void RequestBuilder::parse(void) {
 Request* RequestBuilder::build(void) {
 	if (!_request->has_error())
 		Logger::info("Request parsed and created successfully.");
-	if (_request->method() == http::POST)
+	if (_request->method() == http::POST && !_request->has_error())
 		_parser.parse_body();
 	this->_ready = false;
 	return _request;
