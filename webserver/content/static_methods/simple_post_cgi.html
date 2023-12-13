@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POST com CGI</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,900" rel="stylesheet">
+    <style>
+        body {
+            background-color: #333333FF;
+            font-family: Montserrat;
+            color: #9435d3; /* Cute purple color */
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 4rem;
+        }
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: normal;
+            color: rgb(255, 255, 255);
+            font-size: 1.2rem;
+        }
+        h3 {
+            margin: 0 0 20px 0;
+            font-size: 2.5rem;
+            color: #777777FF;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            align-items: center;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        li {
+            margin-bottom: 1rem;
+            align-items: center;
+            display: flex;
+            font-size: 1.5rem;
+        }
+        li::before {
+            content: '★'; 
+            color: yellow;
+            margin-right: 10px;
+        }
+        button {
+            margin-left: 1rem;
+            background-color: rgb(155, 91, 155);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #7e57c2;
+        }
+        #content {
+            background-color: #CCCCCCFF;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+}
+    </style>
+    <title>Simple CGI Form</title>
+</head>
+<body>
+    <h1>Simple CGI Post Request</h1>
+    <form action="../cgi/simple_form.py" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email"><br><br>
+        <input type="submit" value="Enviar">
+    </form>
+
+    <div id="content">
+        <p>Would you like to go back to the <a href="/" style="color:#777777FF;">homepage</a>?</p>
+        <p>------------------------------------------------</p>
+        <p>Você gostaria de voltar para o <a href="/" style="color:#777777FF;">início</a>?</p>
+    </div>
+</body>
+</html>

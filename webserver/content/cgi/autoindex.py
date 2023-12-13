@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
+
+
+base_dir = Path(__file__).resolve().parent.parent
+not_allowed_page_path = base_dir / "error_pages" / "405.html"
 
 def generate_directory_listing(dir_path):
     print("<!DOCTYPE html>")
@@ -26,5 +31,10 @@ def generate_directory_listing(dir_path):
     print("</body>")
     print("</html>")
 
-directory_to_list = os.getcwd()
-generate_directory_listing(directory_to_list)
+
+if (os.environ.get("REQUEST_METHOD", None) != "GET"):
+    with open(not_allowed_page_path, "r") as f:
+        print(f.read())
+else:
+    directory_to_list = os.getcwd()
+    generate_directory_listing(directory_to_list)

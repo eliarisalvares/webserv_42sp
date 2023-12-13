@@ -192,12 +192,12 @@
 
         window.onload = function () {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", `http://localhost:${location.port}/database/characters.html`, true);
+            xhr.open("GET", `http://localhost:${location.port}/database/characters.csv`, true);
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     var container = document.querySelector('.container');
                     var responseHTML = xhr.responseText;
-                    var newCards = responseHTML.split('<div class=\'card\'>');
+                    var newCards = responseHTML.split('\n<div class=\'card\'>');
                     newCards.shift();
                     newCards.forEach(function (card) {
                         addNewCard('<div class="card">' + card);
