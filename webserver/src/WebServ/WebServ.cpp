@@ -86,7 +86,6 @@ void	WebServ::run(void) {
 			fd = this->_pfds[i].fd;
 
 			if (this->_pfds[i].revents & POLLIN) {
-				Logger::debug("POLLIN event");
 				if (_is_server_socket(fd)) {
 					Logger::debug("Creating connection...");
 					_create_connection(fd);
