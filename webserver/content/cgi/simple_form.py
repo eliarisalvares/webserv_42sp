@@ -13,7 +13,10 @@ if (os.environ.get("REQUEST_METHOD", None) != "POST"):
     with open(not_allowed_page_path, "r") as f:
         print(f.read())
 
-else: 
+else:
+    if not os.path.exists(database_path):
+        with open(database_path, "w") as file:
+            file.write("")
     os.chmod(database_path, 0o777)
     content = os.environ.get("QUERY_STRING", None)
     if content is None:
