@@ -80,9 +80,9 @@ std::string getDefaultFilePath(std::string directoryPath, Request* request);
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request);
 std::string setFlagsContent(std::string contentType);
 
-std::string getJsonContent();
+std::string getJsonContent(Request* request);
 std::string getDirectoryListing(const std::string& directoryPath, Request* request);
-std::string getHtmlContent(const std::string& filePath);
+std::string getHtmlContent(const std::string& filePath, Request* request);
 
 std::string handleCGI(Request* request);
 std::string getContentType(const std::string& filePath);
