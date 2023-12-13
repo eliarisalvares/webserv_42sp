@@ -1,0 +1,10 @@
+http://localhost:9020
+http://localhost:9020/test
+http://localhost:9020/data
+http://localhost:9020/cgi
+http://localhost:9020/cats
+http://localhost:9020/cats/index.html
+http://localhost:9020/methods/post.html
+http://localhost:9020/methods/delete.html
+http://localhost:9020/webwizards.html
+
