@@ -52,12 +52,3 @@ Response	handleErrorPages(Request* request) {
     return response;
 
 }
-
-Response CGIErrorHandler(Request* request) {
-    Response response(request->fd(), request->status_code());
-	std::string contentType = "text/html";
-    response.setMessage(getStatusMessage(request->status_code()));
-    response.setBody(getHtmlContent("content/error_pages/" + ftstring::itostr(request->status_code()) + ".html", request));
-    response.sendResponse();
-	return response;
-}

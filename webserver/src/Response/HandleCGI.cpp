@@ -1,6 +1,21 @@
 # include "Response.hpp"
 
 /**
+ * @brief Handles the error response for CGI scripts.
+ * 
+ * @param request the request to be handled.
+ * @return Response the response to be sent.
+ */
+Response CGIErrorHandler(Request* request) {
+    Response response(request->fd(), request->status_code());
+	std::string contentType = "text/html";
+    response.setMessage(getStatusMessage(request->status_code()));
+    response.setBody(getHtmlContent("content/error_pages/" + ftstring::itostr(request->status_code()) + ".html", request));
+    response.sendResponse();
+	return response;
+}
+
+/**
  * @brief Set environment variables for CGI script execution.
  * Because we can't use setenv() in C++98, we have to use this workaround
  * to set **envp for execve().
@@ -106,6 +121,7 @@ Response handleCGI(Request* request) {
         close(pipefd[0]);
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
             request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+            return CGIErrorHandler(request);
         }
 
         char *const argv[] = {
@@ -127,7 +143,7 @@ Response handleCGI(Request* request) {
         char buffer[BUFFSIZE];
         ssize_t count;
         struct pollfd fds[1];
-        
+
         fds[0].fd = pipefd[0];
         fds[0].events = POLLIN;
 
