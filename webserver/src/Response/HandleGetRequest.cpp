@@ -28,7 +28,8 @@ std::string getDefaultFilePath(std::string directoryPath, Request* request) {
  */
 std::string getResponseBody(const std::string& filePath, const std::string& contentType, Request* request) {
     if (filePath.find(".py") != std::string::npos) {
-        return handleCGI(request);
+        handleCGI(request);
+        return "";
     } else if (contentType == "text/html") {
         return getHtmlContent(filePath, request);
     } else if (filePath.find(".json") != std::string::npos) {

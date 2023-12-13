@@ -74,7 +74,8 @@ char** setEnvironment(Request* request) {
  *    e. Checks the exit status of the child process.
  *    f. Returns the read output.
  */
-std::string handleCGI(Request* request) {
+Response handleCGI(Request* request) {
+    Response response(request->fd(), request->status_code());
 
     int pipefd[2];
     pid_t pid;
@@ -83,6 +84,7 @@ std::string handleCGI(Request* request) {
 
     if (pipe(pipefd) == -1) {
         request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+        return CGIErrorHandler(request);
     }
 
     pid = fork();
@@ -98,7 +100,7 @@ std::string handleCGI(Request* request) {
         filePath = filePath.substr(1, filePath.length() - 1);
         if (chdir(cgiDir.c_str()) == -1) {
             request->setStatusCode(http::INTERNAL_SERVER_ERROR);
-
+            return CGIErrorHandler(request);
         }
 
         close(pipefd[0]);
@@ -112,8 +114,10 @@ std::string handleCGI(Request* request) {
             NULL
         };
 
-        if (execve("/usr/bin/python3", argv, envp) == -1)
+        if (execve("/usr/bin/python3", argv, envp) == -1) {
             request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+            return CGIErrorHandler(request);
+        }
 
         exit(EXIT_FAILURE);
     } else {
@@ -122,6 +126,21 @@ std::string handleCGI(Request* request) {
         std::string result;
         char buffer[BUFFSIZE];
         ssize_t count;
+        struct pollfd fds[1];
+        
+        fds[0].fd = pipefd[0];
+        fds[0].events = POLLIN;
+
+        int ret = poll(fds, 1, 10000);
+
+        if (ret == -1) {
+            request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+            return CGIErrorHandler(request);
+        } else if (ret == 0) {
+            kill(pid, SIGKILL);
+            request->setStatusCode(http::REQUEST_TIMEOUT);
+            return CGIErrorHandler(request);
+        }
 
         while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
             buffer[count] = '\0';
@@ -135,6 +154,7 @@ std::string handleCGI(Request* request) {
 
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
             request->setStatusCode(http::INTERNAL_SERVER_ERROR);
+            return CGIErrorHandler(request);
         }
 
         std::string contentType = "text/html";
@@ -144,12 +164,9 @@ std::string handleCGI(Request* request) {
         std::string contentLength = ss.str();
         Response response(request->fd(), request->status_code());
         response.setMessage(getStatusMessage(request->status_code()));
-        if (request->status_code() == http::INTERNAL_SERVER_ERROR)
-            response.setBody(getHtmlContent("content/error_pages/500.html", request));
-        else
-            response.setBody(result);
+        response.setBody(result);
         setResponseHeaders(response, flagsContent, contentLength, request);
         response.sendResponse();
-        return result;
+        return response;
     }
 }
