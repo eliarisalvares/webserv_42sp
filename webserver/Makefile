@@ -94,4 +94,7 @@ run:
 val:
 	$(VALGRIND) ./$(NAME) config/testconfig.conf
 
+siege:
+	sudo apt-get install siege -y
+
 .PHONY: all clean fclean re
