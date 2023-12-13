@@ -6,6 +6,7 @@ from pathlib import Path
 
 base_dir = Path(__file__).resolve().parent.parent
 not_allowed_page_path = base_dir / "error_pages" / "405.html"
+internal_error_page_path = base_dir / "error_pages" / "500.html"
 
 def generate_directory_listing(dir_path):
     print("<!DOCTYPE html>")
@@ -36,5 +37,9 @@ if (os.environ.get("REQUEST_METHOD", None) != "GET"):
     with open(not_allowed_page_path, "r") as f:
         print(f.read())
 else:
-    directory_to_list = os.getcwd()
-    generate_directory_listing(directory_to_list)
+    try:
+        directory_to_list = os.getcwd()
+        generate_directory_listing(directory_to_list)
+    except Exception as e:
+        with open(internal_error_page_path, "r") as f:
+            print(f.read())
