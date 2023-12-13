@@ -6,7 +6,7 @@
 /*   By: sguilher <sguilher@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 00:28:10 by sguilher          #+#    #+#             */
-/*   Updated: 2023/12/12 20:29:24 by sguilher         ###   ########.fr       */
+/*   Updated: 2023/12/13 13:00:09 by sguilher         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ void RequestParser::_check_uri(void) {
 	if (locations_size)
 		use_server_config = false;
 
+	Logger::debug("received URI", _uri);
 	bool increment = true, is_first_iteration = true;
 	while (it != end && !http::uri_path_end(*it)) {
 		if (*it == SLASH || (it + 1) == end) {
@@ -192,10 +193,12 @@ void RequestParser::_check_uri(void) {
 	if (is_external_redirection)
 		path = root;
 	else {
-		if (location && location_str.size() > 0)
+		if (location && location_str.size() > 1)
 			path.erase(0, location_str.size());
 		path.insert(path.begin(), root.begin(), root.end());
 	}
+	if (path.size() > 1 && path[0] == SLASH && path[1] == SLASH)
+		path = path.substr(1, path.size() - 1);
 	Logger::debug("Path translated", path);
 
 	if (is_redirect) {
