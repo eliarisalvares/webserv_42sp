@@ -13,7 +13,10 @@ As páginas de erro deverão estar no caminho ``/content/error_pages/``
 
 server {
 	listen 8080						# Porta do servidor
-}```
+}
+```
+
+Outras configurações válidas
 
 ```# Exemplo de arquivo de configuração para servidor HTTP
 
@@ -46,7 +49,8 @@ server {
 		root /var/www/html/autoindex
 		autoindex true			# habilita listagem de diretórios
 	}
-}```
+}
+```
 
 
 
