@@ -4,7 +4,7 @@ Para rodar o projeto, é necessário um arquivo de configuração com a extensã
 
 Seguem algumas configurações:
 
-###Configuration File
+### Configuration File
 
 Os caminhos setados terão que ser existentes e estarão no ``/content``.
 As páginas de erro deverão estar no caminho ``/content/error_pages/``
